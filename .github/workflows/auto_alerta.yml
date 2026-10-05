@@ -12,7 +12,7 @@ jobs:
       - name: Clonar espacio de trabajo limpio
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1 # Fuerza una clonación atómica y superficial sin arrastrar historial corrupto
+          fetch-depth: 1
 
       - name: Inicializar Entorno de Ejecución
         uses: actions/setup-python@v5
@@ -27,13 +27,13 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          python -c '
-          import os, requests
+          cat << 'EOF' > run_final.py
+          import os
+          import requests
           
           t = os.environ.get("TELEGRAM_TOKEN")
           c = os.environ.get("TELEGRAM_CHAT_ID")
           
-          # La URL se construye con concatenación segura de objetos string independientes
           endpoint = "https://telegram.org" + str(t) + "/sendMessage"
           
           payload = {
@@ -47,4 +47,5 @@ jobs:
           
           if response.status_code != 200:
               exit(1)
-          '
+          EOF
+          python run_final.py
