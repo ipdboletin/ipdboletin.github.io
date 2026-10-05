@@ -28,12 +28,12 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           cat << 'EOF' > run_final.py
-          import os, requests
+          import os
+          import requests
           
           t = os.environ.get("TELEGRAM_TOKEN")
           c = os.environ.get("TELEGRAM_CHAT_ID")
           
-          # Corrección de Ingeniería: Endpoint oficial de la API de Telegram con bot soldado
           endpoint = f"https://telegram.org{t}/sendMessage"
           
           payload = {
@@ -49,4 +49,3 @@ jobs:
               exit(1)
           EOF
           python run_final.py
-
