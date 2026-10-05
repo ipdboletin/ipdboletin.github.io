@@ -32,7 +32,9 @@ jobs:
           mensaje_final = f'{titulo}\n\n{cuerpo}\n\n━━━━━━━━━━━━━━━━━━━\n🌐 Sumate a la comunidad y registrá tu mail:\nhttps://github.io'
           
           # Envío directo al canal de Telegram usando las llaves del cofre
-          url = f'https://telegram.org{os.environ[\"TELEGRAM_TOKEN\"]}/sendMessage'
+          token = os.environ["TELEGRAM_TOKEN"]
+          url = f"https://telegram.org{token}/sendMessage"
+
           payload = {'chat_id': os.environ['TELEGRAM_CHAT_ID'], 'text': mensaje_final}
           res = requests.post(url, json=payload)
           
