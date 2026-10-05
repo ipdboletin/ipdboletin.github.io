@@ -2,54 +2,49 @@ name: Escáner Automático IPD
 
 on:
   schedule:
-    - cron: '15 8 * * 1-5' # De Lunes a Viernes a las 05:15 AM de Argentina
-  workflow_dispatch: # Botón manual
+    - cron: '15 8 * * 1-5'
+  workflow_dispatch:
 
 jobs:
   procesar_boletin:
     runs-on: ubuntu-latest
     steps:
-      - name: Clonar código
+      - name: Clonar espacio de trabajo limpio
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1 # Fuerza una clonación atómica y superficial sin arrastrar historial corrupto
 
-      - name: Instalar Python
+      - name: Inicializar Entorno de Ejecución
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Instalar Librerías de Red
+      - name: Desplegar Dependencias de Red
         run: pip install requests
 
-      - name: Ejecutar motor de Alerta
+      - name: Ejecución del Despacho Autónomo
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          cat << 'EOF' > run_bot.py
-          import os
-          import requests
-
-          token = os.environ.get("TELEGRAM_TOKEN")
-          chat_id = os.environ.get("TELEGRAM_CHAT_ID")
-
-          titulo = '📢 IPD: Alerta Temprana del Bolsillo Popular'
-          cuerpo = (
-              "🔍 EN CRIOLLO: El motor autónomo de la trinchera está oficialmente en marcha.\n"
-              "⚠️ CÓMO TE AFECTA: Monitoreo activado al 100% en internet. Vos descansás y la máquina labura por la patria.\n"
-              "📝 LA LETRA CHICA: Código limpio ejecutado desde servidores libres de candados corporativos."
-          )
-
-          mensaje_final = f"{titulo}\n\n{cuerpo}\n\n━━━━━━━━━━━━━━━━━━━\n🌐 Sumate a la comunidad y registrá tu mail:\nhttps://github.io"
-
-          url = f"https://telegram.org{token}/sendMessage"
-          payload = {"chat_id": chat_id, "text": mensaje_final}
-
-          res = requests.post(url, json=payload)
-          print(f"Respuesta de Telegram: {res.status_code}")
-          print(f"Texto recibido: {res.text}")
-
-          if res.status_code != 200:
-              raise Exception(f"Falla en el caño: {res.text}")
-          EOF
-          python run_bot.py
-
+          python -c '
+          import os, requests
+          
+          t = os.environ.get("TELEGRAM_TOKEN")
+          c = os.environ.get("TELEGRAM_CHAT_ID")
+          
+          # La URL se construye con concatenación segura de objetos string independientes
+          endpoint = "https://telegram.org" + str(t) + "/sendMessage"
+          
+          payload = {
+              "chat_id": str(c),
+              "text": "📢 IPD: Alerta Temprana del Bolsillo Popular\n\n🔍 EN CRIOLLO: El motor autónomo de la trinchera está oficialmente en marcha.\n⚠️ CÓMO TE AFECTA: Monitoreo activado al 100% en internet. Vos descansás y la máquina labura por la patria.\n📝 LA LETRA CHICA: Código limpio ejecutado desde servidores libres de candados corporativos.\n\n━━━━━━━━━━━━━━━━━━━\n🌐 Sumate a la comunidad y registrá tu mail:\nhttps://github.io"
+          }
+          
+          response = requests.post(endpoint, json=payload)
+          print(f"HTTP Status: {response.status_code}")
+          print(f"API Response: {response.text}")
+          
+          if response.status_code != 200:
+              exit(1)
+          '
