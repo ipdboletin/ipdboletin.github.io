@@ -2,7 +2,7 @@ name: Escáner Automático IPD
 
 on:
   schedule:
-    - cron: '15 8 * * 1-5' # Se ejecuta de Lunes a Viernes a las 05:15 AM de Argentina (08:15 UTC)
+    - cron: '15 8 * * 1-5' # De Lunes a Viernes a las 05:15 AM de Argentina (08:15 UTC)
   workflow_dispatch: # El botón mágico para forzar la prueba a mano cuando queramos
 
 jobs:
@@ -15,7 +15,10 @@ jobs:
       - name: Instalar Python
         uses: actions/setup-python@v5
         with:
-          python-packages: 'requests'
+          python-version: '3.11' # Fuerza el uso de una versión de Python moderna y estable
+
+      - name: Instalar Librerías de Red
+        run: pip install requests # Instala el caño de envíos de forma nativa e infalible
 
       - name: Ejecutar motor de Alerta
         env:
@@ -45,3 +48,4 @@ jobs:
           else:
               print('Falla en los caños:', res.text)
           "
+
