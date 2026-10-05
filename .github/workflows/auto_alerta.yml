@@ -3,7 +3,7 @@ name: Escáner Automático IPD
 on:
   schedule:
     - cron: '15 8 * * 1-5' # De Lunes a Viernes a las 05:15 AM de Argentina (08:15 UTC)
-  workflow_dispatch: # Botón para forzar la prueba a mano
+  workflow_dispatch: # Botón mágico para forzar la prueba manual
 
 jobs:
   procesar_boletin:
