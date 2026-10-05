@@ -2,7 +2,7 @@ name: Escáner Automático IPD
 
 on:
   schedule:
-    - cron: '15 8 * * 1-5' # De Lunes a Viernes a las 05:15 AM de Argentina (08:15 UTC)
+    - cron: '15 8 * * 1-5' # Se ejecuta de Lunes a Viernes a las 05:15 AM de Argentina (08:15 UTC)
   workflow_dispatch: # El botón mágico para forzar la prueba a mano cuando queramos
 
 jobs:
@@ -31,15 +31,17 @@ jobs:
           
           mensaje_final = f'{titulo}\n\n{cuerpo}\n\n━━━━━━━━━━━━━━━━━━━\n🌐 Sumate a la comunidad y registrá tu mail:\nhttps://github.io'
           
-          # Envío directo al canal de Telegram usando las llaves del cofre
-          token = os.environ["TELEGRAM_TOKEN"]
-          url = f"https://telegram.org{token}/sendMessage"
-
-          payload = {'chat_id': os.environ['TELEGRAM_CHAT_ID'], 'text': mensaje_final}
+          # Extracción limpia de llaves sin interferencia de censura
+          token = os.environ[\"TELEGRAM_TOKEN\"]
+          chat_id = os.environ[\"TELEGRAM_CHAT_ID\"]
+          url = f\"https://telegram.org{token}/sendMessage\"
+          
+          # Despacho directo al canal
+          payload = {'chat_id': chat_id, 'text': mensaje_final}
           res = requests.post(url, json=payload)
           
           if res.status_code == 200:
               print('¡Alerta despachada con éxito en piloto automático!')
           else:
-              print('Falla en la cañería:', res.text)
+              print('Falla en los caños:', res.text)
           "
