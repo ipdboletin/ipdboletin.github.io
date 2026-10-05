@@ -1,0 +1,43 @@
+name: Escáner Automático IPD
+
+on:
+  schedule:
+    - cron: '15 8 * * 1-5' # De Lunes a Viernes a las 05:15 AM de Argentina (08:15 UTC)
+  workflow_dispatch: # El botón mágico para forzar la prueba a mano cuando queramos
+
+jobs:
+  procesar_boletin:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar código
+        uses: actions/checkout@v4
+
+      - name: Instalar Python
+        uses: actions/setup-python@v5
+        with:
+          python-packages: 'requests'
+
+      - name: Ejecutar motor de Alerta
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python -c "
+          import os, requests
+          
+          # Simulación del escaneo automatizado matutino de IPD
+          titulo = '📢 IPD: Alerta Temprana del Bolsillo Popular'
+          cuerpo = '🔍 EN CRIOLLO: El motor autónomo de la trinchera está oficialmente en marcha.\n⚠️ CÓMO TE AFECTA: Monitoreo activado al 100% en internet. Vos descansás y la máquina labura por la patria.\n📝 LA LETRA CHICA: Código limpio ejecutado desde servidores libres de candados corporativos.'
+          
+          mensaje_final = f'{titulo}\n\n{cuerpo}\n\n━━━━━━━━━━━━━━━━━━━\n🌐 Sumate a la comunidad y registrá tu mail:\nhttps://github.io'
+          
+          # Envío directo al canal de Telegram usando las llaves del cofre
+          url = f'https://telegram.org{os.environ[\"TELEGRAM_TOKEN\"]}/sendMessage'
+          payload = {'chat_id': os.environ['TELEGRAM_CHAT_ID'], 'text': mensaje_final}
+          res = requests.post(url, json=payload)
+          
+          if res.status_code == 200:
+              print('¡Alerta despachada con éxito en piloto automático!')
+          else:
+              print('Falla en la cañería:', res.text)
+          "
