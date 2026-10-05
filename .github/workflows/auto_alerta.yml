@@ -3,7 +3,7 @@ name: Escáner Automático IPD
 on:
   schedule:
     - cron: '15 8 * * 1-5' # De Lunes a Viernes a las 05:15 AM de Argentina (08:15 UTC)
-  workflow_dispatch: # El botón mágico para forzar la prueba a mano cuando queramos
+  workflow_dispatch: # Botón para forzar la prueba a mano
 
 jobs:
   procesar_boletin:
@@ -15,37 +15,13 @@ jobs:
       - name: Instalar Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11' # Fuerza el uso de una versión de Python moderna y estable
+          python-version: '3.11'
 
       - name: Instalar Librerías de Red
-        run: pip install requests # Instala el caño de envíos de forma nativa e infalible
+        run: pip install requests
 
       - name: Ejecutar motor de Alerta
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: |
-          python -c "
-          import os, requests
-          
-          # Simulación del escaneo automatizado matutino de IPD
-          titulo = '📢 IPD: Alerta Temprana del Bolsillo Popular'
-          cuerpo = '🔍 EN CRIOLLO: El motor autónomo de la trinchera está oficialmente en marcha.\n⚠️ CÓMO TE AFECTA: Monitoreo activado al 100% en internet. Vos descansás y la máquina labura por la patria.\n📝 LA LETRA CHICA: Código limpio ejecutado desde servidores libres de candados corporativos.'
-          
-          mensaje_final = f'{titulo}\n\n{cuerpo}\n\n━━━━━━━━━━━━━━━━━━━\n🌐 Sumate a la comunidad y registrá tu mail:\nhttps://github.io'
-          
-          # Extracción limpia de llaves sin interferencia de censura
-          token = os.environ[\"TELEGRAM_TOKEN\"]
-          chat_id = os.environ[\"TELEGRAM_CHAT_ID\"]
-          url = f\"https://telegram.org{token}/sendMessage\"
-          
-          # Despacho directo al canal
-          payload = {'chat_id': chat_id, 'text': mensaje_final}
-          res = requests.post(url, json=payload)
-          
-          if res.status_code == 200:
-              print('¡Alerta despachada con éxito en piloto automático!')
-          else:
-              print('Falla en los caños:', res.text)
-          "
-
+        run: python script.py
