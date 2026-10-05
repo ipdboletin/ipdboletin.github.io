@@ -1,11 +1,11 @@
 import os
 import requests
 
-# 1. Recuperar los secretos
+# 1. Extraer los datos seguros de la caja fuerte de GitHub de forma limpia
 token = os.environ.get("TELEGRAM_TOKEN")
 chat_id = os.environ.get("TELEGRAM_CHAT_ID")
 
-# 2. Alerta Oficial de IPD
+# 2. Estructura Oficial del Reporte IPD
 titulo = '📢 IPD: Alerta Temprana del Bolsillo Popular'
 cuerpo = (
     "🔍 EN CRIOLLO: El motor autónomo de la trinchera está oficialmente en marcha.\n"
@@ -15,17 +15,13 @@ cuerpo = (
 
 mensaje_final = f"{titulo}\n\n{cuerpo}\n\n━━━━━━━━━━━━━━━━━━━\n🌐 Sumate a la comunidad y registrá tu mail:\nhttps://github.io"
 
-# 3. Envío directo
+# 3. Cañería hacia la API oficial de Telegram
 url = f"https://telegram.org{token}/sendMessage"
 payload = {"chat_id": chat_id, "text": mensaje_final}
 
 res = requests.post(url, json=payload)
 
-# Imprime el resultado real para auditar en pantalla
-print(f"Respuesta del servidor de Telegram: {res.status_code}")
-print(f"Detalle del error: {res.text}")
-
 if res.status_code == 200:
-    print("¡Alerta despachada con éxito!")
+    print("¡Alerta despachada con éxito en piloto automático!")
 else:
-    raise Exception(f"Error en el despacho: {res.text}")
+    raise Exception(f"Error en el despacho (Código {res.status_code}): {res.text}")
