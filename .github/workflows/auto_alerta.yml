@@ -2,8 +2,9 @@ name: Escáner Automático IPD
 
 on:
   schedule:
+    # 05:15 AM de Argentina (ART = UTC-3) se traduce a las 08:15 AM UTC
     - cron: '15 8 * * 1-5'
-  workflow_dispatch:
+  workflow_dispatch: # Activa el botón para disparar el test manual desde la web
 
 jobs:
   procesar_boletin:
@@ -22,30 +23,9 @@ jobs:
       - name: Desplegar Dependencias de Red
         run: pip install requests
 
-      - name: Ejecución del Despacho Autónomo
+      - name: Ejecución del Despacho Autónomo desde la Raíz
+        # Vincula de forma segura tus Secrets de GitHub con las variables del script
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: |
-          cat << 'EOF' > run_final.py
-          import os
-          import requests
-          
-          t = os.environ.get("TELEGRAM_TOKEN")
-          c = os.environ.get("TELEGRAM_CHAT_ID")
-          
-          endpoint = f"https://telegram.org{t}/sendMessage"
-          
-          payload = {
-              "chat_id": str(c),
-              "text": "📢 IPD: Alerta Temprana del Bolsillo Popular\n\n🔍 EN CRIOLLO: El motor autónomo de la trinchera está oficialmente en marcha.\n⚠️ CÓMO TE AFECTA: Monitoreo activado al 100% en internet. Vos descansás y la máquina labura por la patria.\n📝 LA LETRA CHICA: Código limpio ejecutado desde servidores libres de candados corporativos.\n\n━━━━━━━━━━━━━━━━━━━\n🌐 Sumate a la comunidad y registrá tu mail:\nhttps://github.io"
-          }
-          
-          response = requests.post(endpoint, json=payload)
-          print(f"HTTP Status: {response.status_code}")
-          print(f"API Response: {response.text}")
-          
-          if response.status_code != 200:
-              exit(1)
-          EOF
-          python run_final.py
+        run: python script.py
