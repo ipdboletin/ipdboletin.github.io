@@ -1,11 +1,13 @@
 import os
+import re
 import json
+import time
 import requests
+import pdfplumber
 from datetime import datetime
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Cargar variables desde el archivo .env (local) o desde env vars (GitHub Actions)
 load_dotenv()
 
 
@@ -32,15 +34,21 @@ url_telegram = f"https://api.telegram.org/bot{token_tg}/sendMessage"
 url_groq = "https://api.groq.com/openai/v1/chat/completions"
 modelo_groq = "openai/gpt-oss-120b"
 
-CAMPOS_REQUERIDOS = ["jurisdiccion", "titulo", "criollo", "afecta", "letraChica"]
+url_caba = "https://api-restboletinoficial.buenosaires.gob.ar/obtenerBoletin/{fecha}/true"
 
-# Ruta al archivo datos.js (mismo directorio que este script)
+CAMPOS_REQUERIDOS = ["jurisdiccion", "titulo", "criollo", "afecta", "letraChica", "publicar"]
+
+MAX_NORMAS_POR_JURISDICCION = 3
+PAUSA_ENTRE_ANALISIS = 30
+PAGINAS_INDICE = 30
+
 RUTA_SCRIPT = Path(__file__).resolve().parent
 RUTA_DATOS_JS = RUTA_SCRIPT / "datos.js"
+RUTA_PDF_TEMP = RUTA_SCRIPT / "boletin_caba_temp.pdf"
 
 
 # =======================================================================
-# 3. SYSTEM PROMPT DOCTRINARIO (con salida JSON)
+# 3. SYSTEM PROMPT
 # =======================================================================
 
 SYSTEM_PROMPT = """
@@ -182,6 +190,8 @@ IV. TONO Y ESTILO
 - Español de Argentina, tuteo, tono militante pero no panfletario.
 - No inventes información que no aparezca en el texto original.
 - Si la norma es ambigua, decilo expresamente.
+- SINTÉTICO Y AL HUESO. El laburante lee esto en el celular, mientras
+  viaja o mientras trabaja. Cada palabra tiene que aportar.
 
 =======================================================================
 V. FORMATO DE RESPUESTA (JSON ESTRICTO)
@@ -193,20 +203,38 @@ sin backticks, sin markdown, sin explicaciones adicionales.
 ESTRUCTURA EXACTA DEL JSON:
 
 {
+  "publicar": true | false,
   "jurisdiccion": "nacion" | "pba" | "caba",
   "titulo": "Tipo y número de norma, sin descripción",
-  "criollo": "Explicación popular del impacto, con análisis doctrinario aplicado: a quién beneficia, a quién perjudica, qué intereses están en juego, qué eufemismos se usan y qué significan en la realidad.",
-  "afecta": "- <b>Título corto 1:</b> explicación del impacto concreto\\n- <b>Título corto 2:</b> explicación del impacto concreto\\n- <b>Título corto 3:</b> explicación del impacto concreto",
-  "letraChica": "Hallazgos de la auditoría de letra chica: derogaciones ocultas, artículos finales, DNU desplazando leyes, beneficiarios del capital concentrado."
+  "criollo": "Explicación popular y sintética del impacto, con análisis doctrinario aplicado.",
+  "afecta": "- <b>Título corto 1:</b> explicación breve\\n- <b>Título corto 2:</b> explicación breve",
+  "letraChica": "Hallazgo más importante de la auditoría de letra chica."
 }
+
+REGLAS DE EXTENSIÓN (OBLIGATORIAS - SINTETIZAR):
+
+- "criollo": MÁXIMO 350 caracteres. Sintético, directo, sin vueltas.
+  Priorizá: qué cambia + a quién beneficia + a quién perjudica.
+  NO repitas el título de la norma dentro del criollo.
+  NO uses frases de relleno ("cabe destacar", "es importante señalar").
+- "afecta": MÍNIMO 2, MÁXIMO 3 ítems. Cada ítem MÁXIMO 100 caracteres
+  (sin contar el título corto en negrita). Al hueso.
+- "letraChica": MÁXIMO 200 caracteres. Solo el hallazgo más importante.
+  Si no hay nada relevante, poné "Sin datos relevantes en letra chica."
 
 REGLAS OBLIGATORIAS DEL JSON:
 
+- "publicar": true si la norma tiene impacto REAL y CONCRETO sobre el
+  pueblo trabajador (bolsillo, trabajo, derechos, soberanía, servicios
+  públicos, industria, agro, pesca, transporte, vivienda, salud,
+  educación). false si es una norma meramente administrativa,
+  protocolar, de designación, o sin impacto real en la vida del
+  laburante.
 - "jurisdiccion" SIEMPRE en minúscula: "nacion", "pba" o "caba".
-- "titulo" SOLO el tipo y número. Ejemplo: "Decreto 512/2026". NO agregues descripción.
+- "titulo" SOLO el tipo y número. Ejemplo: "Decreto 512/2026".
 - "criollo" es texto plano, SIN etiquetas HTML. Un solo párrafo.
 - "afecta" SÍ lleva etiquetas HTML <b>...</b> para los títulos cortos.
-  Cada ítem va en línea nueva, separado por "\\n". Mínimo 2 ítems, máximo 4.
+  Cada ítem va en línea nueva, separado por "\\n".
 - "letraChica" es texto plano, SIN etiquetas HTML. Un solo párrafo.
 - NO uses asteriscos (**), ni guiones bajos (_), ni backticks.
 - Asegurate de que el JSON sea válido: llaves, comillas y comas correctas.
@@ -214,43 +242,265 @@ REGLAS OBLIGATORIAS DEL JSON:
 
 
 # =======================================================================
-# 4. NORMA A ANALIZAR (de prueba, hasta conectar boletines reales)
+# 4. PALABRAS CLAVE DEL PRE-FILTRO
 # =======================================================================
 
-NORMA_A_ANALIZAR = """
-## NORMA A ANALIZAR
+PALABRAS_INCLUIR = [
+    "tarifa", "tarifas", "aumento", "ajuste", "precio", "precios",
+    "subsidio", "subsidios", "peaje", "transporte", "colectivo",
+    "subte", "tren", "luz", "gas", "agua", "electricidad", "factura",
+    "servicio público",
+    "impuesto", "impuestos", "tasa", "tasas", "contribución",
+    "contribuciones", "abl", "inmobiliario", "patente",
+    "ingresos brutos", "ganancias", "iva", "monotributo",
+    "autónomos", "arca", "afip", "exención", "exenciones",
+    "alícuota", "alícuotas", "tributo", "tributos",
+    "presión fiscal", "evasión", "elusión", "moratoria",
+    "plan de pagos", "blanqueo", "recaudación",
+    "laboral", "trabajador", "trabajadores", "empleo", "salario",
+    "salarios", "convenio", "paritaria", "despido", "indemnización",
+    "jubilación", "jubilados", "pensionados", "art", "gremio",
+    "sindicato",
+    "industria", "industrial", "industrialización", "fábrica",
+    "fábricas", "manufactura", "manufacturero", "producción",
+    "productivo", "productiva", "pyme", "pymes", "pequeña empresa",
+    "mediana empresa", "emprendedor", "emprendimiento", "cooperativa",
+    "mutual", "parque industrial", "polo industrial", "clúster",
+    "cadena de valor", "agregado de valor", "sustitución de importaciones",
+    "compre nacional", "compre argentino", "desarrollo productivo",
+    "fomento", "crédito productivo", "financiamiento productivo", "inti",
+    "aduanas", "aduana", "comercio exterior", "importación",
+    "exportación", "importaciones", "exportaciones", "arancel",
+    "aranceles", "retenciones", "naval", "naviero", "marina mercante",
+    "puerto", "puertos", "buque", "buques", "barcos", "flota",
+    "astillero", "ferroviario", "ferrocarril", "trenes",
+    "vías navegables", "hidrovía", "dragado", "logística", "flete",
+    "fletes", "cabotaje", "contenedor", "elevador", "elevadores",
+    "pesca", "pesquero", "pesquera", "buque pesquero",
+    "flota pesquera", "puerto pesquero", "calamar", "merluza",
+    "langostino", "centolla", "corvina", "anchoíta", "milla 201",
+    "zona económica exclusiva", "permiso de pesca", "cuota pesquera",
+    "veda", "inidep", "astillero pesquero", "conservera",
+    "agro", "agropecuario", "agropecuaria", "agrícola", "agricultura",
+    "ganadería", "ganadero", "ganadera", "campo", "rural", "chacra",
+    "cosecha", "siembra", "cultivo", "cultivos", "grano", "granos",
+    "cereal", "cereales", "trigo", "maíz", "soja", "girasol",
+    "carne", "carnes", "bovino", "bovinos", "vacuno", "vacunos",
+    "porcino", "avícola", "pollo", "leche", "lácteo", "lácteos",
+    "tambo", "frigorífico", "matadero", "feedlot", "inta", "senasa",
+    "tierra rural", "arrendamiento rural", "semilla", "fertilizante",
+    "agroquímico", "forestal", "bosque", "monte",
+    "vivienda", "alquiler", "alquileres", "hábitat", "urbano",
+    "urbanización", "barrio", "desalojo", "expropiación", "tierra",
+    "suelo", "obra pública",
+    "salud", "hospital", "medicamento", "obra social", "pami",
+    "educación", "escuela", "universidad", "beca", "docente",
+    "privatización", "concesión", "licitación", "empresa estatal",
+    "regulación", "control", "fiscalización", "soberanía",
+    "estratégico", "nacionalización", "defensa", "fuerzas armadas",
+    "emergencia", "asistencia social", "ayuda social",
+    "subsidio social", "plan social", "comedor", "niñez", "género",
+    "violencia",
+]
 
-Jurisdicción: NACIÓN.
-
-Norma: Decreto 512/2026.
-
-Texto original:
-
-Visto el plan de optimización de empresas del sector público,
-se dispone el inicio del proceso de articulación público-privada
-para la administración de las vías navegables y elevadores portuarios,
-derogando las restricciones de bandera de la Ley 22.415.
-"""
+PALABRAS_EXCLUIR = [
+    "designa", "designación", "nombra", "nombramiento", "renuncia",
+    "acepta la renuncia", "cesa", "cese", "traslado", "licencia",
+    "sanciona con cesantía", "sanciona con multa",
+]
 
 
 # =======================================================================
-# 5. CONSULTAR GROQ (devuelve dict)
+# 5. BAJAR PDF DEL BOLETÍN DE CABA
 # =======================================================================
 
-def consultar_groq():
+def bajar_pdf_boletin_caba():
+    """Consulta la API de CABA y baja el PDF del boletín del día."""
 
-    print("🤖 IPD: Enviando norma a Groq...")
+    fecha_hoy = datetime.now().strftime("%d-%m-%Y")
+    url = url_caba.format(fecha=fecha_hoy)
+
+    print(f"📥 IPD: Consultando API de CABA para {fecha_hoy}...")
+
+    try:
+        res = requests.get(url, timeout=30)
+        print(f"📡 Código de respuesta de CABA: {res.status_code}")
+
+        if res.status_code != 200:
+            print("❌ La API de CABA rechazó la solicitud.")
+            return None
+
+        data = res.json()
+        url_pdf = data.get("boletin", {}).get("url_boletin")
+
+        if not url_pdf:
+            print("❌ No se encontró 'url_boletin' en la respuesta.")
+            return None
+
+        print(f"📄 Bajando PDF desde {url_pdf}...")
+        res_pdf = requests.get(url_pdf, timeout=120)
+
+        if res_pdf.status_code != 200:
+            print(f"❌ Error al bajar el PDF: {res_pdf.status_code}")
+            return None
+
+        with open(RUTA_PDF_TEMP, "wb") as f:
+            f.write(res_pdf.content)
+
+        tamano_mb = len(res_pdf.content) / 1024 / 1024
+        print(f"✅ PDF bajado ({tamano_mb:.2f} MB) → {RUTA_PDF_TEMP.name}")
+
+        return RUTA_PDF_TEMP
+
+    except requests.exceptions.Timeout:
+        print("⏱️ Timeout al consultar CABA.")
+        return None
+    except requests.exceptions.ConnectionError:
+        print("🌐 No se pudo conectar con CABA.")
+        return None
+    except Exception as e:
+        print(f"💥 Error al bajar el PDF: {e}")
+        return None
+
+
+# =======================================================================
+# 6. EXTRAER TEXTO DEL ÍNDICE DEL PDF
+# =======================================================================
+
+def extraer_indice_del_pdf(ruta_pdf):
+    """Extrae el texto de las primeras páginas del PDF (el índice)."""
+
+    print(f"📖 IPD: Extrayendo índice (primeras {PAGINAS_INDICE} páginas)...")
+
+    try:
+        texto = []
+        with pdfplumber.open(ruta_pdf) as pdf:
+            total = len(pdf.pages)
+            limite = min(PAGINAS_INDICE, total)
+
+            for i in range(limite):
+                pagina = pdf.pages[i].extract_text()
+                if pagina:
+                    texto.append(pagina)
+
+        texto_completo = "\n".join(texto)
+        print(f"✅ Texto extraído ({len(texto_completo)} caracteres).")
+        return texto_completo
+
+    except Exception as e:
+        print(f"💥 Error al extraer texto del PDF: {e}")
+        return ""
+
+
+# =======================================================================
+# 7. PARSEAR NORMAS DEL ÍNDICE
+# =======================================================================
+
+def parsear_normas_del_indice(texto):
+    """Extrae las normas del índice usando regex."""
+
+    print("🔍 IPD: Parseando normas del índice...")
+
+    patron = r'((?:Resolución|Decreto|Ley|Disposición)\s+N°\s+[\w\-/]+)\s*\n(.*?)\.{3,}\s*Pág\.\s*(\d+)'
+
+    normas = []
+
+    for match in re.finditer(patron, texto, re.DOTALL):
+        norma = match.group(1).strip()
+        sumario = match.group(2).strip()
+        pagina = match.group(3).strip()
+
+        if "de Directorio" in norma:
+            continue
+
+        sumario = " ".join(sumario.split())
+
+        normas.append({
+            "norma": norma,
+            "sumario": sumario,
+            "pagina": pagina
+        })
+
+    print(f"✅ Se encontraron {len(normas)} normas en el índice.")
+    return normas
+
+
+# =======================================================================
+# 8. FILTRAR NORMAS RELEVANTES
+# =======================================================================
+
+def filtrar_normas_relevantes(normas):
+    """Aplica el filtro por palabras clave."""
+
+    print(f"🎯 IPD: Filtrando {len(normas)} normas...")
+
+    # Palabras que, si están al INICIO del sumario, descartan la norma
+    # (aunque tenga keywords de incluir)
+    INICIOS_EXCLUIR = [
+        "designa", "designación", "nombra", "nombramiento",
+        "acepta la renuncia", "renuncia", "cesa", "cese",
+        "traslado", "licencia", "sanciona", "prorroga la designación",
+        "da de alta", "ratifica",
+    ]
+
+    candidatas = []
+
+    for norma in normas:
+        sumario = norma.get("sumario", "").lower().strip()
+        norma_str = norma.get("norma", "").lower()
+        texto = f"{sumario} {norma_str}"
+
+        # CAMBIO B: si el sumario ARRANCA con una palabra de designación,
+        # descartarla directamente
+        if any(sumario.startswith(p) for p in INICIOS_EXCLUIR):
+            continue
+
+        # CAMBIO C: excluir la Ley del Boletín Oficial
+        if "boletín oficial" in texto or "boletin oficial" in texto:
+            continue
+
+        matches = sum(1 for p in PALABRAS_INCLUIR if p in texto)
+
+        if matches == 0:
+            continue
+
+        candidatas.append({**norma, "matches": matches})
+
+    candidatas.sort(key=lambda x: x["matches"], reverse=True)
+    top = candidatas[:MAX_NORMAS_POR_JURISDICCION]
+
+    print(f"✅ {len(top)} normas pasaron el filtro (de {len(normas)}).")
+    return top
+
+
+# =======================================================================
+# 9. CONSULTAR GROQ
+# =======================================================================
+
+def consultar_groq(norma, jurisdiccion):
+    """Analiza una norma con Groq. Devuelve un dict o None."""
+
+    titulo = norma.get("norma", "Sin título")
+    print(f"🤖 IPD: Analizando '{titulo}' con Groq...")
 
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {groq_key}"
     }
 
+    norma_texto = (
+        f"## NORMA A ANALIZAR\n\n"
+        f"Jurisdicción: {jurisdiccion.upper()}.\n\n"
+        f"Norma: {norma.get('norma', '')}.\n\n"
+        f"Sumario oficial:\n{norma.get('sumario', '')}\n\n"
+        f"Página del boletín: {norma.get('pagina', '')}"
+    )
+
     payload_groq = {
         "model": modelo_groq,
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": NORMA_A_ANALIZAR}
+            {"role": "user", "content": norma_texto}
         ],
         "temperature": 0.3,
         "max_tokens": 2048,
@@ -258,12 +508,12 @@ def consultar_groq():
     }
 
     try:
-        res_groq = requests.post(url_groq, headers=headers, json=payload_groq, timeout=60)
+        res_groq = requests.post(url_groq, headers=headers, json=payload_groq, timeout=90)
         print(f"📡 Código de respuesta de Groq: {res_groq.status_code}")
 
         if res_groq.status_code != 200:
             print("❌ La API de Groq rechazó la solicitud.")
-            print(res_groq.text)
+            print(res_groq.text[:500])
             return None
 
         data = res_groq.json()
@@ -272,7 +522,6 @@ def consultar_groq():
             contenido = data["choices"][0]["message"]["content"]
         except (KeyError, IndexError, TypeError):
             print("❌ Estructura inesperada en la respuesta de Groq.")
-            print(res_groq.text)
             return None
 
         try:
@@ -281,12 +530,11 @@ def consultar_groq():
             return dictamen
         except json.JSONDecodeError as e:
             print(f"❌ Groq no devolvió un JSON válido: {e}")
-            print("Contenido recibido:")
-            print(contenido)
+            print(contenido[:500])
             return None
 
     except requests.exceptions.Timeout:
-        print("⏱️ Se agotó el tiempo de espera de Groq.")
+        print("⏱️ Timeout con Groq.")
         return None
     except requests.exceptions.ConnectionError:
         print("🌐 No se pudo conectar con Groq.")
@@ -294,10 +542,8 @@ def consultar_groq():
     except requests.exceptions.RequestException as e:
         print(f"💥 Error de conexión con Groq: {e}")
         return None
-
-
-# =======================================================================
-# 6. VALIDAR JSON
+    # =======================================================================
+# 10. VALIDAR DICTAMEN
 # =======================================================================
 
 def validar_dictamen(dictamen):
@@ -307,22 +553,22 @@ def validar_dictamen(dictamen):
         return False
 
     faltantes = [c for c in CAMPOS_REQUERIDOS if c not in dictamen]
-
     if faltantes:
         print(f"❌ Faltan campos en el JSON: {faltantes}")
         return False
 
     for campo in CAMPOS_REQUERIDOS:
+        if campo == "publicar":
+            continue
         if not dictamen[campo] or not str(dictamen[campo]).strip():
             print(f"❌ El campo '{campo}' está vacío.")
             return False
 
-    print("✅ JSON validado correctamente.")
     return True
 
 
 # =======================================================================
-# 7. ESCAPAR HTML (seguridad para Telegram)
+# 11. ESCAPAR HTML
 # =======================================================================
 
 def escapar_html(texto):
@@ -344,7 +590,7 @@ def escapar_html(texto):
 
 
 # =======================================================================
-# 8. FORMATEAR PARA TELEGRAM (desde el JSON)
+# 12. FORMATEAR PARA TELEGRAM
 # =======================================================================
 
 def formatear_para_telegram(dictamen):
@@ -361,19 +607,17 @@ def formatear_para_telegram(dictamen):
         f"<b>⚠️ CÓMO TE AFECTA:</b>\n{afecta}\n\n"
         "━━━━━━━━━━━━━━━━━━━\n\n"
         "🌐 Sumate a la comunidad:\n"
-        "https://github.io"
+        '<a href="https://ipdboletin.github.io">ipdboletin.github.io</a>'
     )
 
     return mensaje
 
 
 # =======================================================================
-# 9. ENVIAR A TELEGRAM
+# 13. ENVIAR A TELEGRAM
 # =======================================================================
 
 def enviar_telegram(mensaje):
-
-    print("📲 IPD: Enviando dictamen a Telegram...")
 
     payload_tg = {
         "chat_id": chat_id_tg,
@@ -383,57 +627,43 @@ def enviar_telegram(mensaje):
 
     try:
         res_tg = requests.post(url_telegram, json=payload_tg, timeout=20)
-        print(f"📡 Código de respuesta de Telegram: {res_tg.status_code}")
-
         if res_tg.status_code == 200:
-            print("🚀 ¡Alerta enviada correctamente a Telegram!")
+            print("🚀 ¡Alerta enviada a Telegram!")
             return True
 
-        print("❌ Telegram rechazó el mensaje.")
-        print(res_tg.text)
+        print(f"❌ Telegram rechazó el mensaje (código {res_tg.status_code}).")
+        print(res_tg.text[:500])
         return False
 
-    except requests.exceptions.Timeout:
-        print("⏱️ Se agotó el tiempo de espera de Telegram.")
-        return False
-    except requests.exceptions.ConnectionError:
-        print("🌐 No se pudo conectar con Telegram.")
-        return False
-    except requests.exceptions.RequestException as e:
-        print(f"💥 Error de conexión con Telegram: {e}")
+    except Exception as e:
+        print(f"💥 Error con Telegram: {e}")
         return False
 
 
 # =======================================================================
-# 10. GUARDAR EN datos.js
+# 14. GUARDAR EN datos.js
 # =======================================================================
 
 def ya_existe_en_datos(titulo):
-    """Chequea si ya hay una entrada con ese título en datos.js."""
 
     if not RUTA_DATOS_JS.exists():
-        print(f"⚠️ No se encontró {RUTA_DATOS_JS}. Se va a crear.")
         return False
 
     with open(RUTA_DATOS_JS, "r", encoding="utf-8") as f:
         contenido = f.read()
 
-    # Chequeo simple: si el título (escapado como aparece en el archivo)
-    # ya está en el contenido, asumimos que ya existe.
     titulo_escapado = titulo.replace('"', '\\"')
     return f'titulo: "{titulo_escapado}"' in contenido
 
 
 def construir_entrada_js(dictamen, fecha):
-    """Devuelve el bloque de texto con la nueva entrada, listo para insertar."""
 
     def limpiar_para_js(valor):
-        """Escapa comillas dobles y saltos de línea para que el JS sea válido."""
         valor = str(valor).strip()
-        valor = valor.replace("\\", "\\\\")   # Barra invertida primero
-        valor = valor.replace('"', '\\"')      # Comillas dobles
-        valor = valor.replace("\n", "\\n")     # Saltos de línea
-        valor = valor.replace("\r", "")        # Retorno de carro
+        valor = valor.replace("\\", "\\\\")
+        valor = valor.replace('"', '\\"')
+        valor = valor.replace("\n", "\\n")
+        valor = valor.replace("\r", "")
         return valor
 
     jurisdiccion = limpiar_para_js(dictamen["jurisdiccion"])
@@ -457,53 +687,44 @@ def construir_entrada_js(dictamen, fecha):
 
 
 def guardar_en_datos_js(dictamen):
-    """Agrega la entrada al principio del array baseDatosIPD en datos.js.
-    No duplica si ya existe (mismo título). No rompe si algo falla."""
 
     print("📝 IPD: Guardando en datos.js...")
 
     titulo = dictamen.get("titulo", "").strip()
     fecha_hoy = datetime.now().strftime("%Y-%m-%d")
 
-    # Chequeo de duplicados
     if ya_existe_en_datos(titulo):
-        print(f"⚠️ Ya existe una entrada con el título '{titulo}'. No se agrega.")
+        print(f"⚠️ Ya existe '{titulo}'. No se agrega.")
         return False
 
     if not RUTA_DATOS_JS.exists():
-        print(f"❌ No se encontró {RUTA_DATOS_JS}. No se puede guardar.")
+        print(f"❌ No se encontró {RUTA_DATOS_JS}.")
         return False
 
     try:
         with open(RUTA_DATOS_JS, "r", encoding="utf-8") as f:
             contenido = f.read()
 
-        # Buscar el primer "[" que abre el array baseDatosIPD
         marcador = "const baseDatosIPD = ["
         indice = contenido.find(marcador)
 
         if indice == -1:
-            print("❌ No se encontró el marcador 'const baseDatosIPD = [' en datos.js.")
+            print("❌ No se encontró el marcador en datos.js.")
             return False
 
-        # Punto de inserción: justo después del marcador + salto de línea
         punto_insercion = indice + len(marcador) + 1
-
-        # Construir la nueva entrada
         nueva_entrada = construir_entrada_js(dictamen, fecha_hoy)
 
-        # Insertar
         nuevo_contenido = (
             contenido[:punto_insercion]
             + nueva_entrada
             + contenido[punto_insercion:]
         )
 
-        # Guardar
         with open(RUTA_DATOS_JS, "w", encoding="utf-8") as f:
             f.write(nuevo_contenido)
 
-        print(f"✅ Entrada agregada a datos.js con fecha {fecha_hoy}.")
+        print(f"✅ Entrada '{titulo}' agregada a datos.js.")
         return True
 
     except Exception as e:
@@ -512,7 +733,7 @@ def guardar_en_datos_js(dictamen):
 
 
 # =======================================================================
-# 11. PROCESO PRINCIPAL
+# 15. PROCESO PRINCIPAL
 # =======================================================================
 
 def ejecutar_patrullaje():
@@ -524,47 +745,95 @@ def ejecutar_patrullaje():
     print("=" * 70)
     print("")
 
-    # PASO 1 — Consultar a Groq
-    dictamen = consultar_groq()
+    # PASO 1 — Bajar PDF del boletín
+    ruta_pdf = bajar_pdf_boletin_caba()
 
-    if not dictamen:
-        print("\n❌ El proceso se detuvo: Groq no devolvió un dictamen.\n")
+    if not ruta_pdf:
+        print("\n❌ No se pudo bajar el PDF de CABA. Fin del patrullaje.\n")
         return
 
-    # PASO 2 — Validar
-    if not validar_dictamen(dictamen):
-        print("\n❌ El proceso se detuvo: el JSON no es válido.\n")
+    # PASO 2 — Extraer índice
+    texto_indice = extraer_indice_del_pdf(ruta_pdf)
+
+    if not texto_indice:
+        print("\n❌ No se pudo extraer el índice. Fin del patrullaje.\n")
         return
 
-    # PASO 3 — Mostrar el JSON crudo (debug)
-    print("")
-    print("-" * 70)
-    print("📄 DICTAMEN (JSON)")
-    print("-" * 70)
-    print(json.dumps(dictamen, indent=2, ensure_ascii=False))
-    print("-" * 70)
-    print("")
+    # PASO 3 — Parsear normas
+    normas = parsear_normas_del_indice(texto_indice)
 
-    # PASO 4 — Formatear y enviar a Telegram
-    mensaje = formatear_para_telegram(dictamen)
-    enviado = enviar_telegram(mensaje)
+    if not normas:
+        print("\n⚠️ No se encontraron normas en el índice. Fin del patrullaje.\n")
+        return
 
-    # PASO 5 — Guardar en datos.js (independiente del resultado de Telegram)
-    guardado = guardar_en_datos_js(dictamen)
+    # PASO 4 — Filtrar por relevancia
+    candidatas = filtrar_normas_relevantes(normas)
+
+    if not candidatas:
+        print("\n⚠️ Ninguna norma pasó el filtro. Fin del patrullaje.\n")
+        return
+
+    # PASO 5 — Analizar cada candidata con Groq
+    print(f"\n🎯 IPD: Analizando {len(candidatas)} normas con Groq...\n")
+
+    resultados = []
+
+    for i, norma in enumerate(candidatas, 1):
+        print(f"\n{'─' * 70}")
+        print(f"📋 NORMA {i}/{len(candidatas)}: {norma.get('norma', '')}")
+        print(f"{'─' * 70}\n")
+
+        dictamen = consultar_groq(norma, "caba")
+
+        if not dictamen:
+            print(f"⚠️ No se pudo analizar '{norma.get('norma', '')}'. Se saltea.")
+            continue
+
+        if not validar_dictamen(dictamen):
+            print(f"⚠️ El dictamen de '{norma.get('norma', '')}' no es válido. Se saltea.")
+            continue
+
+        if not dictamen.get("publicar", False):
+            print(f"⏭️ Groq considera que '{norma.get('norma', '')}' no amerita publicar. Se saltea.")
+            continue
+
+        mensaje = formatear_para_telegram(dictamen)
+        enviado = enviar_telegram(mensaje)
+
+        guardado = guardar_en_datos_js(dictamen)
+
+        resultados.append({
+            "titulo": dictamen.get("titulo", ""),
+            "telegram": enviado,
+            "datos_js": guardado
+        })
+
+        if i < len(candidatas):
+            print(f"\n⏸️ Pausa de {PAUSA_ENTRE_ANALISIS}s antes del siguiente análisis...\n")
+            time.sleep(PAUSA_ENTRE_ANALISIS)
 
     # RESUMEN FINAL
     print("")
     print("=" * 70)
     print("📊 RESUMEN DEL PATRULLAJE")
     print("=" * 70)
-    print(f"  Telegram:  {'✅ OK' if enviado else '❌ FALLÓ'}")
-    print(f"  datos.js:  {'✅ OK' if guardado else '❌ FALLÓ'}")
+    print(f"  Normas en el índice:  {len(normas)}")
+    print(f"  Normas filtradas:     {len(candidatas)}")
+    print(f"  Normas publicadas:    {len(resultados)}")
+    print("")
+    if resultados:
+        for r in resultados:
+            tg = "✅" if r["telegram"] else "❌"
+            js = "✅" if r["datos_js"] else "❌"
+            print(f"  - {r['titulo']}  |  Telegram: {tg}  |  datos.js: {js}")
+    else:
+        print("  (Ninguna norma fue publicada)")
     print("=" * 70)
     print("")
 
 
 # =======================================================================
-# 12. EJECUTAR
+# 16. EJECUTAR
 # =======================================================================
 
 if __name__ == "__main__":
