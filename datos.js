@@ -1,6 +1,14 @@
 // Base de datos viva y acumulativa de IPD
 const baseDatosIPD = [
   {
+    fecha: "2026-10-07",
+    jurisdiccion: "nacion",
+    titulo: "Decreto 512/2026",
+    criollo: "Este decreto vende la gestión de los canales y elevadores portuarios a manos privadas y abre la puerta a que barcos extranjeros naveguen sin la bandera argentina. En la jerga oficial se llama \"articulación público‑privada\" y \"optimización\", pero en la práctica es una privatización encubierta que beneficia a los grupos financieros y a la industria naviera extranjera, mientras que el Estado pierde control estratégico y los trabajadores portuarios pierden empleos y salarios dignos.",
+    afecta: "- <b>Privatización de vías navegables y elevadores</b>: transferencia de la gestión a empresas privadas, con riesgo de despidos y tarifas altas para los usuarios\n- <b>Derogación de la bandera nacional</b>: elimina la obligación de que los buques que operen en puertos argentinos usen la bandera argentina, favoreciendo a navieras extranjeras y debilitando la soberanía marítima\n- <b>Concentración de capital extranjero</b>: abre la puerta a inversiones de conglomerados internacionales en infraestructura estratégica, generando rentas para el capital externo y no para el pueblo",
+    letraChica: "El texto deroga las restricciones de bandera establecidas en la Ley 22.415 sin explicar criterios de selección ni garantías de empleo; la referencia al \"plan de optimización\" no detalla cómo se protegerán los puestos de trabajo ni cómo se fiscalizará la rentabilidad, lo que permite la entrega silenciosa de activos estratégicos a privados y extranjeros."
+  },
+  {
     fecha: "2026-10-05",
     jurisdiccion: "nacion",
     titulo: "Decreto 432/2026: Modificación de Subsidios al Transporte",
