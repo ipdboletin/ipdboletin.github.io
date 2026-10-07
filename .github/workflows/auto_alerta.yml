@@ -25,7 +25,7 @@ jobs:
           python-version: '3.11'
 
       - name: Desplegar Dependencias de Red
-        run: pip install requests python-dotenv
+        run: pip install requests python-dotenv pdfplumber
 
       - name: Ejecución del Despacho Autónomo desde la Raíz
         # Vincula de forma segura tus Secrets de GitHub con las variables del script
