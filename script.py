@@ -356,8 +356,32 @@ PALABRAS_EXCLUIR = [
     "boletín oficial", "boletin oficial",
 ]
 
+
 # =======================================================================
-# 5. FUNCIONES PARA CABA
+# 5. VALIDAR DICTAMEN (movida arriba para evitar warnings)
+# =======================================================================
+
+def validar_dictamen(dictamen):
+
+    if not isinstance(dictamen, dict):
+        return False
+
+    faltantes = [c for c in CAMPOS_REQUERIDOS if c not in dictamen]
+    if faltantes:
+        print(f"❌ Faltan campos: {faltantes}")
+        return False
+
+    for campo in CAMPOS_REQUERIDOS:
+        if campo == "publicar":
+            continue
+        if not dictamen[campo] or not str(dictamen[campo]).strip():
+            print(f"❌ Campo '{campo}' vacío.")
+            return False
+
+    return True
+
+# =======================================================================
+# 6. FUNCIONES PARA CABA
 # =======================================================================
 
 def bajar_pdf_boletin_caba():
@@ -445,7 +469,7 @@ def extraer_normas_caba(ruta_pdf):
 
 
 # =======================================================================
-# 6. FUNCIONES PARA PBA
+# 7. FUNCIONES PARA PBA
 # =======================================================================
 
 def obtener_id_boletin_pba():
@@ -464,22 +488,13 @@ def obtener_id_boletin_pba():
             return None
 
         html = res.text
-
-        # Buscar el bloque del boletín de hoy. El patrón es:
-        # BOLETÍN N° XXXXX - DD/MM/YYYY
-        # ... (más adelante en el mismo bloque)
-        # href="/secciones/XXXXX/ver"
-        patron_fecha = re.escape(fecha_hoy)
         indice_fecha = html.find(f"- {fecha_hoy}")
 
         if indice_fecha == -1:
             print(f"❌ PBA: No se encontró el boletín del {fecha_hoy}.")
             return None
 
-        # Buscar el link /secciones/XXXXX/ver más cercano DESPUÉS del título
-        # Buscamos desde la posición de la fecha hasta 5000 caracteres después
         bloque = html[indice_fecha:indice_fecha + 5000]
-
         match = re.search(r'/secciones/(\d+)/ver', bloque)
 
         if not match:
@@ -534,7 +549,7 @@ def extraer_normas_pba(ruta_pdf):
             total = len(pdf.pages)
             print(f"📄 PBA: {total} páginas para procesar.")
 
-            for i, pagina in enumerate(pdf.pages):
+            for pagina in pdf.pages:
                 contenido = pagina.extract_text()
                 if contenido:
                     texto.append(contenido)
@@ -542,10 +557,7 @@ def extraer_normas_pba(ruta_pdf):
         texto_completo = "\n".join(texto)
         print(f"✅ PBA: Texto extraído ({len(texto_completo)} caracteres).")
 
-        # Patrón: DECRETO N° 1667/2026 | RESOLUCIÓN N° 256-XX-2026 | DISPOSICIÓN N° 1249-XX-2026
         patron_norma = r'((?:DECRETO|RESOLUCIÓN|DISPOSICIÓN)\s+N°\s+[\d\-A-Za-z/]+)'
-
-        # Encontrar todas las posiciones de inicio de norma
         matches = list(re.finditer(patron_norma, texto_completo, re.IGNORECASE))
 
         normas = []
@@ -553,15 +565,10 @@ def extraer_normas_pba(ruta_pdf):
             inicio = match.start()
             fin = matches[i + 1].start() if i + 1 < len(matches) else len(texto_completo)
 
-            # Extraer título y texto
             titulo = match.group(1).strip()
             texto_norma = texto_completo[inicio:fin].strip()
+            texto_norma_limpio = " ".join(texto_norma.split())[:3000]
 
-            # Limpiar y limitar tamaño (evita tokens gigantes)
-            texto_norma_limpio = " ".join(texto_norma.split())
-            texto_norma_limpio = texto_norma_limpio[:3000]  # tope de seguridad
-
-            # Si es muy corto, probablemente es un falso positivo
             if len(texto_norma_limpio) < 200:
                 continue
 
@@ -580,7 +587,7 @@ def extraer_normas_pba(ruta_pdf):
 
 
 # =======================================================================
-# 7. FILTRAR NORMAS RELEVANTES (compartida)
+# 8. FILTRAR NORMAS RELEVANTES
 # =======================================================================
 
 def filtrar_normas_relevantes(normas):
@@ -595,11 +602,9 @@ def filtrar_normas_relevantes(normas):
         norma_str = norma.get("norma", "").lower()
         texto = f"{sumario} {norma_str}"
 
-        # Excluir si el sumario arranca con palabra de designación
         if any(sumario.startswith(p) for p in INICIOS_EXCLUIR):
             continue
 
-        # Excluir boletín oficial
         if any(p in texto for p in PALABRAS_EXCLUIR):
             continue
 
@@ -618,7 +623,7 @@ def filtrar_normas_relevantes(normas):
 
 
 # =======================================================================
-# 8. CONSULTAR GROQ
+# 9. CONSULTAR GROQ (con retry inteligente)
 # =======================================================================
 
 def consultar_groq(norma, jurisdiccion, max_reintentos=3):
@@ -661,20 +666,19 @@ def consultar_groq(norma, jurisdiccion, max_reintentos=3):
 
             # CASO 1: RATE LIMIT (429)
             if res_groq.status_code == 429:
-                espera = 30  # por defecto
+                espera = 30
                 try:
                     error_data = res_groq.json()
                     mensaje = error_data.get("error", {}).get("message", "")
-                    # Buscar "try again in Xs" o "try again in X.XXs"
                     match = re.search(r"try again in ([\d.]+)s", mensaje)
                     if match:
-                        espera = float(match.group(1)) + 5  # +5s de margen
+                        espera = float(match.group(1)) + 5
                 except Exception:
                     pass
 
                 print(f"⏸️ Rate limit. Esperando {espera:.1f}s antes de reintentar...")
                 time.sleep(espera)
-                continue  # siguiente intento
+                continue
 
             # CASO 2: OTROS ERRORES HTTP
             if res_groq.status_code != 200:
@@ -741,30 +745,6 @@ def consultar_groq(norma, jurisdiccion, max_reintentos=3):
 
 
 # =======================================================================
-# 9. VALIDAR DICTAMEN
-# =======================================================================
-
-def validar_dictamen(dictamen):
-
-    if not isinstance(dictamen, dict):
-        return False
-
-    faltantes = [c for c in CAMPOS_REQUERIDOS if c not in dictamen]
-    if faltantes:
-        print(f"❌ Faltan campos: {faltantes}")
-        return False
-
-    for campo in CAMPOS_REQUERIDOS:
-        if campo == "publicar":
-            continue
-        if not dictamen[campo] or not str(dictamen[campo]).strip():
-            print(f"❌ Campo '{campo}' vacío.")
-            return False
-
-    return True
-
-
-# =======================================================================
 # 10. ESCAPAR HTML
 # =======================================================================
 
@@ -822,7 +802,6 @@ def enviar_telegram(mensaje):
         "parse_mode": "HTML"
     }
 
-    # Intentar 2 veces (con timeout de 60s)
     for intento in range(2):
         try:
             res = requests.post(url_telegram, json=payload_tg, timeout=60)
@@ -927,7 +906,6 @@ def procesar_jurisdiccion(jurisdiccion):
     print(f"🗺️ PROCESANDO {jurisdiccion.upper()}")
     print(f"{'═' * 70}\n")
 
-    # PASO 1 — Bajar PDF
     if jurisdiccion == "caba":
         ruta_pdf = bajar_pdf_boletin_caba()
         normas = extraer_normas_caba(ruta_pdf) if ruta_pdf else []
@@ -943,14 +921,12 @@ def procesar_jurisdiccion(jurisdiccion):
         print(f"⚠️ No se encontraron normas en {jurisdiccion.upper()}.")
         return []
 
-    # PASO 2 — Filtrar
     candidatas = filtrar_normas_relevantes(normas)
 
     if not candidatas:
         print(f"⚠️ Ninguna norma de {jurisdiccion.upper()} pasó el filtro.")
         return []
 
-    # PASO 3 — Analizar cada una
     print(f"\n🎯 Analizando {len(candidatas)} normas de {jurisdiccion.upper()}...\n")
 
     resultados = []
@@ -964,10 +940,6 @@ def procesar_jurisdiccion(jurisdiccion):
 
         if not dictamen:
             print(f"⚠️ No se pudo analizar. Se saltea.")
-            continue
-
-        if not validar_dictamen(dictamen):
-            print(f"⚠️ Dictamen inválido. Se saltea.")
             continue
 
         if not dictamen.get("publicar", False):
@@ -1005,13 +977,9 @@ def ejecutar_patrullaje():
 
     todos = {}
 
-    # CABA
     todos["caba"] = procesar_jurisdiccion("caba")
-
-    # PBA
     todos["pba"] = procesar_jurisdiccion("pba")
 
-    # RESUMEN FINAL
     print("\n")
     print("=" * 70)
     print("📊 RESUMEN DEL PATRULLAJE")
