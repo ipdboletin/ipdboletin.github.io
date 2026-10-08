@@ -42,12 +42,23 @@
         .calendario-dia.seleccionado { border: 2px solid var(--dorado); }
         .calendario-dia.hoy { border: 2px solid #C53030; }
         .calendario-dia.vacio { background: transparent; }
+        .footer-comunidad { margin-top: 40px; padding-top: 30px; border-top: 2px solid #E2E8F0; text-align: center; }
+        .footer-titulo { font-size: 15px; color: #4A5568; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 15px; font-weight: bold; }
+        .footer-botones { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 25px; }
+        .footer-btn { display: inline-flex; align-items: center; gap: 6px; background-color: var(--azul-tactico); color: #ffffff; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-size: 15px; font-weight: bold; transition: 0.3s; }
+        .footer-btn:hover { background-color: var(--dorado); }
+        .footer-firma { margin-top: 25px; padding-top: 20px; border-top: 1px solid #E2E8F0; }
+        .footer-firma p { margin: 5px 0; color: #4A5568; font-size: 13px; }
+        .footer-firma p.nombre { font-weight: bold; font-size: 14px; }
+        .footer-firma p.descripcion { font-style: italic; color: #718096; }
         @media (max-width: 600px) {
             .container { margin: 15px auto; padding: 15px; }
             .logo-condor { max-width: 240px; }
             h1 { font-size: 20px; }
             .fecha-titulo { font-size: 18px; }
             .calendario-grid { max-width: 100%; }
+            .footer-botones { flex-direction: column; align-items: center; }
+            .footer-btn { width: 100%; max-width: 280px; justify-content: center; }
         }
     </style>
 </head>
@@ -76,6 +87,18 @@
         </div>
 
         <a href="historial.html" class="back-link">← Volver al Historial</a>
+
+        <div class="footer-comunidad">
+            <div class="footer-titulo">Sumate a nuestra comunidad:</div>
+            <div class="footer-botones">
+                <a href="https://t.me/+x1jpuKAZKMowNjYx" class="footer-btn" target="_blank">📲 Telegram</a>
+                <a href="https://whatsapp.com/channel/0029VbDIsLn2ZjCuyTNW5E1L" class="footer-btn" target="_blank">💬 WhatsApp</a>
+            </div>
+            <div class="footer-firma">
+                <p class="nombre">Junta de Desarrolladores Nacional Justicialistas</p>
+                <p class="descripcion">Información para la Defensa</p>
+            </div>
+        </div>
     </div>
 
     <script src="datos.js"></script>
