@@ -41,7 +41,7 @@ url_pba_pdf = "https://boletinoficial.gba.gob.ar/secciones/{id}/ver"
 CAMPOS_REQUERIDOS = ["jurisdiccion", "titulo", "criollo", "afecta", "letraChica", "publicar"]
 
 MAX_NORMAS_POR_JURISDICCION = 3
-PAUSA_ENTRE_ANALISIS = 30
+PAUSA_ENTRE_ANALISIS = 60
 PAGINAS_INDICE_CABA = 30
 
 RUTA_SCRIPT = Path(__file__).resolve().parent
@@ -621,8 +621,9 @@ def filtrar_normas_relevantes(normas):
 # 8. CONSULTAR GROQ
 # =======================================================================
 
-def consultar_groq(norma, jurisdiccion):
-    """Analiza una norma con Groq. Devuelve un dict o None."""
+def consultar_groq(norma, jurisdiccion, max_reintentos=3):
+    """Analiza una norma con Groq. Maneja rate limit (429) y JSON inválido
+    con reintentos automáticos."""
 
     titulo = norma.get("norma", "Sin título")
     print(f"🤖 Groq: Analizando '{titulo}'...")
@@ -651,35 +652,92 @@ def consultar_groq(norma, jurisdiccion):
         "response_format": {"type": "json_object"}
     }
 
-    try:
-        res_groq = requests.post(url_groq, headers=headers, json=payload_groq, timeout=90)
-        print(f"📡 Groq: Código {res_groq.status_code}")
-
-        if res_groq.status_code != 200:
-            print("❌ Groq rechazó la solicitud.")
-            print(res_groq.text[:500])
-            return None
-
-        data = res_groq.json()
-
+    for intento in range(1, max_reintentos + 1):
         try:
-            contenido = data["choices"][0]["message"]["content"]
-        except (KeyError, IndexError, TypeError):
-            print("❌ Estructura inesperada en Groq.")
-            return None
+            res_groq = requests.post(
+                url_groq, headers=headers, json=payload_groq, timeout=120
+            )
+            print(f"📡 Groq: Código {res_groq.status_code} (intento {intento}/{max_reintentos})")
 
-        try:
-            dictamen = json.loads(contenido)
-            print("⚖️ Dictamen parseado.")
+            # CASO 1: RATE LIMIT (429)
+            if res_groq.status_code == 429:
+                espera = 30  # por defecto
+                try:
+                    error_data = res_groq.json()
+                    mensaje = error_data.get("error", {}).get("message", "")
+                    # Buscar "try again in Xs" o "try again in X.XXs"
+                    match = re.search(r"try again in ([\d.]+)s", mensaje)
+                    if match:
+                        espera = float(match.group(1)) + 5  # +5s de margen
+                except Exception:
+                    pass
+
+                print(f"⏸️ Rate limit. Esperando {espera:.1f}s antes de reintentar...")
+                time.sleep(espera)
+                continue  # siguiente intento
+
+            # CASO 2: OTROS ERRORES HTTP
+            if res_groq.status_code != 200:
+                print(f"❌ Groq rechazó la solicitud ({res_groq.status_code}).")
+                print(res_groq.text[:300])
+                if intento < max_reintentos:
+                    print(f"⏸️ Reintentando en 15s...")
+                    time.sleep(15)
+                    continue
+                return None
+
+            # CASO 3: RESPUESTA OK → parsear
+            data = res_groq.json()
+
+            try:
+                contenido = data["choices"][0]["message"]["content"]
+            except (KeyError, IndexError, TypeError):
+                print("❌ Estructura inesperada en Groq.")
+                if intento < max_reintentos:
+                    print("⏸️ Reintentando en 15s...")
+                    time.sleep(15)
+                    continue
+                return None
+
+            try:
+                dictamen = json.loads(contenido)
+            except json.JSONDecodeError as e:
+                print(f"❌ JSON inválido: {e}")
+                print(contenido[:300])
+                if intento < max_reintentos:
+                    print("⏸️ Reintentando en 15s...")
+                    time.sleep(15)
+                    continue
+                return None
+
+            # CASO 4: JSON OK pero con campos vacíos → reintentar
+            if not validar_dictamen(dictamen):
+                print(f"⚠️ Dictamen incompleto en intento {intento}/{max_reintentos}.")
+                if intento < max_reintentos:
+                    print("⏸️ Reintentando en 15s...")
+                    time.sleep(15)
+                    continue
+                return None
+
+            print(f"⚖️ Dictamen válido (intento {intento}/{max_reintentos}).")
             return dictamen
-        except json.JSONDecodeError as e:
-            print(f"❌ JSON inválido: {e}")
-            print(contenido[:500])
+
+        except requests.exceptions.Timeout:
+            print(f"⏱️ Timeout en intento {intento}/{max_reintentos}.")
+            if intento < max_reintentos:
+                time.sleep(15)
+                continue
             return None
 
-    except Exception as e:
-        print(f"💥 Error con Groq: {e}")
-        return None
+        except Exception as e:
+            print(f"💥 Error con Groq: {e}")
+            if intento < max_reintentos:
+                time.sleep(15)
+                continue
+            return None
+
+    print(f"❌ Se agotaron los {max_reintentos} intentos para '{titulo}'.")
+    return None
 
 
 # =======================================================================
