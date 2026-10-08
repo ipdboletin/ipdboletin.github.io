@@ -603,8 +603,8 @@ def formatear_para_telegram(dictamen):
     mensaje = (
         "<b>📢 IPD: Alerta Temprana del Bolsillo Popular</b>\n\n"
         f"<b>📌 {jurisdiccion} | {titulo}</b>\n\n"
-        f"<b>🔍 LA POSTA:</b>\n{criollo}\n\n"
-        f"<b>⚠️ CÓMO TE AFECTA:</b>\n{afecta}\n\n"
+        f"<b>🔍 LA POSTA:</b>\n\n{criollo}\n\n"
+        f"<b>⚠️ CÓMO TE AFECTA:</b>\n\n{afecta}\n\n"
         "━━━━━━━━━━━━━━━━━━━\n\n"
         "🌐 Sumate a la comunidad:\n"
         '<a href="https://ipdboletin.github.io">ipdboletin.github.io</a>'
