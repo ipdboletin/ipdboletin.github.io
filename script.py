@@ -726,17 +726,23 @@ def enviar_telegram(mensaje):
         "parse_mode": "HTML"
     }
 
-    try:
-        res = requests.post(url_telegram, json=payload_tg, timeout=20)
-        if res.status_code == 200:
-            print("🚀 Telegram OK")
-            return True
-        print(f"❌ Telegram rechazó ({res.status_code})")
-        print(res.text[:300])
-        return False
-    except Exception as e:
-        print(f"💥 Error Telegram: {e}")
-        return False
+    # Intentar 2 veces (con timeout de 60s)
+    for intento in range(2):
+        try:
+            res = requests.post(url_telegram, json=payload_tg, timeout=60)
+            if res.status_code == 200:
+                print("🚀 Telegram OK")
+                return True
+            print(f"❌ Telegram rechazó ({res.status_code})")
+            print(res.text[:300])
+            return False
+        except Exception as e:
+            if intento == 0:
+                print(f"⚠️ Timeout, reintentando en 5s...")
+                time.sleep(5)
+            else:
+                print(f"💥 Error Telegram (2 intentos): {e}")
+                return False
 
 
 # =======================================================================
