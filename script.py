@@ -37,17 +37,20 @@ modelo_groq = "openai/gpt-oss-120b"
 url_caba = "https://api-restboletinoficial.buenosaires.gob.ar/obtenerBoletin/{fecha}/true"
 url_pba_anteriores = "https://boletinoficial.gba.gob.ar/ediciones-anteriores"
 url_pba_pdf = "https://boletinoficial.gba.gob.ar/secciones/{id}/ver"
+url_nacion_pdf = "https://s3.arsat.com.ar/cdn-bo-001/pdf-del-dia/primera.pdf"
 
 CAMPOS_REQUERIDOS = ["jurisdiccion", "titulo", "criollo", "afecta", "letraChica", "publicar"]
 
 MAX_NORMAS_POR_JURISDICCION = 3
 PAUSA_ENTRE_ANALISIS = 60
 PAGINAS_INDICE_CABA = 30
+PAGINAS_INDICE_NACION = 10
 
 RUTA_SCRIPT = Path(__file__).resolve().parent
 RUTA_DATOS_JS = RUTA_SCRIPT / "datos.js"
 RUTA_PDF_CABA = RUTA_SCRIPT / "boletin_caba_temp.pdf"
 RUTA_PDF_PBA = RUTA_SCRIPT / "boletin_pba_temp.pdf"
+RUTA_PDF_NACION = RUTA_SCRIPT / "boletin_nacion_temp.pdf"
 
 
 # =======================================================================
@@ -358,7 +361,7 @@ PALABRAS_EXCLUIR = [
 
 
 # =======================================================================
-# 5. VALIDAR DICTAMEN (movida arriba para evitar warnings)
+# 5. VALIDAR DICTAMEN
 # =======================================================================
 
 def validar_dictamen(dictamen):
@@ -379,6 +382,7 @@ def validar_dictamen(dictamen):
             return False
 
     return True
+
 
 # =======================================================================
 # 6. FUNCIONES PARA CABA
@@ -587,7 +591,80 @@ def extraer_normas_pba(ruta_pdf):
 
 
 # =======================================================================
-# 8. FILTRAR NORMAS RELEVANTES
+# 8. FUNCIONES PARA NACIÓN
+# =======================================================================
+
+def bajar_pdf_boletin_nacion():
+    """Baja el PDF de la primera sección del Boletín Oficial de Nación."""
+
+    print(f"📄 NACIÓN: Bajando PDF desde {url_nacion_pdf}...")
+
+    try:
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        }
+        res = requests.get(url_nacion_pdf, headers=headers, timeout=180)
+
+        if res.status_code != 200:
+            print(f"❌ NACIÓN: Error al bajar PDF ({res.status_code})")
+            return None
+
+        with open(RUTA_PDF_NACION, "wb") as f:
+            f.write(res.content)
+
+        tamano_mb = len(res.content) / 1024 / 1024
+        print(f"✅ NACIÓN: PDF bajado ({tamano_mb:.2f} MB)")
+        return RUTA_PDF_NACION
+
+    except Exception as e:
+        print(f"💥 NACIÓN: Error bajando PDF: {e}")
+        return None
+
+
+def extraer_normas_nacion(ruta_pdf):
+    """Extrae normas del índice del PDF de Nación."""
+
+    print(f"📖 NACIÓN: Extrayendo índice (primeras {PAGINAS_INDICE_NACION} páginas)...")
+
+    try:
+        texto = []
+        with pdfplumber.open(ruta_pdf) as pdf:
+            limite = min(PAGINAS_INDICE_NACION, len(pdf.pages))
+            for i in range(limite):
+                pagina = pdf.pages[i].extract_text()
+                if pagina:
+                    texto.append(pagina)
+
+        texto_completo = "\n".join(texto)
+        print(f"✅ NACIÓN: Texto extraído ({len(texto_completo)} caracteres).")
+
+        patron = r'([^\.]+?)\.\s+((?:Decreto|Resolución(?:\s+General)?|Disposición)\s+\d+/\d{4})\.\s*([A-Z]+-\d+-[\w\-#\-]+)?\s*[-.]?\s*(.*?)\.{1,}\s*(\d+)(?=\s*(?:[A-ZÁÉÍÓÚÑ]|$))'
+
+        normas = []
+        for match in re.finditer(patron, texto_completo, re.DOTALL):
+            organismo = match.group(1).strip()
+            norma = match.group(2).strip()
+            codigo = match.group(3).strip() if match.group(3) else ""
+            sumario = " ".join(match.group(4).split()).strip() if match.group(4) else ""
+            pagina = match.group(5).strip()
+
+            sumario_completo = f"{organismo}. {sumario}".strip()
+
+            normas.append({
+                "norma": norma,
+                "sumario": sumario_completo,
+                "pagina": pagina
+            })
+
+        print(f"✅ NACIÓN: {len(normas)} normas encontradas.")
+        return normas
+
+    except Exception as e:
+        print(f"💥 NACIÓN: Error extrayendo normas: {e}")
+        return []
+
+    # =======================================================================
+# 9. FILTRAR NORMAS RELEVANTES
 # =======================================================================
 
 def filtrar_normas_relevantes(normas):
@@ -623,7 +700,7 @@ def filtrar_normas_relevantes(normas):
 
 
 # =======================================================================
-# 9. CONSULTAR GROQ (con retry inteligente)
+# 10. CONSULTAR GROQ (con retry inteligente)
 # =======================================================================
 
 def consultar_groq(norma, jurisdiccion, max_reintentos=3):
@@ -745,7 +822,7 @@ def consultar_groq(norma, jurisdiccion, max_reintentos=3):
 
 
 # =======================================================================
-# 10. ESCAPAR HTML
+# 11. ESCAPAR HTML
 # =======================================================================
 
 def escapar_html(texto):
@@ -767,7 +844,7 @@ def escapar_html(texto):
 
 
 # =======================================================================
-# 11. FORMATEAR PARA TELEGRAM
+# 12. FORMATEAR PARA TELEGRAM
 # =======================================================================
 
 def formatear_para_telegram(dictamen):
@@ -791,7 +868,7 @@ def formatear_para_telegram(dictamen):
 
 
 # =======================================================================
-# 12. ENVIAR A TELEGRAM
+# 13. ENVIAR A TELEGRAM
 # =======================================================================
 
 def enviar_telegram(mensaje):
@@ -821,7 +898,7 @@ def enviar_telegram(mensaje):
 
 
 # =======================================================================
-# 13. GUARDAR EN datos.js
+# 14. GUARDAR EN datos.js
 # =======================================================================
 
 def ya_existe_en_datos(titulo):
@@ -896,11 +973,11 @@ def guardar_en_datos_js(dictamen):
 
 
 # =======================================================================
-# 14. PROCESAR UNA JURISDICCIÓN
+# 15. PROCESAR UNA JURISDICCIÓN
 # =======================================================================
 
 def procesar_jurisdiccion(jurisdiccion):
-    """Procesa CABA o PBA. Devuelve lista de resultados."""
+    """Procesa CABA, PBA o Nación. Devuelve lista de resultados."""
 
     print(f"\n{'═' * 70}")
     print(f"🗺️ PROCESANDO {jurisdiccion.upper()}")
@@ -913,6 +990,9 @@ def procesar_jurisdiccion(jurisdiccion):
         id_boletin = obtener_id_boletin_pba()
         ruta_pdf = bajar_pdf_boletin_pba(id_boletin) if id_boletin else None
         normas = extraer_normas_pba(ruta_pdf) if ruta_pdf else []
+    elif jurisdiccion == "nacion":
+        ruta_pdf = bajar_pdf_boletin_nacion()
+        normas = extraer_normas_nacion(ruta_pdf) if ruta_pdf else []
     else:
         print(f"❌ Jurisdicción desconocida: {jurisdiccion}")
         return []
@@ -964,7 +1044,7 @@ def procesar_jurisdiccion(jurisdiccion):
 
 
 # =======================================================================
-# 15. PROCESO PRINCIPAL
+# 16. PROCESO PRINCIPAL
 # =======================================================================
 
 def ejecutar_patrullaje():
@@ -979,6 +1059,7 @@ def ejecutar_patrullaje():
 
     todos["caba"] = procesar_jurisdiccion("caba")
     todos["pba"] = procesar_jurisdiccion("pba")
+    todos["nacion"] = procesar_jurisdiccion("nacion")
 
     print("\n")
     print("=" * 70)
@@ -997,7 +1078,7 @@ def ejecutar_patrullaje():
 
 
 # =======================================================================
-# 16. EJECUTAR
+# 17. EJECUTAR
 # =======================================================================
 
 if __name__ == "__main__":
