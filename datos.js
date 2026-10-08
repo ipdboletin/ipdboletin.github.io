@@ -1,6 +1,14 @@
 // Base de datos viva y acumulativa de IPD
 const baseDatosIPD = [
   {
+    fecha: "2026-10-08",
+    jurisdiccion: "caba",
+    titulo: "Resolución 696/2026",
+    criollo: "La medida sube los precios de la licitación pública, encareciendo la obra para la Ciudad y enriqueciendo al empresario que la ejecutará. El gasto extra recae sobre el erario municipal, reduciendo recursos para salud, educación o salarios del sector público y pudiendo trasladarse a los contribuyentes.",
+    afecta: "<b>Presupuesto municipal</b>: encarece la obra y reduce fondos disponibles.\n<b>Trabajadores del Estado</b>: riesgo de recortes salariales o de servicios.\n<b>Empresario privado</b>: gana mayor rentabilidad por el ajuste de precios.",
+    letraChica: "Permite ajustes de precios sin control previo, favoreciendo al contratista y limitando la fiscalización del gasto público."
+  },
+  {
     fecha: "2026-10-07",
     jurisdiccion: "pba",
     titulo: "Resolución 150/2023",
