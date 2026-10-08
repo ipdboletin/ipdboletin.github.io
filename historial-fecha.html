@@ -8,9 +8,9 @@
         :root { --azul-tactico: #1D3557; --gris-oscuro: #2D3748; --gris-claro: #F7FAFC; --dorado: #C9A227; }
         body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: var(--gris-claro); color: var(--gris-oscuro); }
         .container { max-width: 800px; margin: 40px auto; padding: 20px; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .logo-condor { display: block; margin: 0 auto 25px auto; max-width: 280px; height: auto; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.1)); }
         h1 { color: var(--azul-tactico); text-align: center; text-transform: uppercase; font-size: 24px; margin-bottom: 15px; letter-spacing: 1px; }
         .subtitulo { text-align: center; color: #718096; font-size: 14px; margin-bottom: 25px; font-style: italic; }
+        .logo-condor { display: block; margin: 0 auto 25px auto; max-width: 350px; width: 100%; height: auto; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.1)); }
         .fecha-titulo { text-align: center; font-size: 22px; font-weight: bold; color: var(--azul-tactico); margin: 25px 0 20px 0; padding: 15px; background: #F7FAFC; border-radius: 8px; border-left: 4px solid var(--azul-tactico); }
         .tabs { display: flex; justify-content: space-between; margin-bottom: 25px; border-bottom: 2px solid #E2E8F0; }
         .tab-btn { flex: 1; padding: 12px; border: none; background: none; font-size: 16px; font-weight: bold; color: #718096; cursor: pointer; text-align: center; transition: 0.3s; }
@@ -44,7 +44,7 @@
         .calendario-dia.vacio { background: transparent; }
         @media (max-width: 600px) {
             .container { margin: 15px auto; padding: 15px; }
-            .logo-condor { max-width: 200px; }
+            .logo-condor { max-width: 240px; }
             h1 { font-size: 20px; }
             .fecha-titulo { font-size: 18px; }
             .calendario-grid { max-width: 100%; }
@@ -127,16 +127,13 @@
         function actualizarTabs() {
             const tabsContainer = document.getElementById('tabs-container');
             
-            // Limpiar tabs
             tabsContainer.innerHTML = '';
 
-            // Si solo hay 1 jurisdicción, ocultar tabs
             if (jurisdiccionesDisponibles.length <= 1) {
                 tabsContainer.style.display = 'none';
                 return;
             }
 
-            // Crear un botón por cada jurisdicción disponible
             jurisdiccionesDisponibles.forEach(jur => {
                 const btn = document.createElement('button');
                 btn.className = 'tab-btn' + (jur === jurisdiccionActiva ? ' active' : '');
@@ -153,7 +150,6 @@
             const noResults = document.getElementById('no-results');
             contenedor.innerHTML = '';
 
-            // Filtrar por fecha y jurisdicción activa
             const normasFiltradas = baseDatosIPD.filter(a => 
                 a.fecha === fechaSeleccionada && a.jurisdiccion === jurisdiccionActiva
             );
@@ -166,7 +162,6 @@
                 noResults.style.display = 'none';
             }
 
-            // Renderizar artículos
             normasFiltradas.forEach(art => {
                 const card = document.createElement('div');
                 card.className = 'articulo-card open';
@@ -257,7 +252,6 @@
 
             fechaSeleccionada = obtenerFechaDeURL();
 
-            // Caso 1: No hay fecha en la URL
             if (!fechaSeleccionada) {
                 fechaTitulo.textContent = '⚠️ No se especificó una fecha';
                 tabsContainer.style.display = 'none';
@@ -267,10 +261,8 @@
                 return;
             }
 
-            // Filtrar normas del día
             const normasDelDia = baseDatosIPD.filter(a => a.fecha === fechaSeleccionada);
 
-            // Caso 2: No hay normas ese día
             if (normasDelDia.length === 0) {
                 fechaTitulo.textContent = `📅 ${formatearFecha(fechaSeleccionada)}`;
                 tabsContainer.style.display = 'none';
@@ -280,20 +272,15 @@
                 return;
             }
 
-            // Título con la fecha
             fechaTitulo.textContent = `📅 ${formatearFecha(fechaSeleccionada)}`;
 
-            // Obtener jurisdicciones disponibles (solo las que tienen normas ese día)
             jurisdiccionesDisponibles = Array.from(new Set(normasDelDia.map(a => a.jurisdiccion)));
 
-            // Ordenar por prioridad: NACIÓN, PBA, CABA
             const orden = { nacion: 1, pba: 2, caba: 3 };
             jurisdiccionesDisponibles.sort((a, b) => (orden[a] || 99) - (orden[b] || 99));
 
-            // Setear la jurisdicción activa (la primera de la lista)
             jurisdiccionActiva = jurisdiccionesDisponibles[0];
 
-            // Actualizar tabs y renderizar
             actualizarTabs();
             renderizarContenido();
             renderizarCalendario();
