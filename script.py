@@ -317,3 +317,618 @@ INICIOS_EXCLUIR = [
 PALABRAS_EXCLUIR = [
     "boletín oficial", "boletin oficial",
 ]
+
+# =======================================================================
+# 5. FUNCIONES PARA CABA
+# =======================================================================
+
+def bajar_pdf_boletin_caba():
+    """Consulta la API de CABA y baja el PDF del boletín del día."""
+
+    fecha_hoy = datetime.now().strftime("%d-%m-%Y")
+    url = url_caba.format(fecha=fecha_hoy)
+
+    print(f"📥 CABA: Consultando API para {fecha_hoy}...")
+
+    try:
+        res = requests.get(url, timeout=30)
+        print(f"📡 CABA: Código {res.status_code}")
+
+        if res.status_code != 200:
+            print("❌ CABA: La API rechazó la solicitud.")
+            return None
+
+        data = res.json()
+        url_pdf = data.get("boletin", {}).get("url_boletin")
+
+        if not url_pdf:
+            print("❌ CABA: No se encontró 'url_boletin'.")
+            return None
+
+        print(f"📄 CABA: Bajando PDF...")
+        res_pdf = requests.get(url_pdf, timeout=120)
+
+        if res_pdf.status_code != 200:
+            print(f"❌ CABA: Error al bajar PDF ({res_pdf.status_code})")
+            return None
+
+        with open(RUTA_PDF_CABA, "wb") as f:
+            f.write(res_pdf.content)
+
+        tamano_mb = len(res_pdf.content) / 1024 / 1024
+        print(f"✅ CABA: PDF bajado ({tamano_mb:.2f} MB)")
+        return RUTA_PDF_CABA
+
+    except Exception as e:
+        print(f"💥 CABA: Error bajando PDF: {e}")
+        return None
+
+
+def extraer_normas_caba(ruta_pdf):
+    """Extrae normas del índice del PDF de CABA."""
+
+    print(f"📖 CABA: Extrayendo índice (primeras {PAGINAS_INDICE_CABA} páginas)...")
+
+    try:
+        texto = []
+        with pdfplumber.open(ruta_pdf) as pdf:
+            limite = min(PAGINAS_INDICE_CABA, len(pdf.pages))
+            for i in range(limite):
+                pagina = pdf.pages[i].extract_text()
+                if pagina:
+                    texto.append(pagina)
+
+        texto_completo = "\n".join(texto)
+        print(f"✅ CABA: Texto extraído ({len(texto_completo)} caracteres).")
+
+        patron = r'((?:Resolución|Decreto|Ley|Disposición)\s+N°\s+[\w\-/]+)\s*\n(.*?)\.{3,}\s*Pág\.\s*(\d+)'
+
+        normas = []
+        for match in re.finditer(patron, texto_completo, re.DOTALL):
+            norma = match.group(1).strip()
+            sumario = " ".join(match.group(2).strip().split())
+            pagina = match.group(3).strip()
+
+            if "de Directorio" in norma:
+                continue
+
+            normas.append({
+                "norma": norma,
+                "sumario": sumario,
+                "pagina": pagina
+            })
+
+        print(f"✅ CABA: {len(normas)} normas encontradas.")
+        return normas
+
+    except Exception as e:
+        print(f"💥 CABA: Error extrayendo normas: {e}")
+        return []
+
+
+# =======================================================================
+# 6. FUNCIONES PARA PBA
+# =======================================================================
+
+def obtener_id_boletin_pba():
+    """Scrappea la página de ediciones anteriores y devuelve el ID
+    de la sección OFICIAL del boletín de hoy."""
+
+    fecha_hoy = datetime.now().strftime("%d/%m/%Y")
+    print(f"📥 PBA: Buscando boletín del {fecha_hoy}...")
+
+    try:
+        res = requests.get(url_pba_anteriores, timeout=30)
+        print(f"📡 PBA: Código {res.status_code}")
+
+        if res.status_code != 200:
+            print("❌ PBA: La página rechazó la solicitud.")
+            return None
+
+        html = res.text
+
+        # Buscar el bloque del boletín de hoy. El patrón es:
+        # BOLETÍN N° XXXXX - DD/MM/YYYY
+        # ... (más adelante en el mismo bloque)
+        # href="/secciones/XXXXX/ver"
+        patron_fecha = re.escape(fecha_hoy)
+        indice_fecha = html.find(f"- {fecha_hoy}")
+
+        if indice_fecha == -1:
+            print(f"❌ PBA: No se encontró el boletín del {fecha_hoy}.")
+            return None
+
+        # Buscar el link /secciones/XXXXX/ver más cercano DESPUÉS del título
+        # Buscamos desde la posición de la fecha hasta 5000 caracteres después
+        bloque = html[indice_fecha:indice_fecha + 5000]
+
+        match = re.search(r'/secciones/(\d+)/ver', bloque)
+
+        if not match:
+            print("❌ PBA: No se encontró el ID de la sección OFICIAL.")
+            return None
+
+        id_boletin = match.group(1)
+        print(f"✅ PBA: ID del boletín OFICIAL = {id_boletin}")
+        return id_boletin
+
+    except Exception as e:
+        print(f"💥 PBA: Error buscando ID: {e}")
+        return None
+
+
+def bajar_pdf_boletin_pba(id_boletin):
+    """Baja el PDF del boletín de PBA."""
+
+    if not id_boletin:
+        return None
+
+    url = url_pba_pdf.format(id=id_boletin)
+    print(f"📄 PBA: Bajando PDF desde {url}...")
+
+    try:
+        res = requests.get(url, timeout=180)
+
+        if res.status_code != 200:
+            print(f"❌ PBA: Error al bajar PDF ({res.status_code})")
+            return None
+
+        with open(RUTA_PDF_PBA, "wb") as f:
+            f.write(res.content)
+
+        tamano_mb = len(res.content) / 1024 / 1024
+        print(f"✅ PBA: PDF bajado ({tamano_mb:.2f} MB)")
+        return RUTA_PDF_PBA
+
+    except Exception as e:
+        print(f"💥 PBA: Error bajando PDF: {e}")
+        return None
+
+
+def extraer_normas_pba(ruta_pdf):
+    """Extrae normas del PDF completo de PBA."""
+
+    print("📖 PBA: Extrayendo texto del PDF completo...")
+
+    try:
+        texto = []
+        with pdfplumber.open(ruta_pdf) as pdf:
+            total = len(pdf.pages)
+            print(f"📄 PBA: {total} páginas para procesar.")
+
+            for i, pagina in enumerate(pdf.pages):
+                contenido = pagina.extract_text()
+                if contenido:
+                    texto.append(contenido)
+
+        texto_completo = "\n".join(texto)
+        print(f"✅ PBA: Texto extraído ({len(texto_completo)} caracteres).")
+
+        # Patrón: DECRETO N° 1667/2026 | RESOLUCIÓN N° 256-XX-2026 | DISPOSICIÓN N° 1249-XX-2026
+        patron_norma = r'((?:DECRETO|RESOLUCIÓN|DISPOSICIÓN)\s+N°\s+[\d\-A-Za-z/]+)'
+
+        # Encontrar todas las posiciones de inicio de norma
+        matches = list(re.finditer(patron_norma, texto_completo, re.IGNORECASE))
+
+        normas = []
+        for i, match in enumerate(matches):
+            inicio = match.start()
+            fin = matches[i + 1].start() if i + 1 < len(matches) else len(texto_completo)
+
+            # Extraer título y texto
+            titulo = match.group(1).strip()
+            texto_norma = texto_completo[inicio:fin].strip()
+
+            # Limpiar y limitar tamaño (evita tokens gigantes)
+            texto_norma_limpio = " ".join(texto_norma.split())
+            texto_norma_limpio = texto_norma_limpio[:3000]  # tope de seguridad
+
+            # Si es muy corto, probablemente es un falso positivo
+            if len(texto_norma_limpio) < 200:
+                continue
+
+            normas.append({
+                "norma": titulo,
+                "sumario": texto_norma_limpio,
+                "pagina": ""
+            })
+
+        print(f"✅ PBA: {len(normas)} normas encontradas.")
+        return normas
+
+    except Exception as e:
+        print(f"💥 PBA: Error extrayendo normas: {e}")
+        return []
+
+
+# =======================================================================
+# 7. FILTRAR NORMAS RELEVANTES (compartida)
+# =======================================================================
+
+def filtrar_normas_relevantes(normas):
+    """Aplica el filtro por palabras clave."""
+
+    print(f"🎯 IPD: Filtrando {len(normas)} normas...")
+
+    candidatas = []
+
+    for norma in normas:
+        sumario = norma.get("sumario", "").lower().strip()
+        norma_str = norma.get("norma", "").lower()
+        texto = f"{sumario} {norma_str}"
+
+        # Excluir si el sumario arranca con palabra de designación
+        if any(sumario.startswith(p) for p in INICIOS_EXCLUIR):
+            continue
+
+        # Excluir boletín oficial
+        if any(p in texto for p in PALABRAS_EXCLUIR):
+            continue
+
+        matches = sum(1 for p in PALABRAS_INCLUIR if p in texto)
+
+        if matches == 0:
+            continue
+
+        candidatas.append({**norma, "matches": matches})
+
+    candidatas.sort(key=lambda x: x["matches"], reverse=True)
+    top = candidatas[:MAX_NORMAS_POR_JURISDICCION]
+
+    print(f"✅ {len(top)} normas pasaron el filtro (de {len(normas)}).")
+    return top
+
+
+# =======================================================================
+# 8. CONSULTAR GROQ
+# =======================================================================
+
+def consultar_groq(norma, jurisdiccion):
+    """Analiza una norma con Groq. Devuelve un dict o None."""
+
+    titulo = norma.get("norma", "Sin título")
+    print(f"🤖 Groq: Analizando '{titulo}'...")
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {groq_key}"
+    }
+
+    norma_texto = (
+        f"## NORMA A ANALIZAR\n\n"
+        f"Jurisdicción: {jurisdiccion.upper()}.\n\n"
+        f"Norma: {norma.get('norma', '')}.\n\n"
+        f"Sumario oficial:\n{norma.get('sumario', '')}\n\n"
+        f"Página del boletín: {norma.get('pagina', '')}"
+    )
+
+    payload_groq = {
+        "model": modelo_groq,
+        "messages": [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": norma_texto}
+        ],
+        "temperature": 0.3,
+        "max_tokens": 2048,
+        "response_format": {"type": "json_object"}
+    }
+
+    try:
+        res_groq = requests.post(url_groq, headers=headers, json=payload_groq, timeout=90)
+        print(f"📡 Groq: Código {res_groq.status_code}")
+
+        if res_groq.status_code != 200:
+            print("❌ Groq rechazó la solicitud.")
+            print(res_groq.text[:500])
+            return None
+
+        data = res_groq.json()
+
+        try:
+            contenido = data["choices"][0]["message"]["content"]
+        except (KeyError, IndexError, TypeError):
+            print("❌ Estructura inesperada en Groq.")
+            return None
+
+        try:
+            dictamen = json.loads(contenido)
+            print("⚖️ Dictamen parseado.")
+            return dictamen
+        except json.JSONDecodeError as e:
+            print(f"❌ JSON inválido: {e}")
+            print(contenido[:500])
+            return None
+
+    except Exception as e:
+        print(f"💥 Error con Groq: {e}")
+        return None
+
+
+# =======================================================================
+# 9. VALIDAR DICTAMEN
+# =======================================================================
+
+def validar_dictamen(dictamen):
+
+    if not isinstance(dictamen, dict):
+        return False
+
+    faltantes = [c for c in CAMPOS_REQUERIDOS if c not in dictamen]
+    if faltantes:
+        print(f"❌ Faltan campos: {faltantes}")
+        return False
+
+    for campo in CAMPOS_REQUERIDOS:
+        if campo == "publicar":
+            continue
+        if not dictamen[campo] or not str(dictamen[campo]).strip():
+            print(f"❌ Campo '{campo}' vacío.")
+            return False
+
+    return True
+
+
+# =======================================================================
+# 10. ESCAPAR HTML
+# =======================================================================
+
+def escapar_html(texto):
+
+    if not texto:
+        return ""
+
+    texto = texto.replace("<b>", "___B_OPEN___")
+    texto = texto.replace("</b>", "___B_CLOSE___")
+
+    texto = texto.replace("&", "&amp;")
+    texto = texto.replace("<", "&lt;")
+    texto = texto.replace(">", "&gt;")
+
+    texto = texto.replace("___B_OPEN___", "<b>")
+    texto = texto.replace("___B_CLOSE___", "</b>")
+
+    return texto
+
+
+# =======================================================================
+# 11. FORMATEAR PARA TELEGRAM
+# =======================================================================
+
+def formatear_para_telegram(dictamen):
+
+    jurisdiccion = str(dictamen.get("jurisdiccion", "")).upper()
+    titulo = escapar_html(dictamen.get("titulo", ""))
+    criollo = escapar_html(dictamen.get("criollo", ""))
+    afecta = escapar_html(dictamen.get("afecta", ""))
+
+    mensaje = (
+        "<b>📢 IPD: Alerta Temprana del Bolsillo Popular</b>\n\n"
+        f"<b>📌 {jurisdiccion} | {titulo}</b>\n\n"
+        f"<b>🔍 LA POSTA:</b>\n\n{criollo}\n\n"
+        f"<b>⚠️ CÓMO TE AFECTA:</b>\n\n{afecta}\n\n"
+        "━━━━━━━━━━━━━━━━━━━\n\n"
+        "🌐 Sumate a la comunidad:\n"
+        '<a href="https://ipdboletin.github.io">ipdboletin.github.io</a>'
+    )
+
+    return mensaje
+
+
+# =======================================================================
+# 12. ENVIAR A TELEGRAM
+# =======================================================================
+
+def enviar_telegram(mensaje):
+
+    payload_tg = {
+        "chat_id": chat_id_tg,
+        "text": mensaje,
+        "parse_mode": "HTML"
+    }
+
+    try:
+        res = requests.post(url_telegram, json=payload_tg, timeout=20)
+        if res.status_code == 200:
+            print("🚀 Telegram OK")
+            return True
+        print(f"❌ Telegram rechazó ({res.status_code})")
+        print(res.text[:300])
+        return False
+    except Exception as e:
+        print(f"💥 Error Telegram: {e}")
+        return False
+
+
+# =======================================================================
+# 13. GUARDAR EN datos.js
+# =======================================================================
+
+def ya_existe_en_datos(titulo):
+    if not RUTA_DATOS_JS.exists():
+        return False
+    with open(RUTA_DATOS_JS, "r", encoding="utf-8") as f:
+        contenido = f.read()
+    titulo_escapado = titulo.replace('"', '\\"')
+    return f'titulo: "{titulo_escapado}"' in contenido
+
+
+def construir_entrada_js(dictamen, fecha):
+
+    def limpiar(valor):
+        valor = str(valor).strip()
+        valor = valor.replace("\\", "\\\\")
+        valor = valor.replace('"', '\\"')
+        valor = valor.replace("\n", "\\n")
+        valor = valor.replace("\r", "")
+        return valor
+
+    return (
+        "  {\n"
+        f'    fecha: "{fecha}",\n'
+        f'    jurisdiccion: "{limpiar(dictamen["jurisdiccion"])}",\n'
+        f'    titulo: "{limpiar(dictamen["titulo"])}",\n'
+        f'    criollo: "{limpiar(dictamen["criollo"])}",\n'
+        f'    afecta: "{limpiar(dictamen["afecta"])}",\n'
+        f'    letraChica: "{limpiar(dictamen["letraChica"])}"\n'
+        "  },\n"
+    )
+
+
+def guardar_en_datos_js(dictamen):
+
+    titulo = dictamen.get("titulo", "").strip()
+    fecha_hoy = datetime.now().strftime("%Y-%m-%d")
+
+    if ya_existe_en_datos(titulo):
+        print(f"⚠️ Ya existe '{titulo}'. No se agrega.")
+        return False
+
+    if not RUTA_DATOS_JS.exists():
+        print(f"❌ No se encontró {RUTA_DATOS_JS}.")
+        return False
+
+    try:
+        with open(RUTA_DATOS_JS, "r", encoding="utf-8") as f:
+            contenido = f.read()
+
+        marcador = "const baseDatosIPD = ["
+        indice = contenido.find(marcador)
+
+        if indice == -1:
+            print("❌ No se encontró el marcador en datos.js.")
+            return False
+
+        punto = indice + len(marcador) + 1
+        nueva = construir_entrada_js(dictamen, fecha_hoy)
+
+        nuevo = contenido[:punto] + nueva + contenido[punto:]
+
+        with open(RUTA_DATOS_JS, "w", encoding="utf-8") as f:
+            f.write(nuevo)
+
+        print(f"✅ '{titulo}' agregada a datos.js.")
+        return True
+
+    except Exception as e:
+        print(f"💥 Error guardando: {e}")
+        return False
+
+
+# =======================================================================
+# 14. PROCESAR UNA JURISDICCIÓN
+# =======================================================================
+
+def procesar_jurisdiccion(jurisdiccion):
+    """Procesa CABA o PBA. Devuelve lista de resultados."""
+
+    print(f"\n{'═' * 70}")
+    print(f"🗺️ PROCESANDO {jurisdiccion.upper()}")
+    print(f"{'═' * 70}\n")
+
+    # PASO 1 — Bajar PDF
+    if jurisdiccion == "caba":
+        ruta_pdf = bajar_pdf_boletin_caba()
+        normas = extraer_normas_caba(ruta_pdf) if ruta_pdf else []
+    elif jurisdiccion == "pba":
+        id_boletin = obtener_id_boletin_pba()
+        ruta_pdf = bajar_pdf_boletin_pba(id_boletin) if id_boletin else None
+        normas = extraer_normas_pba(ruta_pdf) if ruta_pdf else []
+    else:
+        print(f"❌ Jurisdicción desconocida: {jurisdiccion}")
+        return []
+
+    if not normas:
+        print(f"⚠️ No se encontraron normas en {jurisdiccion.upper()}.")
+        return []
+
+    # PASO 2 — Filtrar
+    candidatas = filtrar_normas_relevantes(normas)
+
+    if not candidatas:
+        print(f"⚠️ Ninguna norma de {jurisdiccion.upper()} pasó el filtro.")
+        return []
+
+    # PASO 3 — Analizar cada una
+    print(f"\n🎯 Analizando {len(candidatas)} normas de {jurisdiccion.upper()}...\n")
+
+    resultados = []
+
+    for i, norma in enumerate(candidatas, 1):
+        print(f"\n{'─' * 70}")
+        print(f"📋 [{jurisdiccion.upper()}] NORMA {i}/{len(candidatas)}: {norma.get('norma', '')}")
+        print(f"{'─' * 70}\n")
+
+        dictamen = consultar_groq(norma, jurisdiccion)
+
+        if not dictamen:
+            print(f"⚠️ No se pudo analizar. Se saltea.")
+            continue
+
+        if not validar_dictamen(dictamen):
+            print(f"⚠️ Dictamen inválido. Se saltea.")
+            continue
+
+        if not dictamen.get("publicar", False):
+            print(f"⏭️ Groq: no amerita publicar.")
+            continue
+
+        mensaje = formatear_para_telegram(dictamen)
+        enviado = enviar_telegram(mensaje)
+        guardado = guardar_en_datos_js(dictamen)
+
+        resultados.append({
+            "titulo": dictamen.get("titulo", ""),
+            "telegram": enviado,
+            "datos_js": guardado
+        })
+
+        if i < len(candidatas):
+            print(f"\n⏸️ Pausa de {PAUSA_ENTRE_ANALISIS}s...\n")
+            time.sleep(PAUSA_ENTRE_ANALISIS)
+
+    return resultados
+
+
+# =======================================================================
+# 15. PROCESO PRINCIPAL
+# =======================================================================
+
+def ejecutar_patrullaje():
+
+    print("")
+    print("=" * 70)
+    print("🛡️ IPD - INFORMACIÓN PARA LA DEFENSA")
+    print("🕵️ Iniciando patrullaje...")
+    print("=" * 70)
+
+    todos = {}
+
+    # CABA
+    todos["caba"] = procesar_jurisdiccion("caba")
+
+    # PBA
+    todos["pba"] = procesar_jurisdiccion("pba")
+
+    # RESUMEN FINAL
+    print("\n")
+    print("=" * 70)
+    print("📊 RESUMEN DEL PATRULLAJE")
+    print("=" * 70)
+
+    for jur, resultados in todos.items():
+        print(f"\n  {jur.upper()}: {len(resultados)} publicadas")
+        for r in resultados:
+            tg = "✅" if r["telegram"] else "❌"
+            js = "✅" if r["datos_js"] else "❌"
+            print(f"    - {r['titulo']} | TG: {tg} | JS: {js}")
+
+    print("\n" + "=" * 70)
+    print("")
+
+
+# =======================================================================
+# 16. EJECUTAR
+# =======================================================================
+
+if __name__ == "__main__":
+    ejecutar_patrullaje()
