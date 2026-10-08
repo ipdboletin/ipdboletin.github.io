@@ -2,11 +2,10 @@ name: Escáner Automático IPD
 
 on:
   schedule:
-    # 05:15 AM de Argentina (ART = UTC-3) se traduce a las 08:15 AM UTC
-    - cron: '15 8 * * 1-5'
-  workflow_dispatch: # Activa el botón para disparar el test manual desde la web
+    # 07:40 AM de Argentina (ART = UTC-3) se traduce a las 10:40 AM UTC
+    - cron: '40 10 * * 1-5'
+  workflow_dispatch:
 
-# Permiso explícito para que el bot pueda commitear y pushear datos.js
 permissions:
   contents: write
 
@@ -28,7 +27,6 @@ jobs:
         run: pip install requests python-dotenv pdfplumber
 
       - name: Ejecución del Despacho Autónomo desde la Raíz
-        # Vincula de forma segura tus Secrets de GitHub con las variables del script
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -40,7 +38,6 @@ jobs:
           git config --local user.name "IPD Bot"
           git config --local user.email "bot@ipd.local"
           git add datos.js
-          # Solo commitea si hay cambios reales
           if git diff --cached --quiet; then
             echo "ℹ️ No hay cambios en datos.js. No se commitea."
           else
