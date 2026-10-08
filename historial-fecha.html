@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archivo por Fecha – IPD</title>
+    <style>
+        :root { --azul-tactico: #1D3557; --gris-oscuro: #2D3748; --gris-claro: #F7FAFC; --dorado: #C9A227; }
+        body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: var(--gris-claro); color: var(--gris-oscuro); }
+        .container { max-width: 800px; margin: 40px auto; padding: 20px; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .logo-condor { display: block; margin: 0 auto 25px auto; max-width: 280px; height: auto; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.1)); }
+        h1 { color: var(--azul-tactico); text-align: center; text-transform: uppercase; font-size: 24px; margin-bottom: 15px; letter-spacing: 1px; }
+        .subtitulo { text-align: center; color: #718096; font-size: 14px; margin-bottom: 25px; font-style: italic; }
+        .fecha-titulo { text-align: center; font-size: 22px; font-weight: bold; color: var(--azul-tactico); margin: 25px 0 20px 0; padding: 15px; background: #F7FAFC; border-radius: 8px; border-left: 4px solid var(--azul-tactico); }
+        .tabs { display: flex; justify-content: space-between; margin-bottom: 25px; border-bottom: 2px solid #E2E8F0; }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: none; font-size: 16px; font-weight: bold; color: #718096; cursor: pointer; text-align: center; transition: 0.3s; }
+        .tab-btn.active { color: var(--azul-tactico); border-bottom: 4px solid var(--azul-tactico); }
+        .articulo-card { background: #ffffff; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 12px; overflow: hidden; transition: 0.2s; }
+        .articulo-card:hover { border-color: var(--azul-tactico); }
+        .articulo-header { padding: 15px; background: #ffffff; cursor: pointer; font-weight: bold; color: var(--azul-tactico); font-size: 16px; display: flex; justify-content: space-between; align-items: center; user-select: none; gap: 10px; }
+        .articulo-header-titulo { flex: 1; }
+        .articulo-header::after { content: '▼'; font-size: 12px; color: #A0AEC0; transition: 0.3s; flex-shrink: 0; }
+        .articulo-card.open .articulo-header::after { transform: rotate(180deg); color: var(--azul-tactico); }
+        .badge-jurisdiccion { display: inline-block; font-size: 10px; background: var(--azul-tactico); color: white; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; margin-left: 8px; vertical-align: middle; }
+        .articulo-body { max-height: 0; padding: 0 15px; background: #FAFAFA; overflow: hidden; transition: all 0.3s ease-out; font-size: 15px; line-height: 1.6; }
+        .articulo-card.open .articulo-body { max-height: 2500px; padding: 15px; border-top: 1px solid #E2E8F0; }
+        .bloque-ipd { margin-bottom: 12px; }
+        .bloque-ipd strong { display: block; color: var(--azul-tactico); text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .no-results { text-align: center; color: #A0AEC0; margin-top: 20px; padding: 20px; display: none; }
+        .back-link { display: block; text-align: center; margin-top: 30px; color: #74B9FF; font-weight: bold; text-decoration: none; }
+        .calendario-seccion { margin-top: 40px; padding-top: 30px; border-top: 2px solid #E2E8F0; }
+        .calendario-titulo { font-size: 18px; font-weight: bold; color: var(--azul-tactico); text-align: center; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        .calendario-nav { display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .calendario-nav-btn { background: var(--azul-tactico); color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 16px; font-weight: bold; }
+        .calendario-nav-btn:hover { background: var(--dorado); }
+        .calendario-mes-titulo { font-size: 16px; font-weight: bold; color: var(--azul-tactico); min-width: 180px; text-align: center; text-transform: uppercase; }
+        .calendario-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; max-width: 400px; margin: 0 auto; }
+        .calendario-dia-semana { text-align: center; font-size: 11px; font-weight: bold; color: #718096; padding: 5px 0; text-transform: uppercase; }
+        .calendario-dia { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 14px; background: #F7FAFC; color: #A0AEC0; }
+        .calendario-dia.con-normas { background: var(--azul-tactico); color: white; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .calendario-dia.con-normas:hover { background: var(--dorado); transform: scale(1.1); }
+        .calendario-dia.seleccionado { border: 2px solid var(--dorado); }
+        .calendario-dia.hoy { border: 2px solid #C53030; }
+        .calendario-dia.vacio { background: transparent; }
+        @media (max-width: 600px) {
+            .container { margin: 15px auto; padding: 15px; }
+            .logo-condor { max-width: 200px; }
+            h1 { font-size: 20px; }
+            .fecha-titulo { font-size: 18px; }
+            .calendario-grid { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>📂 Memoria Colectiva IPD</h1>
+        <p class="subtitulo">Traducimos el Boletín Oficial para que sepas cómo te afecta</p>
+        <img src="INFOPD-Photoroom.png" alt="Cóndor IPD" class="logo-condor">
+
+        <div class="fecha-titulo" id="fecha-titulo">📅 Cargando...</div>
+
+        <div class="tabs" id="tabs-container" style="display:none;"></div>
+
+        <div id="contenedor-archivo"></div>
+        <div id="no-results" class="no-results"></div>
+
+        <div class="calendario-seccion">
+            <div class="calendario-titulo">📅 Buscar otra fecha</div>
+            <div class="calendario-nav">
+                <button class="calendario-nav-btn" onclick="cambiarMes(-1)">◀</button>
+                <div class="calendario-mes-titulo" id="calendario-mes-titulo"></div>
+                <button class="calendario-nav-btn" onclick="cambiarMes(1)">▶</button>
+            </div>
+            <div class="calendario-grid" id="calendario-grid"></div>
+        </div>
+
+        <a href="historial.html" class="back-link">← Volver al Historial</a>
+    </div>
+
+    <script src="datos.js"></script>
+    <script>
+        let jurisdiccionActiva = null;
+        let fechaSeleccionada = null;
+        let jurisdiccionesDisponibles = [];
+        let mesCalendario = new Date().getMonth();
+        let anioCalendario = new Date().getFullYear();
+
+        const mesesNombres = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        const diasSemana = ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"];
+
+        function formatearTexto(texto) {
+            if (!texto) return "";
+            return texto.replace(/\n/g, '<br>');
+        }
+
+        function formatearFecha(fechaStr) {
+            const [anio, mes, dia] = fechaStr.split('-');
+            return `${dia}/${mes}/${anio}`;
+        }
+
+        function obtenerFechaDeURL() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('fecha');
+        }
+
+        function fechaHoy() {
+            const hoy = new Date();
+            return `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
+        }
+
+        function toggleCard(header) {
+            header.parentElement.classList.toggle('open');
+        }
+
+        function nombreJurisdiccion(jur) {
+            const nombres = { nacion: 'NACIÓN', pba: 'PBA', caba: 'CABA' };
+            return nombres[jur] || jur.toUpperCase();
+        }
+
+        function cambiarJurisdiccion(jur) {
+            jurisdiccionActiva = jur;
+            actualizarTabs();
+            renderizarContenido();
+        }
+
+        function actualizarTabs() {
+            const tabsContainer = document.getElementById('tabs-container');
+            
+            // Limpiar tabs
+            tabsContainer.innerHTML = '';
+
+            // Si solo hay 1 jurisdicción, ocultar tabs
+            if (jurisdiccionesDisponibles.length <= 1) {
+                tabsContainer.style.display = 'none';
+                return;
+            }
+
+            // Crear un botón por cada jurisdicción disponible
+            jurisdiccionesDisponibles.forEach(jur => {
+                const btn = document.createElement('button');
+                btn.className = 'tab-btn' + (jur === jurisdiccionActiva ? ' active' : '');
+                btn.textContent = nombreJurisdiccion(jur);
+                btn.onclick = () => cambiarJurisdiccion(jur);
+                tabsContainer.appendChild(btn);
+            });
+
+            tabsContainer.style.display = 'flex';
+        }
+
+        function renderizarContenido() {
+            const contenedor = document.getElementById('contenedor-archivo');
+            const noResults = document.getElementById('no-results');
+            contenedor.innerHTML = '';
+
+            // Filtrar por fecha y jurisdicción activa
+            const normasFiltradas = baseDatosIPD.filter(a => 
+                a.fecha === fechaSeleccionada && a.jurisdiccion === jurisdiccionActiva
+            );
+
+            if (normasFiltradas.length === 0) {
+                noResults.textContent = `No hay normas de ${nombreJurisdiccion(jurisdiccionActiva)} el ${formatearFecha(fechaSeleccionada)}.`;
+                noResults.style.display = 'block';
+                return;
+            } else {
+                noResults.style.display = 'none';
+            }
+
+            // Renderizar artículos
+            normasFiltradas.forEach(art => {
+                const card = document.createElement('div');
+                card.className = 'articulo-card open';
+                const jur = art.jurisdiccion.toUpperCase();
+
+                card.innerHTML = `
+                    <div class="articulo-header" onclick="toggleCard(this)">
+                        <div class="articulo-header-titulo">
+                            ${art.titulo}
+                            <span class="badge-jurisdiccion">${jur}</span>
+                        </div>
+                    </div>
+                    <div class="articulo-body">
+                        <div class="bloque-ipd"><strong>🔍 La Posta:</strong> ${formatearTexto(art.criollo)}</div>
+                        <div class="bloque-ipd"><strong>⚠️ Cómo te afecta:</strong> ${formatearTexto(art.afecta)}</div>
+                        <div class="bloque-ipd"><strong>📝 La Letra Chica:</strong> ${formatearTexto(art.letraChica)}</div>
+                    </div>
+                `;
+                contenedor.appendChild(card);
+            });
+        }
+
+        function renderizarCalendario() {
+            const grid = document.getElementById('calendario-grid');
+            const titulo = document.getElementById('calendario-mes-titulo');
+            grid.innerHTML = '';
+            titulo.textContent = `${mesesNombres[mesCalendario]} ${anioCalendario}`;
+
+            diasSemana.forEach(d => {
+                const el = document.createElement('div');
+                el.className = 'calendario-dia-semana';
+                el.textContent = d;
+                grid.appendChild(el);
+            });
+
+            const diasConNormas = new Set(baseDatosIPD.map(a => a.fecha));
+
+            const primerDia = new Date(anioCalendario, mesCalendario, 1);
+            const ultimoDia = new Date(anioCalendario, mesCalendario + 1, 0);
+            const diaSemanaInicio = primerDia.getDay();
+            const totalDias = ultimoDia.getDate();
+
+            for (let i = 0; i < diaSemanaInicio; i++) {
+                const vacio = document.createElement('div');
+                vacio.className = 'calendario-dia vacio';
+                grid.appendChild(vacio);
+            }
+
+            const hoyStr = fechaHoy();
+
+            for (let d = 1; d <= totalDias; d++) {
+                const dia = document.createElement('div');
+                const fechaStr = `${anioCalendario}-${String(mesCalendario+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                
+                dia.className = 'calendario-dia';
+                dia.textContent = d;
+
+                if (diasConNormas.has(fechaStr)) {
+                    dia.classList.add('con-normas');
+                    dia.onclick = () => {
+                        window.location.href = `historial-fecha.html?fecha=${fechaStr}`;
+                    };
+                }
+
+                if (fechaStr === hoyStr) {
+                    dia.classList.add('hoy');
+                }
+
+                if (fechaStr === fechaSeleccionada) {
+                    dia.classList.add('seleccionado');
+                }
+
+                grid.appendChild(dia);
+            }
+        }
+
+        function cambiarMes(delta) {
+            mesCalendario += delta;
+            if (mesCalendario > 11) { mesCalendario = 0; anioCalendario++; }
+            if (mesCalendario < 0) { mesCalendario = 11; anioCalendario--; }
+            renderizarCalendario();
+        }
+
+        function inicializar() {
+            const fechaTitulo = document.getElementById('fecha-titulo');
+            const noResults = document.getElementById('no-results');
+            const tabsContainer = document.getElementById('tabs-container');
+
+            fechaSeleccionada = obtenerFechaDeURL();
+
+            // Caso 1: No hay fecha en la URL
+            if (!fechaSeleccionada) {
+                fechaTitulo.textContent = '⚠️ No se especificó una fecha';
+                tabsContainer.style.display = 'none';
+                noResults.textContent = 'No se especificó una fecha. Por favor, volvé al historial y elegí un día del calendario.';
+                noResults.style.display = 'block';
+                renderizarCalendario();
+                return;
+            }
+
+            // Filtrar normas del día
+            const normasDelDia = baseDatosIPD.filter(a => a.fecha === fechaSeleccionada);
+
+            // Caso 2: No hay normas ese día
+            if (normasDelDia.length === 0) {
+                fechaTitulo.textContent = `📅 ${formatearFecha(fechaSeleccionada)}`;
+                tabsContainer.style.display = 'none';
+                noResults.textContent = `No hay normas publicadas el ${formatearFecha(fechaSeleccionada)}.`;
+                noResults.style.display = 'block';
+                renderizarCalendario();
+                return;
+            }
+
+            // Título con la fecha
+            fechaTitulo.textContent = `📅 ${formatearFecha(fechaSeleccionada)}`;
+
+            // Obtener jurisdicciones disponibles (solo las que tienen normas ese día)
+            jurisdiccionesDisponibles = Array.from(new Set(normasDelDia.map(a => a.jurisdiccion)));
+
+            // Ordenar por prioridad: NACIÓN, PBA, CABA
+            const orden = { nacion: 1, pba: 2, caba: 3 };
+            jurisdiccionesDisponibles.sort((a, b) => (orden[a] || 99) - (orden[b] || 99));
+
+            // Setear la jurisdicción activa (la primera de la lista)
+            jurisdiccionActiva = jurisdiccionesDisponibles[0];
+
+            // Actualizar tabs y renderizar
+            actualizarTabs();
+            renderizarContenido();
+            renderizarCalendario();
+        }
+
+        inicializar();
+    </script>
+</body>
+</html>
