@@ -2,6 +2,30 @@
 const baseDatosIPD = [
   {
     fecha: "2026-10-08",
+    jurisdiccion: "pba",
+    titulo: "Resolución 160/24",
+    criollo: "El Estado destina casi 10 millones de pesos a la cooperativa Abriendo Caminos para comprar materia prima y equipamiento. ¿A quién le sirve? A esa empresa y a sus dueños, no al trabajador promedio. El dinero sale del erario, lo paga la gente y no hay garantía de que genere empleo masivo. Al final, la cuenta la pagamos entre todos.",
+    afecta: "- <b>Finanzas públicas</b>: se asignan $9,9 M a una cooperativa, carga al erario y a los contribuyentes.\n- <b>Empleo</b>: el subsidio solo beneficia a la cooperativa, sin garantía de crear puestos para la mayoría.\n- <b>Transparencia</b>: la selección no es clara, favoreciendo a grupos vinculados al gobierno.",
+    letraChica: "El anexo no detalla criterios de adjudicación ni mecanismos de rendición; el subsidio se otorga sin competencia, favoreciendo a la cooperativa elegida y dejando fuera a otras organizaciones."
+  },
+  {
+    fecha: "2026-10-08",
+    jurisdiccion: "pba",
+    titulo: "Resolución RESO-2021-943-GDEBA-MIYSPGP",
+    criollo: "El Estado paga $1,176 M extra a la empresa constructora y la deja sin derecho a reclamar costos mayores. El gasto se carga al presupuesto provincial y a los contribuyentes, mientras el trabajador no recibe mejora ni empleo garantizado.",
+    afecta: "- <b>Mayor gasto público:</b> +$1,176 M al presupuesto, recortando fondos de salud, educación y empleo.\n- <b>Beneficio a la empresa:</b> la contratista cobra +$1,176 M y renuncia a reclamos, sin asegurar nuevos puestos.\n- <b>Trabajador excluido:</b> no hay aumento de empleo ni mejora salarial; la carga recae en los laburantes vía impuestos.",
+    letraChica: "La renuncia de la contratista a reclamar sobrecostos impide revisar futuros aumentos, garantizando que cualquier exceso recaiga totalmente sobre la provincia y, por ende, sobre los contribuyentes."
+  },
+  {
+    fecha: "2026-10-08",
+    jurisdiccion: "pba",
+    titulo: "Resolución 682/2026",
+    criollo: "El Estado crea un Fondo Provincial de Compensaciones Tarifarias que paga a los distribuidores municipales cuando sus costos superan los de referencia. ¿Quién paga esa compensación? Los usuarios, entre ellos los laburantes, absorben el gasto en la factura de luz. Se promete igualdad tarifaria, pero la carga recae en el pueblo.",
+    afecta: "<b>Tarifas eléctricas</b>: se mantienen o suben para cubrir compensaciones, encareciendo la luz del laburante.\n<b>Concesionarios</b>: reciben dinero del fondo sin que se demuestre mayor eficiencia, se benefician.",
+    letraChica: "La resolución permite ajustes de alícuotas sin control estricto; los faltantes del fondo se cubren después con cargos a los usuarios, ocultando el verdadero costo al contribuyente."
+  },
+  {
+    fecha: "2026-10-08",
     jurisdiccion: "caba",
     titulo: "Resolución 696/2026",
     criollo: "La medida sube los precios de la licitación pública, encareciendo la obra para la Ciudad y enriqueciendo al empresario que la ejecutará. El gasto extra recae sobre el erario municipal, reduciendo recursos para salud, educación o salarios del sector público y pudiendo trasladarse a los contribuyentes.",
