@@ -3,6 +3,14 @@ const baseDatosIPD = [
   {
     fecha: "2026-10-08",
     jurisdiccion: "pba",
+    titulo: "Resolución 682-MIYSPGP-2026",
+    criollo: "El Estado crea un Fondo de Compensaciones Tarifarias que paga a los distribuidores municipales cuando sus costos superan los de referencia, pero la tarifa final que paga el usuario no baja. ¿A quién le sirve? A las empresas eléctricas, mientras el bolsillo del laburante sigue cargado. Al final, la cuenta la pagamos entre todos.",
+    afecta: "- <b>Tarifas fijas para usuarios:</b> no baja el precio de la luz, se mantiene o sube.\n- <b>Beneficio a concesionarios eléctricos:</b> reciben compensación sin que el Estado asuma costos.\n- <b>Coste para los contribuyentes:</b> el fondo se financia con cargos obligatorios a los usuarios.",
+    letraChica: "La compensación se financia con aportes obligatorios de los usuarios y sin control de gasto, permitiendo que los concesionarios recuperen costos extra sin inversión pública."
+  },
+  {
+    fecha: "2026-10-08",
+    jurisdiccion: "pba",
     titulo: "Resolución 160/24",
     criollo: "El Estado destina casi 10 millones de pesos a la cooperativa Abriendo Caminos para comprar materia prima y equipamiento. ¿A quién le sirve? A esa empresa y a sus dueños, no al trabajador promedio. El dinero sale del erario, lo paga la gente y no hay garantía de que genere empleo masivo. Al final, la cuenta la pagamos entre todos.",
     afecta: "- <b>Finanzas públicas</b>: se asignan $9,9 M a una cooperativa, carga al erario y a los contribuyentes.\n- <b>Empleo</b>: el subsidio solo beneficia a la cooperativa, sin garantía de crear puestos para la mayoría.\n- <b>Transparencia</b>: la selección no es clara, favoreciendo a grupos vinculados al gobierno.",
