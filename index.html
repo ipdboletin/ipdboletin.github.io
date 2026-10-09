@@ -102,14 +102,14 @@
         
         /* ============ HEADER ESTILO ARCA ============ */
         .header-ipd { background-color: var(--header-fondo); color: var(--header-texto); position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
-        .header-top { display: flex; justify-content: space-between; align-items: flex-start; padding: 12px 30px; max-width: 1400px; margin: 0 auto; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; padding: 12px 30px; max-width: 1400px; margin: 0 auto; }
         .header-izq { display: flex; align-items: center; gap: 15px; height: 45px; }
-        .header-logo { font-size: 32px; font-weight: 900; letter-spacing: 2px; color: var(--header-texto); line-height: 1; position: relative; top: -3px; }
-        .header-separador { font-size: 32px; color: rgba(255,255,255,0.3); line-height: 1; position: relative; top: -4px; }
-        .header-nombre { display: flex; flex-direction: column; justify-content: center; height: 100%; line-height: 1.15; }
+        .header-logo { font-size: 32px; font-weight: 900; letter-spacing: 2px; color: var(--header-texto); line-height: 1; }
+        .header-separador { font-size: 32px; color: rgba(255,255,255,0.3); line-height: 1; }
+        .header-nombre { display: flex; flex-direction: column; justify-content: center; line-height: 1.15; }
         .header-nombre .linea1 { font-size: 12px; font-weight: 400; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.65); line-height: 1.15; }
         .header-nombre .linea2 { font-size: 12px; font-weight: 400; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.65); line-height: 1.15; }
-        .header-der { display: flex; align-items: center; gap: 15px; margin-top: 4px; }
+        .header-der { display: flex; align-items: center; gap: 15px; }
         .bandera-css { width: 40px; height: 26px; border-radius: 2px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.3); display: flex; flex-direction: column; }
         .bandera-css .franja-celeste { flex: 1; background-color: #74ACDF; }
         .bandera-css .franja-blanca { flex: 1; background-color: #FFFFFF; }
@@ -117,7 +117,7 @@
         .header-año { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.9); letter-spacing: 1px; line-height: 1; }
         
         /* Botón modo oscuro */
-        .btn-modo { background-color: rgba(255,255,255,0.15); border: none; color: var(--header-texto); width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+        .btn-modo { background-color: rgba(255,255,255,0.15); border: none; color: var(--header-texto); width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: 0.3s; flex-shrink: 0; }
         .btn-modo:hover { background-color: rgba(255,255,255,0.3); transform: scale(1.05); }
         
         /* ============ NAV ============ */
@@ -199,7 +199,7 @@
                 align-items: center;
                 justify-content: center;
                 gap: 8px;
-                padding: 10px 40px 10px 15px;
+                padding: 10px 45px 10px 15px;
                 position: relative;
                 min-height: 50px;
             }
@@ -211,12 +211,10 @@
                 gap: 10px;
                 height: auto;
                 width: auto;
-                position: static;
             }
 
             .header-logo {
                 font-size: 22px;
-                top: 0;
                 letter-spacing: 1.5px;
             }
 
@@ -224,7 +222,6 @@
 
             .header-nombre {
                 display: block;
-                height: auto;
                 line-height: 1;
             }
 
@@ -238,10 +235,15 @@
 
             .header-nombre .linea1::after { content: " "; }
 
-            /* Ocultar todo lo decorativo en mobile */
-            .header-der { display: none; }
+            /* En mobile ocultamos bandera, cóndor y año. Dejamos solo el botón */
+            .header-der { 
+                display: contents;
+            }
+            .bandera-css,
+            .header-emblema,
+            .header-año { display: none; }
 
-            /* Botón modo chico y discreto */
+            /* Botón modo: anclado a la derecha de la fila */
             .btn-modo {
                 position: absolute;
                 right: 10px;
@@ -355,6 +357,7 @@
                 </div>
             </div>
             <div class="header-der">
+                <button class="btn-modo" id="btn-modo" title="Cambiar modo claro/oscuro">🌙</button>
                 <div class="bandera-css">
                     <div class="franja-celeste"></div>
                     <div class="franja-blanca"></div>
@@ -362,7 +365,6 @@
                 </div>
                 <img src="emblema.png" alt="Emblema IPD" class="header-emblema">
                 <span class="header-año">2026 - La organización vence al tiempo...</span>
-                <button class="btn-modo" id="btn-modo" title="Cambiar modo claro/oscuro">🌙</button>
             </div>
         </div>
         <nav class="nav-ipd">
