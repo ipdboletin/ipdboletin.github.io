@@ -8,6 +8,49 @@
     <meta name="keywords" content="IPD, sobre, peronismo, justicialismo, boletín oficial, Argentina">
     <meta name="author" content="Junta de Desarrolladores Nacional Justicialistas">
     <meta name="robots" content="index, follow">
+
+    <!-- ============ CANONICAL ============ -->
+    <link rel="canonical" href="https://ipdboletin.github.io/sobre.html" />
+
+    <!-- ============ FAVICON ============ -->
+    <link rel="icon" href="condor.png" type="image/png">
+    <link rel="apple-touch-icon" href="condor.png">
+
+    <!-- ============ MANIFEST PWA ============ -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1D3557">
+
+    <!-- ============ OPEN GRAPH (Facebook / WhatsApp) ============ -->
+    <meta property="og:title" content="Sobre IPD – Información para la Defensa">
+    <meta property="og:description" content="La Junta de Desarrolladores Nacional Justicialistas pone la verdad del Boletín Oficial al servicio del pueblo trabajador.">
+    <meta property="og:image" content="https://ipdboletin.github.io/condor.png">
+    <meta property="og:url" content="https://ipdboletin.github.io/sobre.html">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="es_AR">
+    <meta property="og:site_name" content="IPD - Información para la Defensa">
+
+    <!-- ============ TWITTER / X CARD ============ -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Sobre IPD – Información para la Defensa">
+    <meta name="twitter:description" content="La Junta de Desarrolladores Nacional Justicialistas pone la verdad del Boletín Oficial al servicio del pueblo trabajador.">
+    <meta name="twitter:image" content="https://ipdboletin.github.io/condor.png">
+
+    <!-- ============ JSON-LD (Structured Data) ============ -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "AboutPage",
+      "name": "Sobre IPD – Información para la Defensa",
+      "url": "https://ipdboletin.github.io/sobre.html",
+      "description": "Sobre IPD - Información para la Defensa. Junta de Desarrolladores Nacional Justicialistas.",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "IPD - Información para la Defensa",
+        "url": "https://ipdboletin.github.io/"
+      }
+    }
+    </script>
+
     <style>
         :root {
             --azul-tactico: #1D3557;
@@ -56,20 +99,22 @@
         
         /* ============ HEADER ESTILO ARCA ============ */
         .header-ipd { background-color: var(--header-fondo); color: var(--header-texto); position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
-        .header-top { display: flex; justify-content: space-between; align-items: flex-start; padding: 12px 30px; max-width: 1400px; margin: 0 auto; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; padding: 12px 30px; max-width: 1400px; margin: 0 auto; }
         .header-izq { display: flex; align-items: center; gap: 15px; height: 45px; }
-        .header-logo { font-size: 32px; font-weight: 900; letter-spacing: 2px; color: var(--header-texto); line-height: 1; position: relative; top: -3px; }
-        .header-separador { font-size: 32px; color: rgba(255,255,255,0.3); line-height: 1; position: relative; top: -4px; }
-        .header-nombre { display: flex; flex-direction: column; justify-content: center; height: 100%; line-height: 1.15; }
+        .header-logo { font-size: 32px; font-weight: 900; letter-spacing: 2px; color: var(--header-texto); line-height: 1; }
+        .header-separador { font-size: 32px; color: rgba(255,255,255,0.3); line-height: 1; }
+        .header-nombre { display: flex; flex-direction: column; justify-content: center; line-height: 1.15; }
         .header-nombre .linea1 { font-size: 12px; font-weight: 400; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.65); line-height: 1.15; }
         .header-nombre .linea2 { font-size: 12px; font-weight: 400; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.65); line-height: 1.15; }
-        .header-der { display: flex; align-items: center; gap: 15px; margin-top: 4px; }
+        .header-der { display: flex; align-items: center; gap: 15px; }
         .bandera-css { width: 40px; height: 26px; border-radius: 2px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.3); display: flex; flex-direction: column; }
         .bandera-css .franja-celeste { flex: 1; background-color: #74ACDF; }
         .bandera-css .franja-blanca { flex: 1; background-color: #FFFFFF; }
         .header-emblema { height: 45px; width: auto; filter: brightness(0) invert(1); }
         .header-año { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.9); letter-spacing: 1px; line-height: 1; }
-        .btn-modo { background-color: rgba(255,255,255,0.15); border: none; color: var(--header-texto); width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+        
+        /* Botón modo oscuro (desktop) */
+        .btn-modo { background-color: rgba(255,255,255,0.15); border: none; color: var(--header-texto); width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-size: 18px; line-height: 1; display: flex; align-items: center; justify-content: center; transition: 0.3s; flex-shrink: 0; padding: 0; }
         .btn-modo:hover { background-color: rgba(255,255,255,0.3); transform: scale(1.05); }
         
         /* ============ NAV ============ */
@@ -123,27 +168,108 @@
         
         /* ============ RESPONSIVE ============ */
         @media (max-width: 768px) {
-            .header-top { flex-direction: column; gap: 12px; padding: 15px 20px; text-align: center; align-items: center; }
-            .header-izq, .header-der { justify-content: center; height: auto; margin-top: 0; }
-            .header-logo, .header-separador { top: 0; }
-            .header-logo { font-size: 24px; }
+            /* --- HEADER MOBILE: UNA FILA CENTRADA --- */
+            .header-top {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                padding: 10px 45px 10px 15px;
+                position: relative;
+                min-height: 50px;
+                height: 50px;
+            }
+
+            .header-izq {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                height: auto;
+                width: auto;
+            }
+
+            .header-logo {
+                font-size: 22px;
+                letter-spacing: 1.5px;
+            }
+
             .header-separador { display: none; }
-            .header-nombre { height: auto; }
-            .header-nombre .linea1 { font-size: 10px; }
-            .header-nombre .linea2 { font-size: 10px; }
-            .header-año { font-size: 11px; }
-            .header-emblema { height: 35px; }
-            .nav-ipd-inner { flex-wrap: wrap; justify-content: center; padding: 0 15px; }
-            .nav-ipd a { padding: 10px 14px; font-size: 12px; }
-            .container { margin: 20px 15px; padding: 0 0; }
+
+            .header-nombre {
+                display: block;
+                line-height: 1;
+            }
+
+            .header-nombre .linea1,
+            .header-nombre .linea2 {
+                display: inline;
+                font-size: 10px;
+                letter-spacing: 1px;
+                color: rgba(255,255,255,0.75);
+            }
+
+            .header-nombre .linea1::after { content: " "; }
+
+            /* En mobile ocultamos bandera, cóndor y año. Dejamos solo el botón */
+            .header-der { 
+                display: contents;
+            }
+            .bandera-css,
+            .header-emblema,
+            .header-año { display: none; }
+
+            /* Botón modo: anclado a posición FIJA, sin depender del contenido */
+            .btn-modo {
+                position: absolute;
+                right: 10px;
+                top: 12px;
+                width: 26px;
+                height: 26px;
+                font-size: 14px;
+                line-height: 1;
+                background-color: rgba(255,255,255,0.08);
+                padding: 0;
+                transform: none;
+                margin: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .btn-modo:active { background-color: rgba(255,255,255,0.25); }
+
+            /* --- NAV --- */
+            .nav-ipd-inner {
+                flex-wrap: wrap;
+                justify-content: center;
+                padding: 0 10px;
+                gap: 0;
+            }
+            .nav-ipd a {
+                padding: 10px 12px;
+                font-size: 11px;
+                letter-spacing: 0.5px;
+            }
+
+            /* --- CONTENEDOR --- */
+            .container { margin: 20px 15px; padding: 0; }
             .seccion-card { padding: 25px 20px; }
             .seccion-card h2 { font-size: 17px; }
-            .seccion-card p { font-size: 15px; }
+            .seccion-card p { font-size: 15px; text-align: left; }
             .valores-base { grid-template-columns: 1fr; }
             .valor-comunidad { max-width: 100%; }
             .cita-peron { font-size: 16px; }
+
+            /* --- FOOTER --- */
             .footer-botones { flex-direction: column; align-items: center; }
             .footer-btn { width: 100%; max-width: 280px; justify-content: center; }
+        }
+
+        /* Ajuste extra para pantallas muy chicas */
+        @media (max-width: 380px) {
+            .nav-ipd a { padding: 9px 9px; font-size: 10px; }
+            .seccion-card h2 { font-size: 15px; }
         }
     </style>
 </head>
@@ -161,6 +287,7 @@
                 </div>
             </div>
             <div class="header-der">
+                <button class="btn-modo" id="btn-modo" title="Cambiar modo claro/oscuro">🌙</button>
                 <div class="bandera-css">
                     <div class="franja-celeste"></div>
                     <div class="franja-blanca"></div>
@@ -168,7 +295,6 @@
                 </div>
                 <img src="emblema.png" alt="Emblema IPD" class="header-emblema">
                 <span class="header-año">2026 - La organización vence al tiempo...</span>
-                <button class="btn-modo" id="btn-modo" title="Cambiar modo claro/oscuro">🌙</button>
             </div>
         </div>
         <nav class="nav-ipd">
