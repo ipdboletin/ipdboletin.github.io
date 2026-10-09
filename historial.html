@@ -482,3 +482,48 @@
                 if (diasConNormas.has(fechaStr)) {
                     dia.classList.add('con-normas');
                 }
+
+                if (fechaStr === hoyStr) {
+                    dia.classList.add('hoy');
+                }
+
+                if (fechaStr === fechaSeleccionada) {
+                    dia.classList.add('seleccionado');
+                }
+
+                dia.onclick = () => seleccionarDia(fechaStr);
+
+                grid.appendChild(dia);
+            }
+        }
+
+        function cambiarMes(delta) {
+            mesCalendario += delta;
+            if (mesCalendario > 11) { mesCalendario = 0; anioCalendario++; }
+            if (mesCalendario < 0) { mesCalendario = 11; anioCalendario--; }
+            renderizarCalendario();
+        }
+
+        // ============ INICIALIZAR ============
+        function inicializar() {
+            // Detectar fecha de la URL
+            const fechaURL = fechaDeURL();
+            if (fechaURL) {
+                fechaSeleccionada = fechaURL;
+                // Si la fecha es de otro mes, actualizar el calendario
+                const [anio, mes, dia] = fechaURL.split('-');
+                anioCalendario = parseInt(anio);
+                mesCalendario = parseInt(mes) - 1;
+            } else {
+                fechaSeleccionada = fechaHoy();
+                actualizarURL(fechaSeleccionada);
+            }
+
+            renderizarArchivo();
+            renderizarCalendario();
+        }
+
+        inicializar();
+    </script>
+</body>
+</html>
