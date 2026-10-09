@@ -116,8 +116,8 @@
         .header-emblema { height: 45px; width: auto; filter: brightness(0) invert(1); }
         .header-año { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.9); letter-spacing: 1px; line-height: 1; }
         
-        /* Botón modo oscuro */
-        .btn-modo { background-color: rgba(255,255,255,0.15); border: none; color: var(--header-texto); width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: 0.3s; flex-shrink: 0; }
+        /* Botón modo oscuro (desktop) */
+        .btn-modo { background-color: rgba(255,255,255,0.15); border: none; color: var(--header-texto); width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-size: 18px; line-height: 1; display: flex; align-items: center; justify-content: center; transition: 0.3s; flex-shrink: 0; padding: 0; }
         .btn-modo:hover { background-color: rgba(255,255,255,0.3); transform: scale(1.05); }
         
         /* ============ NAV ============ */
@@ -202,6 +202,7 @@
                 padding: 10px 45px 10px 15px;
                 position: relative;
                 min-height: 50px;
+                height: 50px;
             }
 
             .header-izq {
@@ -243,17 +244,22 @@
             .header-emblema,
             .header-año { display: none; }
 
-            /* Botón modo: anclado a la derecha de la fila */
+            /* Botón modo: anclado a posición FIJA, sin depender del contenido */
             .btn-modo {
                 position: absolute;
                 right: 10px;
-                top: 50%;
-                transform: translateY(-50%);
+                top: 12px;
                 width: 26px;
                 height: 26px;
                 font-size: 14px;
+                line-height: 1;
                 background-color: rgba(255,255,255,0.08);
                 padding: 0;
+                transform: none;
+                margin: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
             .btn-modo:active { background-color: rgba(255,255,255,0.25); }
 
