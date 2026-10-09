@@ -199,9 +199,9 @@
                 align-items: center;
                 justify-content: center;
                 gap: 8px;
-                padding: 10px 50px 10px 15px;
+                padding: 10px 40px 10px 15px;
                 position: relative;
-                min-height: 52px;
+                min-height: 50px;
             }
 
             .header-izq {
@@ -241,17 +241,19 @@
             /* Ocultar todo lo decorativo en mobile */
             .header-der { display: none; }
 
-            /* Botón modo anclado a la derecha */
+            /* Botón modo chico y discreto */
             .btn-modo {
                 position: absolute;
-                right: 12px;
+                right: 10px;
                 top: 50%;
                 transform: translateY(-50%);
-                width: 34px;
-                height: 34px;
-                font-size: 16px;
+                width: 26px;
+                height: 26px;
+                font-size: 14px;
+                background-color: rgba(255,255,255,0.08);
+                padding: 0;
             }
-            .btn-modo:hover { transform: translateY(-50%) scale(1.05); }
+            .btn-modo:active { background-color: rgba(255,255,255,0.25); }
 
             /* --- NAV --- */
             .nav-ipd-inner {
