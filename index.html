@@ -192,56 +192,59 @@
         
         /* ============ RESPONSIVE ============ */
         @media (max-width: 768px) {
-            /* --- HEADER MOBILE: OPCIÓN A (2 filas) --- */
+            /* --- HEADER MOBILE: UNA FILA CENTRADA --- */
             .header-top {
                 display: flex;
-                flex-direction: column;
-                align-items: stretch;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
                 gap: 8px;
-                padding: 10px 15px;
+                padding: 10px 50px 10px 15px;
+                position: relative;
+                min-height: 52px;
             }
 
-            /* Fila 1: IPD + INFORMACIÓN PARA LA DEFENSA + botón modo */
             .header-izq {
-                order: 1;
+                display: flex;
+                align-items: center;
                 justify-content: center;
-                height: auto;
                 gap: 10px;
-                width: 100%;
-                position: relative;
+                height: auto;
+                width: auto;
+                position: static;
             }
-            .header-logo { font-size: 26px; top: 0; }
+
+            .header-logo {
+                font-size: 22px;
+                top: 0;
+                letter-spacing: 1.5px;
+            }
+
             .header-separador { display: none; }
-            .header-nombre { height: auto; }
+
+            .header-nombre {
+                display: block;
+                height: auto;
+                line-height: 1;
+            }
+
             .header-nombre .linea1,
             .header-nombre .linea2 {
+                display: inline;
                 font-size: 10px;
                 letter-spacing: 1px;
-                text-align: left;
+                color: rgba(255,255,255,0.75);
             }
 
-            /* Fila 2: bandera + emblema + año */
-            .header-der {
-                order: 2;
-                justify-content: center;
-                width: 100%;
-                margin-top: 0;
-                gap: 12px;
-                flex-wrap: wrap;
-            }
-            .bandera-css { width: 32px; height: 21px; }
-            .header-emblema { height: 30px; }
-            .header-año {
-                font-size: 11px;
-                text-align: center;
-                line-height: 1.2;
-                max-width: 200px;
-            }
+            .header-nombre .linea1::after { content: " "; }
 
-            /* Botón modo: se ancla a la derecha de la fila 1 */
+            /* Ocultar todo lo decorativo en mobile */
+            .header-der { display: none; }
+
+            /* Botón modo anclado a la derecha */
             .btn-modo {
                 position: absolute;
-                right: 0;
+                right: 12px;
                 top: 50%;
                 transform: translateY(-50%);
                 width: 34px;
@@ -269,7 +272,6 @@
             .hero-subtitulo { font-size: 15px; margin-bottom: 18px; }
             .hero-proclama { font-size: 15px; line-height: 1.6; margin-bottom: 28px; }
 
-            /* Botones del hero: full-width y apilados */
             .hero-botones {
                 flex-direction: column;
                 align-items: stretch;
@@ -332,8 +334,6 @@
 
         /* Ajuste extra para pantallas muy chicas */
         @media (max-width: 380px) {
-            .header-año { font-size: 10px; max-width: 160px; }
-            .header-logo { font-size: 22px; }
             .nav-ipd a { padding: 9px 9px; font-size: 10px; }
             .stat-numero { font-size: 20px; }
         }
@@ -351,7 +351,6 @@
                     <span class="linea1">Información para la</span>
                     <span class="linea2">Defensa</span>
                 </div>
-                <button class="btn-modo" id="btn-modo" title="Cambiar modo claro/oscuro">🌙</button>
             </div>
             <div class="header-der">
                 <div class="bandera-css">
@@ -361,6 +360,7 @@
                 </div>
                 <img src="emblema.png" alt="Emblema IPD" class="header-emblema">
                 <span class="header-año">2026 - La organización vence al tiempo...</span>
+                <button class="btn-modo" id="btn-modo" title="Cambiar modo claro/oscuro">🌙</button>
             </div>
         </div>
         <nav class="nav-ipd">
