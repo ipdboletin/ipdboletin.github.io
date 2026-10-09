@@ -8,12 +8,50 @@
     <meta name="keywords" content="boletín oficial, análisis, peronismo, justicialismo, trabajo, Argentina, Nación, PBA, CABA">
     <meta name="author" content="Junta de Desarrolladores Nacional Justicialistas">
     <meta name="robots" content="index, follow">
+
+    <!-- ============ CANONICAL ============ -->
+    <link rel="canonical" href="https://ipdboletin.github.io/" />
+
+    <!-- ============ FAVICON ============ -->
+    <link rel="icon" href="condor.png" type="image/png">
+    <link rel="apple-touch-icon" href="condor.png">
+
+    <!-- ============ MANIFEST PWA ============ -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1D3557">
+
+    <!-- ============ OPEN GRAPH (Facebook / WhatsApp) ============ -->
     <meta property="og:title" content="IPD - Información para la Defensa">
     <meta property="og:description" content="Análisis diario del Boletín Oficial. Traducimos la letra chica para defender el trabajo, la Patria y el bolsillo popular.">
     <meta property="og:image" content="https://ipdboletin.github.io/condor.png">
-    <meta property="og:url" content="https://ipdboletin.github.io">
+    <meta property="og:url" content="https://ipdboletin.github.io/">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="es_AR">
+    <meta property="og:site_name" content="IPD - Información para la Defensa">
+
+    <!-- ============ TWITTER / X CARD ============ -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="IPD - Información para la Defensa">
+    <meta name="twitter:description" content="Análisis diario del Boletín Oficial. Traducimos la letra chica para defender el trabajo, la Patria y el bolsillo popular.">
+    <meta name="twitter:image" content="https://ipdboletin.github.io/condor.png">
+
+    <!-- ============ JSON-LD (Structured Data) ============ -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "IPD - Información para la Defensa",
+      "alternateName": "IPD",
+      "url": "https://ipdboletin.github.io/",
+      "logo": "https://ipdboletin.github.io/condor.png",
+      "description": "Análisis diario del Boletín Oficial de Nación, PBA y CABA bajo la doctrina nacional justicialista.",
+      "sameAs": [
+        "https://t.me/+x1jpuKAZKMowNjYx",
+        "https://whatsapp.com/channel/0029VbDIsLn2ZjCuyTNW5E1L"
+      ]
+    }
+    </script>
+
     <style>
         /* ============ VARIABLES MODO CLARO ============ */
         :root {
@@ -154,24 +192,150 @@
         
         /* ============ RESPONSIVE ============ */
         @media (max-width: 768px) {
-            .header-top { flex-direction: column; gap: 12px; padding: 15px 20px; text-align: center; align-items: center; }
-            .header-izq, .header-der { justify-content: center; height: auto; margin-top: 0; }
-            .header-logo, .header-separador { top: 0; }
-            .header-logo { font-size: 24px; }
+            /* --- HEADER MOBILE: OPCIÓN A (2 filas) --- */
+            .header-top {
+                display: flex;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+
+            /* Fila 1: IPD + INFORMACIÓN PARA LA DEFENSA + botón modo */
+            .header-izq {
+                order: 1;
+                justify-content: center;
+                height: auto;
+                gap: 10px;
+                width: 100%;
+                position: relative;
+            }
+            .header-logo { font-size: 26px; top: 0; }
             .header-separador { display: none; }
             .header-nombre { height: auto; }
-            .header-nombre .linea1 { font-size: 10px; }
-            .header-nombre .linea2 { font-size: 10px; }
-            .header-año { font-size: 11px; }
-            .header-emblema { height: 35px; }
-            .nav-ipd-inner { flex-wrap: wrap; justify-content: center; padding: 0 15px; }
-            .nav-ipd a { padding: 10px 14px; font-size: 12px; }
-            .hero-subtitulo { font-size: 15px; }
-            .hero-proclama { font-size: 15px; }
-            .hero-condor { max-width: 260px; }
-            .stats { gap: 30px; padding: 25px 15px; }
-            .stat-numero { font-size: 24px; }
+            .header-nombre .linea1,
+            .header-nombre .linea2 {
+                font-size: 10px;
+                letter-spacing: 1px;
+                text-align: left;
+            }
+
+            /* Fila 2: bandera + emblema + año */
+            .header-der {
+                order: 2;
+                justify-content: center;
+                width: 100%;
+                margin-top: 0;
+                gap: 12px;
+                flex-wrap: wrap;
+            }
+            .bandera-css { width: 32px; height: 21px; }
+            .header-emblema { height: 30px; }
+            .header-año {
+                font-size: 11px;
+                text-align: center;
+                line-height: 1.2;
+                max-width: 200px;
+            }
+
+            /* Botón modo: se ancla a la derecha de la fila 1 */
+            .btn-modo {
+                position: absolute;
+                right: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 34px;
+                height: 34px;
+                font-size: 16px;
+            }
+            .btn-modo:hover { transform: translateY(-50%) scale(1.05); }
+
+            /* --- NAV --- */
+            .nav-ipd-inner {
+                flex-wrap: wrap;
+                justify-content: center;
+                padding: 0 10px;
+                gap: 0;
+            }
+            .nav-ipd a {
+                padding: 10px 12px;
+                font-size: 11px;
+                letter-spacing: 0.5px;
+            }
+
+            /* --- HERO --- */
+            .hero { padding: 35px 18px 30px 18px; }
+            .hero-condor { max-width: 240px; margin-bottom: 22px; }
+            .hero-subtitulo { font-size: 15px; margin-bottom: 18px; }
+            .hero-proclama { font-size: 15px; line-height: 1.6; margin-bottom: 28px; }
+
+            /* Botones del hero: full-width y apilados */
+            .hero-botones {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+                max-width: 320px;
+                margin: 0 auto;
+            }
+            .btn-primario,
+            .btn-secundario {
+                width: 100%;
+                text-align: center;
+                padding: 14px 20px;
+                font-size: 14px;
+            }
+
+            /* --- STATS --- */
+            .stats {
+                gap: 20px;
+                padding: 22px 15px;
+                justify-content: space-around;
+            }
+            .stat-item { flex: 1 1 30%; min-width: 90px; }
+            .stat-numero { font-size: 22px; }
+            .stat-label { font-size: 10px; letter-spacing: 1px; }
+
+            /* --- SECCIONES --- */
+            .container-seccion { padding: 35px 18px; }
             .seccion-titulo { font-size: 20px; }
+            .seccion-subtitulo { font-size: 13px; margin-bottom: 25px; }
+
+            /* --- CARDS --- */
+            .cards-grid { grid-template-columns: 1fr; gap: 15px; }
+
+            /* --- FORM SUSCRIPCIÓN --- */
+            .seccion-suscripcion { padding: 35px 18px; }
+            .form-suscripcion {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .form-suscripcion input[type="email"] {
+                min-width: 0;
+                width: 100%;
+            }
+            .form-suscripcion button { width: 100%; }
+
+            /* --- SOBRE --- */
+            .sobre-grid { grid-template-columns: 1fr; }
+
+            /* --- COMUNIDAD --- */
+            .seccion-comunidad { padding: 35px 18px; }
+            .comunidad-titulo { font-size: 20px; }
+            .comunidad-botones {
+                flex-direction: column;
+                align-items: stretch;
+                max-width: 320px;
+                margin: 0 auto;
+            }
+            .btn-comunidad { justify-content: center; }
+        }
+
+        /* Ajuste extra para pantallas muy chicas */
+        @media (max-width: 380px) {
+            .header-año { font-size: 10px; max-width: 160px; }
+            .header-logo { font-size: 22px; }
+            .nav-ipd a { padding: 9px 9px; font-size: 10px; }
+            .stat-numero { font-size: 20px; }
         }
     </style>
 </head>
@@ -187,6 +351,7 @@
                     <span class="linea1">Información para la</span>
                     <span class="linea2">Defensa</span>
                 </div>
+                <button class="btn-modo" id="btn-modo" title="Cambiar modo claro/oscuro">🌙</button>
             </div>
             <div class="header-der">
                 <div class="bandera-css">
@@ -196,7 +361,6 @@
                 </div>
                 <img src="emblema.png" alt="Emblema IPD" class="header-emblema">
                 <span class="header-año">2026 - La organización vence al tiempo...</span>
-                <button class="btn-modo" id="btn-modo" title="Cambiar modo claro/oscuro">🌙</button>
             </div>
         </div>
         <nav class="nav-ipd">
