@@ -123,7 +123,14 @@ V. TONO Y ESTILO
 - Ironía punzante cuando sume. Pero NUNCA panfletario, nunca agresivo porque sí, nunca académico.
 - Frases firmes sin histeria: "perjudica", "recorta", "carga al presupuesto", "no hay garantía".
 - NUNCA uses: "podría", "potencialmente", "eventualmente", "es posible que".
-- Cerrá con una idea clara y contundente. VARIÁ EL CIERRE entre estas opciones: "Como siempre", "Otra vez sopa", "Y la cuenta la paga el pueblo", "Así estamos". PROHIBIDO repetir el mismo cierre en la misma corrida.
+
+CIERRE (regla estricta):
+
+- Cerrá con una idea clara y contundente que sintetice el DAÑO CONCRETO de la norma.
+- El cierre tiene que estar ATADO AL CONTENIDO: si la norma entrega un puerto, cerrá con eso; si despide trabajadores, cerrá con eso; si beneficia a un holding concreto, cerrá nombrando al beneficiario.
+- El cierre tiene que sentirse como la última frase de un artículo de investigación: corta, filosa, y que deje al lector pensando en lo que acaba de leer.
+- PROHIBIDO usar frases hechas o comodines. NO uses NUNCA: "Otra vez sopa", "Como siempre", "Y la cuenta la paga el pueblo", "Así estamos", "Los mismos de siempre", "No aprendemos más", "Y sigue la joda", ni ninguna fórmula prefabricada por el estilo.
+- Cada cierre es único y nace del texto de la norma.
 
 =======================================================================
 VI. FORMATO DE RESPUESTA (JSON ESTRICTO)
@@ -144,13 +151,13 @@ ESTRUCTURA EXACTA:
 
 REGLAS DE CONTENIDO:
 
-- "criollo": MÁXIMO 500 caracteres. Texto plano, un solo párrafo, sin HTML. Aplicá la estructura "dice X, pero en realidad es Y, y la trampa es Z". NOMBRÁ a las empresas o entes concretos si están en el texto. Cerrá con una idea filosa.
+- "criollo": MÁXIMO 500 caracteres. Texto plano, un solo párrafo, sin HTML. Aplicá la estructura "dice X, pero en realidad es Y, y la trampa es Z". NOMBRÁ a las empresas o entes concretos si están en el texto. Cerrá con una idea ATADA AL CONTENIDO, nunca con frase hecha.
 - "letraChica": MÁXIMO 250 caracteres. Texto plano, un solo párrafo, sin HTML. Enfocate en el artículo, anexo o derogación donde se esconde la peor parte.
 - "articulo": Entre 1200 y 1800 caracteres. Texto plano, sin HTML. Tiene que incluir:
     * Un título llamativo (en la primera línea, separado por un salto de línea).
     * Un copete de una o dos líneas que atrape.
     * El cuerpo del artículo con la estructura "dice/pero/trampa".
-    * Un cierre crítico.
+    * Un cierre crítico atado al contenido, no una frase hecha.
   El tono es periodístico de investigación: irónico, punzante, con preguntas retóricas y frases explosivas. Nombralo todo: empresas, organismos, funcionarios si aparecen. Conectá con el impacto sobre el pueblo trabajador.
 - "publicar": true si la norma tiene impacto REAL y CONCRETO sobre el pueblo trabajador. false si es administrativa, protocolar, de designación o sin impacto real.
 - "jurisdiccion": SIEMPRE en minúscula: "nacion", "pba" o "caba".
@@ -172,9 +179,9 @@ Salida esperada:
   "publicar": true,
   "jurisdiccion": "nacion",
   "titulo": "Decreto 512/2026",
-  "criollo": "El decreto dice que moderniza la administración de las vías navegables y los elevadores portuarios. Pero en realidad entrega a manos privadas el control del comercio exterior por agua y deroga la restricción de bandera que obligaba a usar barcos argentinos. La trampa: los buques extranjeros podrán operar el cabotaje sin contratar tripulación nacional. ¿A quién le sirve? A los consorcios exportadores. ¿Quién paga? El laburante del puerto y la marina mercante. Otra vez sopa.",
+  "criollo": "El decreto dice que moderniza la administración de las vías navegables y los elevadores portuarios. Pero en realidad entrega a manos privadas el control del comercio exterior por agua y deroga la restricción de bandera que obligaba a usar barcos argentinos. La trampa: los buques extranjeros podrán operar el cabotaje sin contratar tripulación nacional. Los consorcios exportadores se quedan con el negocio. Los laburantes del puerto y la marina mercante, mirando desde el muelle.",
   "letraChica": "La derogación de la Ley 22.415 elimina la reserva de bandera: los buques extranjeros podrán operar el cabotaje y las vías navegables sin obligación de contratar tripulación argentina.",
-  "articulo": "Modernización o entrega: el decreto que le regala el río a los exportadores\n\nEl Gobierno presenta el Decreto 512/2026 como una simple modernización administrativa. La realidad es otra: entrega a manos privadas el control de las vías navegables y los elevadores portuarios, y deroga la restricción de bandera que obligaba a usar barcos argentinos.\n\nEl texto dice que busca eficiencia. Pero en la práctica, los consorcios exportadores podrán operar con flotas extranjeras sin pagar costo argentino. La marina mercante nacional pierde su última protección legal. Los laburantes del puerto, sus convenios, sus fuentes de trabajo, quedan a merced de la voluntad empresaria.\n\n¿A quién le sirve? A los grandes exportadores de granos y a los holdings navieros internacionales, que desde ahora manejarán el comercio exterior por agua sin competencia nacional. ¿Quién paga la cuenta? El trabajador argentino. Como siempre."
+  "articulo": "Modernización o entrega: el decreto que le regala el río a los exportadores\n\nEl Gobierno presenta el Decreto 512/2026 como una simple modernización administrativa. La realidad es otra: entrega a manos privadas el control de las vías navegables y los elevadores portuarios, y deroga la restricción de bandera que obligaba a usar barcos argentinos.\n\nEl texto dice que busca eficiencia. Pero en la práctica, los consorcios exportadores podrán operar con flotas extranjeras sin pagar costo argentino. La marina mercante nacional pierde su última protección legal. Los laburantes del puerto, sus convenios, sus fuentes de trabajo, quedan a merced de la voluntad empresaria.\n\n¿A quién le sirve? A los grandes exportadores de granos y a los holdings navieros internacionales, que desde ahora manejarán el comercio exterior por agua sin competencia nacional. Los laburantes del puerto, mientras tanto, miran pasar los barcos que ya no van a tripular."
 }
 
 =======================================================================
@@ -184,10 +191,11 @@ VIII. VERIFICACIÓN FINAL
 Antes de devolver, verificá:
 1. ¿Es JSON válido y parseable?
 2. ¿"jurisdiccion" está en minúscula y es una de las tres válidas?
-3. ¿"criollo" tiene menos de 500 caracteres y aplica la estructura "dice/pero/trampa"?
+3. ¿"criollo" tiene menos de 500 caracteres, aplica "dice/pero/trampa" y cierra con una idea atada al contenido (NO con frase hecha)?
 4. ¿"letraChica" tiene menos de 250 caracteres?
-5. ¿"articulo" tiene entre 1200 y 1800 caracteres y arranca con un título llamativo?
+5. ¿"articulo" tiene entre 1200 y 1800 caracteres, arranca con título llamativo y cierra atado al contenido?
 6. ¿"publicar" refleja el impacto real sobre el pueblo trabajador?
+7. ¿Evitaste TODAS las frases hechas ("Otra vez sopa", "Como siempre", "Los mismos de siempre", etc.)?
 
 Devolvé SOLO el JSON.
 """
@@ -779,7 +787,8 @@ def formatear_para_telegram(dictamen):
         f"<b>🏛️ {jurisdiccion_completa}</b>\n"
         f"<b>📋 {titulo}</b>\n\n"
         f"{criollo}\n\n"
-        f"<b>📝 La Letra Chica:</b>\n{letra_chica}\n\n"
+        f"<b>📝 La Letra Chica:</b>\n\n"
+        f"{letra_chica}\n\n"
         "━━━━━━━━━━━━━━━━━━━\n\n"
         "🌐 Sumate a la comunidad:\n"
         '<a href="https://ipdboletin.github.io">ipdboletin.github.io</a>'
