@@ -1,0 +1,33 @@
+{
+  "name": "IPD - Información para la Defensa",
+  "short_name": "IPD",
+  "description": "Análisis diario del Boletín Oficial de Nación, PBA y CABA bajo la doctrina nacional justicialista.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1D3557",
+  "theme_color": "#1D3557",
+  "lang": "es-AR",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "condor.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "condor.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "condor.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
