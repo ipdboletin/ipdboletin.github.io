@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cargando... – IPD | Información para la Defensa</title>
+    <meta name="description" content="Análisis del Boletín Oficial bajo la doctrina nacional justicialista.">
+    <meta name="author" content="Junta de Desarrolladores Nacional Justicialistas">
+    <meta name="robots" content="index, follow">
+
+    <link rel="canonical" id="canonical-link" href="https://ipdboletin.github.io/entrada.html" />
+    <link rel="icon" href="condor.png" type="image/png">
+    <link rel="apple-touch-icon" href="condor.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1D3557">
+
+    <meta property="og:title" id="og-title" content="IPD - Información para la Defensa">
+    <meta property="og:description" id="og-desc" content="Análisis del Boletín Oficial.">
+    <meta property="og:image" id="og-image" content="https://ipdboletin.github.io/condor.png">
+    <meta property="og:url" id="og-url" content="https://ipdboletin.github.io/entrada.html">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="es_AR">
+    <meta property="og:site_name" content="IPD - Información para la Defensa">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" id="tw-title" content="IPD - Información para la Defensa">
+    <meta name="twitter:description" id="tw-desc" content="Análisis del Boletín Oficial.">
+    <meta name="twitter:image" id="tw-image" content="https://ipdboletin.github.io/condor.png">
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <style>
+        :root {
+            --azul-tactico: #1D3557;
+            --azul-medio: #457B9D;
+            --azul-claro: #A8DADC;
+            --rojo: #C1121F;
+            --dorado: #C9A227;
+            --gris-oscuro: #2D3748;
+            --fondo-principal: #F7FAFC;
+            --fondo-secundario: #FFFFFF;
+            --texto-principal: #2D3748;
+            --texto-secundario: #718096;
+            --texto-terciario: #4A5568;
+            --borde: #E2E8F0;
+            --card-fondo: #FFFFFF;
+            --header-fondo: #1D3557;
+            --header-texto: #FFFFFF;
+            --footer-fondo: #2D3748;
+            --footer-texto: rgba(255,255,255,0.8);
+        }
+        body.modo-oscuro {
+            --fondo-principal: #0F172A;
+            --fondo-secundario: #1E293B;
+            --texto-principal: #E2E8F0;
+            --texto-secundario: #94A3B8;
+            --texto-terciario: #CBD5E1;
+            --borde: #334155;
+            --card-fondo: #1E293B;
+            --header-fondo: #0F172A;
+            --header-texto: #FFFFFF;
+            --footer-fondo: #020617;
+            --footer-texto: rgba(255,255,255,0.7);
+            --azul-tactico: #457B9D;
+            --azul-medio: #A8DADC;
+        }
+        * { box-sizing: border-box; transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
+        body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--fondo-principal); color: var(--texto-principal); line-height: 1.6; min-height: 100vh; display: flex; flex-direction: column; }
+
+        .header-ipd { background-color: var(--header-fondo); color: var(--header-texto); position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .header-top { display: flex; justify-content: space-between; align-items: center; padding: 12px 30px; max-width: 1400px; margin: 0 auto; width: 100%; }
+        .header-izq { display: flex; align-items: center; gap: 15px; height: 45px; }
+        .header-logo { font-size: 32px; font-weight: 900; letter-spacing: 2px; color: var(--header-texto); line-height: 1; }
+        .header-separador { font-size: 32px; color: rgba(255,255,255,0.3); line-height: 1; }
+        .header-nombre { display: flex; flex-direction: column; justify-content: center; line-height: 1.15; }
+        .header-nombre .linea1, .header-nombre .linea2 { font-size: 12px; font-weight: 400; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.65); line-height: 1.15; }
+        .header-der { display: flex; align-items: center; gap: 15px; }
+        .bandera-css { width: 40px; height: 26px; border-radius: 2px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.3); display: flex; flex-direction: column; }
+        .bandera-css .franja-celeste { flex: 1; background-color: #74ACDF; }
+        .bandera-css .franja-blanca { flex: 1; background-color: #FFFFFF; }
+        .header-emblema { height: 45px; width: auto; filter: brightness(0) invert(1); }
+        .header-año { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.9); letter-spacing: 1px; line-height: 1
