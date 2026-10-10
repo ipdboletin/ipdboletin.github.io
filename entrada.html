@@ -79,4 +79,244 @@
         .bandera-css .franja-celeste { flex: 1; background-color: #74ACDF; }
         .bandera-css .franja-blanca { flex: 1; background-color: #FFFFFF; }
         .header-emblema { height: 45px; width: auto; filter: brightness(0) invert(1); }
-        .header-año { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.9); letter-spacing: 1px; line-height: 1
+        .header-año { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.9); letter-spacing: 1px; line-height: 1; }
+        .btn-modo { background-color: rgba(255,255,255,0.15); border: none; color: var(--header-texto); width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-size: 18px; line-height: 1; display: flex; align-items: center; justify-content: center; transition: 0.3s; flex-shrink: 0; padding: 0; }
+        .btn-modo:hover { background-color: rgba(255,255,255,0.3); transform: scale(1.05); }
+        .nav-ipd { background-color: var(--header-fondo); border-top: 1px solid rgba(255,255,255,0.15); }
+        .nav-ipd-inner { max-width: 1400px; margin: 0 auto; padding: 0 30px; display: flex; gap: 5px; }
+        .nav-ipd a { color: var(--header-texto); text-decoration: none; padding: 12px 20px; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; border-bottom: 3px solid transparent; }
+        .nav-ipd a:hover, .nav-ipd a.active { background-color: rgba(255,255,255,0.1); border-bottom-color: var(--dorado); }
+
+        .contenido-entrada { flex: 1; max-width: 800px; margin: 0 auto; padding: 40px 20px; width: 100%; }
+        .entrada-cargando { text-align: center; padding: 60px 20px; color: var(--texto-secundario); font-size: 15px; }
+        .entrada-volver { display: inline-block; color: var(--azul-tactico); text-decoration: none; font-size: 14px; font-weight: 600; margin-bottom: 25px; }
+        .entrada-volver:hover { color: var(--dorado); }
+        .entrada-cabecera { margin-bottom: 30px; }
+        .entrada-fecha { font-size: 13px; color: var(--texto-secundario); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; margin-bottom: 12px; }
+        .entrada-titulo { color: var(--azul-tactico); font-size: 38px; font-weight: 900; line-height: 1.2; margin: 0 0 18px 0; }
+        .entrada-copete { color: var(--texto-terciario); font-size: 19px; line-height: 1.5; font-style: italic; margin: 0 0 25px 0; padding-left: 15px; border-left: 4px solid var(--dorado); }
+        .entrada-imagen { width: 100%; height: auto; border-radius: 10px; margin-bottom: 30px; display: block; }
+        .entrada-cuerpo { font-size: 17px; line-height: 1.8; color: var(--texto-principal); }
+        .entrada-cuerpo p { margin: 0 0 20px 0; }
+        .entrada-cuerpo h2 { color: var(--azul-tactico); font-size: 26px; font-weight: 800; margin: 35px 0 15px 0; line-height: 1.3; }
+        .entrada-cuerpo h3 { color: var(--azul-tactico); font-size: 21px; font-weight: 700; margin: 30px 0 12px 0; line-height: 1.3; }
+        .entrada-cuerpo blockquote { border-left: 4px solid var(--dorado); padding-left: 20px; margin: 25px 0; color: var(--texto-terciario); font-style: italic; font-size: 18px; }
+        .entrada-cuerpo ul, .entrada-cuerpo ol { margin: 0 0 20px 0; padding-left: 25px; }
+        .entrada-cuerpo li { margin-bottom: 8px; }
+        .entrada-cuerpo a { color: var(--azul-medio); text-decoration: underline; }
+        .entrada-cuerpo a:hover { color: var(--dorado); }
+        .entrada-cuerpo strong { color: var(--azul-tactico); font-weight: 700; }
+        .entrada-cuerpo img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
+
+        .footer-ipd { background-color: var(--footer-fondo); color: var(--footer-texto); padding: 40px 20px 25px 20px; text-align: center; margin-top: auto; }
+        .footer-contenido { max-width: 1100px; margin: 0 auto; }
+        .footer-titulo { font-size: 15px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; font-weight: bold; color: #FFFFFF; }
+        .footer-botones { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 25px; }
+        .footer-btn { display: inline-flex; align-items: center; gap: 8px; background-color: var(--azul-tactico); color: #FFFFFF; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-size: 15px; font-weight: 700; transition: 0.3s; }
+        .footer-btn:hover { background-color: var(--dorado); }
+        .footer-firma-nombre { font-size: 15px; font-weight: 700; color: #FFFFFF; margin-bottom: 5px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
+        .footer-firma-desc { font-size: 13px; font-style: italic; color: rgba(255,255,255,0.6); margin-bottom: 20px; }
+        .footer-copy { font-size: 12px; color: rgba(255,255,255,0.5); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
+
+        @media (max-width: 768px) {
+            .header-top { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 8px; padding: 10px 45px 10px 15px; position: relative; min-height: 50px; height: 50px; }
+            .header-izq { display: flex; align-items: center; justify-content: center; gap: 10px; height: auto; width: auto; }
+            .header-logo { font-size: 22px; letter-spacing: 1.5px; }
+            .header-separador { display: none; }
+            .header-nombre { display: block; line-height: 1; }
+            .header-nombre .linea1, .header-nombre .linea2 { display: inline; font-size: 10px; letter-spacing: 1px; color: rgba(255,255,255,0.75); }
+            .header-nombre .linea1::after { content: " "; }
+            .header-der { display: contents; }
+            .bandera-css, .header-emblema, .header-año { display: none; }
+            .btn-modo { position: absolute; right: 10px; top: 12px; width: 26px; height: 26px; font-size: 14px; line-height: 1; background-color: rgba(255,255,255,0.08); padding: 0; transform: none; margin: 0; display: flex; align-items: center; justify-content: center; }
+            .nav-ipd-inner { flex-wrap: wrap; justify-content: center; padding: 0 10px; gap: 0; }
+            .nav-ipd a { padding: 10px 12px; font-size: 11px; letter-spacing: 0.5px; }
+            .contenido-entrada { padding: 25px 15px; }
+            .entrada-titulo { font-size: 26px; }
+            .entrada-copete { font-size: 16px; }
+            .entrada-cuerpo { font-size: 16px; }
+            .entrada-cuerpo h2 { font-size: 22px; }
+            .entrada-cuerpo h3 { font-size: 19px; }
+            .footer-botones { flex-direction: column; align-items: center; }
+            .footer-btn { width: 100%; max-width: 280px; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header-ipd">
+        <div class="header-top">
+            <div class="header-izq">
+                <span class="header-logo">IPD</span>
+                <span class="header-separador">|</span>
+                <div class="header-nombre">
+                    <span class="linea1">Información para la</span>
+                    <span class="linea2">Defensa</span>
+                </div>
+            </div>
+            <div class="header-der">
+                <button class="btn-modo" id="btn-modo" title="Cambiar modo claro/oscuro">🌙</button>
+                <div class="bandera-css">
+                    <div class="franja-celeste"></div>
+                    <div class="franja-blanca"></div>
+                    <div class="franja-celeste"></div>
+                </div>
+                <img src="emblema.png" alt="Emblema IPD" class="header-emblema">
+                <span class="header-año">2026 - La organización vence al tiempo...</span>
+            </div>
+        </div>
+        <nav class="nav-ipd">
+            <div class="nav-ipd-inner">
+                <a href="index.html">Inicio</a>
+                <a href="historial.html">Historial</a>
+                <a href="blog.html" class="active">Blog</a>
+                <a href="sobre.html">Sobre IPD</a>
+            </div>
+        </nav>
+    </header>
+
+    <section class="contenido-entrada">
+        <a href="blog.html" class="entrada-volver">← Volver al Blog</a>
+        <div id="entrada-cargando" class="entrada-cargando">Cargando nota...</div>
+        <article id="entrada-articulo" style="display:none;">
+            <div class="entrada-cabecera">
+                <div class="entrada-fecha" id="entrada-fecha"></div>
+                <h1 class="entrada-titulo" id="entrada-titulo"></h1>
+                <p class="entrada-copete" id="entrada-copete"></p>
+            </div>
+            <img id="entrada-imagen" class="entrada-imagen" style="display:none;" alt="">
+            <div class="entrada-cuerpo" id="entrada-cuerpo"></div>
+        </article>
+    </section>
+
+    <footer class="footer-ipd">
+        <div class="footer-contenido">
+            <p class="footer-titulo">📲 Sumate a nuestra comunidad</p>
+            <div class="footer-botones">
+                <a href="https://t.me/+x1jpuKAZKMowNjYx" class="footer-btn" target="_blank">📲 Telegram</a>
+                <a href="https://whatsapp.com/channel/0029VbDIsLn2ZjCuyTNW5E1L" class="footer-btn" target="_blank">💬 WhatsApp</a>
+            </div>
+            <p class="footer-firma-nombre">Junta de Desarrolladores Nacional Justicialistas</p>
+            <p class="footer-firma-desc">Información para la Defensa</p>
+            <p class="footer-copy">© 2026 IPD - Información para la Defensa · Todos los derechos reservados</p>
+        </div>
+    </footer>
+
+    <script>
+        // ============ MODO OSCURO ============
+        const btnModo = document.getElementById('btn-modo');
+        const body = document.body;
+        function aplicarModo(oscuro) {
+            if (oscuro) {
+                body.classList.add('modo-oscuro');
+                btnModo.textContent = '☀️';
+                btnModo.title = 'Cambiar a modo claro';
+            } else {
+                body.classList.remove('modo-oscuro');
+                btnModo.textContent = '🌙';
+                btnModo.title = 'Cambiar a modo oscuro';
+            }
+        }
+        const modoGuardado = localStorage.getItem('modo-oscuro');
+        if (modoGuardado === 'true') { aplicarModo(true); }
+        else { aplicarModo(false); }
+        btnModo.addEventListener('click', () => {
+            const estaOscuro = body.classList.contains('modo-oscuro');
+            aplicarModo(!estaOscuro);
+            localStorage.setItem('modo-oscuro', (!estaOscuro).toString());
+        });
+
+        // ============ CONFIGURACIÓN ============
+        const REPO = 'ipdboletin/ipdboletin.github.io';
+        const CARPETA = 'blog';
+
+        // ============ PARSEAR FRONTMATTER ============
+        function parseFrontmatter(texto) {
+            const match = texto.match(/^---\s*\n([\s\S]*?)\n---\s*\n?([\s\S]*)$/);
+            if (!match) return { data: {}, body: texto };
+            const yaml = match[1];
+            const body = match[2];
+            const data = {};
+            yaml.split('\n').forEach(linea => {
+                const m = linea.match(/^(\w+):\s*(.*)$/);
+                if (!m) return;
+                const clave = m[1].trim();
+                let valor = m[2].trim();
+                valor = valor.replace(/^['"]|['"]$/g, '');
+                data[clave] = valor;
+            });
+            return { data, body };
+        }
+
+        // ============ FORMATEAR FECHA ============
+        function formatearFecha(iso) {
+            if (!iso) return '';
+            const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+            const [a, m, d] = iso.split('-');
+            return `${parseInt(d)} de ${meses[parseInt(m)-1]} de ${a}`;
+        }
+
+        // ============ CARGAR ENTRADA ============
+        async function cargarEntrada() {
+            const params = new URLSearchParams(window.location.search);
+            const slug = params.get('slug');
+
+            const cargando = document.getElementById('entrada-cargando');
+
+            if (!slug) {
+                cargando.textContent = 'No se especificó ninguna nota.';
+                return;
+            }
+
+            try {
+                const url = `https://raw.githubusercontent.com/${REPO}/main/${CARPETA}/${slug}.md`;
+                const res = await fetch(url + '?t=' + Date.now());
+                if (!res.ok) throw new Error('No se encontró la nota');
+                const texto = await res.text();
+                const { data, body: cuerpoMd } = parseFrontmatter(texto);
+
+                // Título de la pestaña
+                document.title = (data.title || 'Nota') + ' – IPD';
+
+                // Meta tags para SEO / compartir
+                const titulo = data.title || '';
+                const copete = data.excerpt || '';
+                const imagen = data.image ? new URL(data.image, window.location.origin).href : 'https://ipdboletin.github.io/condor.png';
+                const urlActual = window.location.href;
+
+                document.getElementById('og-title').setAttribute('content', titulo);
+                document.getElementById('og-desc').setAttribute('content', copete);
+                document.getElementById('og-image').setAttribute('content', imagen);
+                document.getElementById('og-url').setAttribute('content', urlActual);
+                document.getElementById('tw-title').setAttribute('content', titulo);
+                document.getElementById('tw-desc').setAttribute('content', copete);
+                document.getElementById('tw-image').setAttribute('content', imagen);
+                document.getElementById('canonical-link').setAttribute('href', urlActual);
+
+                // Renderizar
+                document.getElementById('entrada-fecha').textContent = formatearFecha(data.date);
+                document.getElementById('entrada-titulo').textContent = titulo;
+                document.getElementById('entrada-copete').textContent = copete;
+
+                if (data.image) {
+                    const img = document.getElementById('entrada-imagen');
+                    img.src = data.image;
+                    img.alt = titulo;
+                    img.style.display = 'block';
+                }
+
+                document.getElementById('entrada-cuerpo').innerHTML = marked.parse(cuerpoMd);
+
+                cargando.style.display = 'none';
+                document.getElementById('entrada-articulo').style.display = 'block';
+            } catch (err) {
+                console.error('Error cargando la entrada:', err);
+                cargando.innerHTML = 'No se pudo cargar la nota. <a href="blog.html">Volver al Blog</a>.';
+            }
+        }
+
+        cargarEntrada();
+    </script>
+
+</body>
+</html>
