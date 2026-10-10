@@ -15,12 +15,12 @@ collections:
     label_singular: "Entrada"
     folder: "blog"
     create: true
-    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    slug: "{{slug}}"
     extension: "md"
     format: "frontmatter"
     fields:
       - { label: "Título", name: "title", widget: "string" }
       - { label: "Fecha", name: "date", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false, format: "YYYY-MM-DD" }
-      - { label: "Copete", name: "excerpt", widget: "text", hint: "1-2 líneas que resumen la nota. Se usa en el índice y en el meta description." }
+      - { label: "Copete", name: "excerpt", widget: "text", hint: "1-2 líneas que resumen la nota." }
       - { label: "Imagen de cabecera", name: "image", widget: "image", required: false }
       - { label: "Cuerpo", name: "body", widget: "markdown" }
