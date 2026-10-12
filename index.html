@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta name="google-site-verification" content="uVCzl8Y0NnW03Vz9Cw8-fZILuYE0kNPQupCdbykdJno" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IPD – Información para la Defensa</title>
@@ -48,7 +47,8 @@
       "description": "Análisis diario del Boletín Oficial de Nación, PBA y CABA bajo la doctrina nacional justicialista.",
       "sameAs": [
         "https://t.me/+x1jpuKAZKMowNjYx",
-        "https://whatsapp.com/channel/0029VbDIsLn2ZjCuyTNW5E1L"
+        "https://whatsapp.com/channel/0029VbDIsLn2ZjCuyTNW5E1L",
+        "https://x.com/ipdboletin"
       ]
     }
     </script>
@@ -107,9 +107,9 @@
         .header-izq { display: flex; align-items: center; gap: 15px; height: 45px; }
         .header-logo { font-size: 32px; font-weight: 900; letter-spacing: 2px; color: var(--header-texto); line-height: 1; }
         .header-separador { font-size: 32px; color: rgba(255,255,255,0.3); line-height: 1; }
-        .header-nombre { display: flex; flex-direction: column; justify-content: center; line-height: 1.15; }
-        .header-nombre .linea1 { font-size: 12px; font-weight: 400; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.65); line-height: 1.15; }
-        .header-nombre .linea2 { font-size: 12px; font-weight: 400; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.65); line-height: 1.15; }
+        .header-nombre { display: flex; flex-direction: column; justify-content: center; line-height: 1; }
+        .header-nombre .linea1 { font-size: 12px; font-weight: 400; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.65); line-height: 1; }
+        .header-nombre .linea2 { font-size: 12px; font-weight: 400; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.65); line-height: 1; }
         .header-der { display: flex; align-items: center; gap: 15px; }
         .bandera-css { width: 40px; height: 26px; border-radius: 2px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.3); display: flex; flex-direction: column; }
         .bandera-css .franja-celeste { flex: 1; background-color: #74ACDF; }
@@ -177,16 +177,59 @@
         .sobre-texto { font-size: 14px; color: var(--texto-principal); line-height: 1.6; }
         
         /* ============ COMUNIDAD ============ */
-        .seccion-comunidad { background-color: var(--azul-tactico); color: #FFFFFF; padding: 50px 20px; text-align: center; }
+        .seccion-comunidad { background-color: var(--azul-tactico); color: #FFFFFF; padding: 50px 20px 30px 20px; text-align: center; }
         .comunidad-titulo { font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
         .comunidad-subtitulo { font-size: 14px; color: rgba(255,255,255,0.8); margin-bottom: 30px; font-style: italic; }
-        .comunidad-botones { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+
+        /* Pirámide invertida: fila de arriba (Telegram + WhatsApp) y X abajo centrado */
+        .comunidad-botones {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 28px;
+        }
+        .comunidad-fila-arriba {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
         .btn-comunidad { display: inline-flex; align-items: center; gap: 8px; background-color: #FFFFFF; color: var(--azul-tactico); padding: 14px 28px; border-radius: 8px; text-decoration: none; font-size: 15px; font-weight: 700; transition: 0.3s; }
         .btn-comunidad:hover { background-color: var(--dorado); color: #FFFFFF; }
+
+        /* Logo X: ícono suelto, sin fondo, centrado abajo */
+        .link-x {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            opacity: 0.9;
+        }
+        .link-x img {
+            height: 38px;
+            width: auto;
+            display: block;
+        }
+        .link-x:hover {
+            transform: scale(1.12);
+            opacity: 1;
+        }
         
         /* ============ FOOTER ============ */
-        .footer-ipd { background-color: var(--footer-fondo); color: var(--footer-texto); padding: 40px 20px 25px 20px; text-align: center; }
+        .footer-ipd { background-color: var(--footer-fondo); color: var(--footer-texto); padding: 25px 20px 25px 20px; text-align: center; }
         .footer-contenido { max-width: 1100px; margin: 0 auto; }
+
+        /* Emblema J.D.N.J en footer */
+        .footer-emblema-jdnj {
+            display: block;
+            width: 110px;
+            height: auto;
+            margin: 0 auto 14px auto;
+            opacity: 0.95;
+        }
+
         .footer-firma-nombre { font-size: 15px; font-weight: 700; color: #FFFFFF; margin-bottom: 5px; }
         .footer-firma-desc { font-size: 13px; font-style: italic; color: rgba(255,255,255,0.6); margin-bottom: 20px; }
         .footer-copy { font-size: 12px; color: rgba(255,255,255,0.5); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
@@ -331,16 +374,29 @@
             /* --- SOBRE --- */
             .sobre-grid { grid-template-columns: 1fr; }
 
-            /* --- COMUNIDAD --- */
-            .seccion-comunidad { padding: 35px 18px; }
+            /* --- COMUNIDAD MOBILE: apilado vertical --- */
+            .seccion-comunidad { padding: 35px 18px 25px 18px; }
             .comunidad-titulo { font-size: 20px; }
             .comunidad-botones {
-                flex-direction: column;
-                align-items: stretch;
                 max-width: 320px;
                 margin: 0 auto;
+                gap: 22px;
+            }
+            .comunidad-fila-arriba {
+                flex-direction: column;
+                align-items: stretch;
+                width: 100%;
             }
             .btn-comunidad { justify-content: center; }
+            .link-x img {
+                height: 34px;
+            }
+
+            /* --- FOOTER: emblema más chico en mobile --- */
+            .footer-emblema-jdnj {
+                width: 95px;
+                margin-bottom: 12px;
+            }
         }
 
         /* Ajuste extra para pantallas muy chicas */
@@ -464,15 +520,22 @@
     <section class="seccion-comunidad">
         <h2 class="comunidad-titulo">📲 Sumate a la comunidad</h2>
         <p class="comunidad-subtitulo">Recibí las alertas al instante en tu canal preferido</p>
+        <!-- Pirámide invertida: Telegram + WhatsApp arriba, X abajo centrado -->
         <div class="comunidad-botones">
-            <a href="https://t.me/+x1jpuKAZKMowNjYx" class="btn-comunidad" target="_blank">📲 Telegram</a>
-            <a href="https://whatsapp.com/channel/0029VbDIsLn2ZjCuyTNW5E1L" class="btn-comunidad" target="_blank">💬 WhatsApp</a>
+            <div class="comunidad-fila-arriba">
+                <a href="https://t.me/+x1jpuKAZKMowNjYx" class="btn-comunidad" target="_blank">📲 Telegram</a>
+                <a href="https://whatsapp.com/channel/0029VbDIsLn2ZjCuyTNW5E1L" class="btn-comunidad" target="_blank">💬 WhatsApp</a>
+            </div>
+            <a href="https://x.com/ipdboletin" class="link-x" target="_blank" rel="noopener" aria-label="Seguinos en X" title="Seguinos en X">
+                <img src="equislogo.png" alt="X - Información para la Defensa">
+            </a>
         </div>
     </section>
 
     <!-- ============ FOOTER ============ -->
     <footer class="footer-ipd">
         <div class="footer-contenido">
+            <img src="JDNJ.png" alt="Junta de Desarrolladores Nacional Justicialistas" class="footer-emblema-jdnj">
             <p class="footer-firma-nombre">Junta de Desarrolladores Nacional Justicialistas</p>
             <p class="footer-firma-desc">Información para la Defensa</p>
             <p class="footer-copy">© 2026 IPD - Información para la Defensa · Todos los derechos reservados</p>
