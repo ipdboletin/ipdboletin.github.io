@@ -2,6 +2,7 @@ import os
 import re
 import json
 import time
+import hashlib
 import requests
 import pdfplumber
 from datetime import datetime
@@ -48,13 +49,71 @@ PAGINAS_INDICE_NACION = 10
 
 RUTA_SCRIPT = Path(__file__).resolve().parent
 RUTA_DATOS_JS = RUTA_SCRIPT / "datos.js"
+RUTA_PROCESADAS = RUTA_SCRIPT / "procesadas.json"
+RUTA_DESCARTADAS = RUTA_SCRIPT / "descartadas.json"
 RUTA_PDF_CABA = RUTA_SCRIPT / "boletin_caba_temp.pdf"
 RUTA_PDF_PBA = RUTA_SCRIPT / "boletin_pba_temp.pdf"
 RUTA_PDF_NACION = RUTA_SCRIPT / "boletin_nacion_temp.pdf"
 
 
 # =======================================================================
-# 3. SYSTEM PROMPT
+# 3. CACHÉ DE NORMAS PROCESADAS
+# =======================================================================
+
+def cargar_procesadas():
+    """Carga los hashes de normas ya procesadas (publicadas o descartadas)."""
+    if not RUTA_PROCESADAS.exists():
+        return set()
+    try:
+        with open(RUTA_PROCESADAS, "r", encoding="utf-8") as f:
+            return set(json.load(f))
+    except Exception as e:
+        print(f"⚠️ No se pudo leer procesadas.json: {e}")
+        return set()
+
+
+def guardar_procesadas(procesadas):
+    """Guarda los hashes de normas procesadas."""
+    try:
+        with open(RUTA_PROCESADAS, "w", encoding="utf-8") as f:
+            json.dump(sorted(list(procesadas)), f, ensure_ascii=False, indent=2)
+        print(f"💾 procesadas.json actualizado ({len(procesadas)} hashes).")
+    except Exception as e:
+        print(f"⚠️ No se pudo guardar procesadas.json: {e}")
+
+
+def cargar_descartadas():
+    """Carga el registro de normas descartadas."""
+    if not RUTA_DESCARTADAS.exists():
+        return []
+    try:
+        with open(RUTA_DESCARTADAS, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"⚠️ No se pudo leer descartadas.json: {e}")
+        return []
+
+
+def guardar_descartadas(descartadas):
+    """Guarda el registro de normas descartadas."""
+    try:
+        with open(RUTA_DESCARTADAS, "w", encoding="utf-8") as f:
+            json.dump(descartadas, f, ensure_ascii=False, indent=2)
+        print(f"💾 descartadas.json actualizado ({len(descartadas)} registros).")
+    except Exception as e:
+        print(f"⚠️ No se pudo guardar descartadas.json: {e}")
+
+
+def hash_norma(jurisdiccion, titulo):
+    """Genera un hash único para una norma.
+    Usa jurisdicción + título normalizado (sin fecha, porque el mismo
+    título puede aparecer en boletines de distintos días)."""
+    clave = f"{jurisdiccion.lower().strip()}|{titulo.lower().strip()}"
+    return hashlib.md5(clave.encode("utf-8")).hexdigest()
+
+
+# =======================================================================
+# 4. SYSTEM PROMPT
 # =======================================================================
 
 SYSTEM_PROMPT = """CONTESTÁ SIEMPRE EN ESPAÑOL DE ARGENTINA. TUTEÁ AL LECTOR.
@@ -202,7 +261,7 @@ Devolvé SOLO el JSON.
 
 
 # =======================================================================
-# 4. PALABRAS CLAVE DEL PRE-FILTRO
+# 5. PALABRAS CLAVE DEL PRE-FILTRO
 # =======================================================================
 
 PALABRAS_INCLUIR = [
@@ -277,7 +336,7 @@ PALABRAS_EXCLUIR = [
 
 
 # =======================================================================
-# 5. VALIDAR DICTAMEN
+# 6. VALIDAR DICTAMEN
 # =======================================================================
 
 def validar_dictamen(dictamen):
@@ -301,7 +360,7 @@ def validar_dictamen(dictamen):
 
 
 # =======================================================================
-# 6. FUNCIONES PARA CABA
+# 7. FUNCIONES PARA CABA
 # =======================================================================
 
 def bajar_pdf_boletin_caba():
@@ -389,7 +448,7 @@ def extraer_normas_caba(ruta_pdf):
 
 
 # =======================================================================
-# 7. FUNCIONES PARA PBA
+# 8. FUNCIONES PARA PBA
 # =======================================================================
 
 def obtener_id_boletin_pba():
@@ -507,7 +566,7 @@ def extraer_normas_pba(ruta_pdf):
 
 
 # =======================================================================
-# 8. FUNCIONES PARA NACIÓN
+# 9. FUNCIONES PARA NACIÓN
 # =======================================================================
 
 def bajar_pdf_boletin_nacion():
@@ -581,7 +640,7 @@ def extraer_normas_nacion(ruta_pdf):
 
 
 # =======================================================================
-# 9. FILTRAR NORMAS RELEVANTES
+# 10. FILTRAR NORMAS RELEVANTES
 # =======================================================================
 
 def filtrar_normas_relevantes(normas):
@@ -617,7 +676,7 @@ def filtrar_normas_relevantes(normas):
 
 
 # =======================================================================
-# 10. CONSULTAR GROQ (con retry inteligente)
+# 11. CONSULTAR GROQ (con retry inteligente)
 # =======================================================================
 
 def consultar_groq(norma, jurisdiccion, max_reintentos=3):
@@ -663,7 +722,6 @@ def consultar_groq(norma, jurisdiccion, max_reintentos=3):
             )
             print(f"📡 Groq: Código {res_groq.status_code} (intento {intento}/{max_reintentos})")
 
-            # CASO 1: RATE LIMIT (429)
             if res_groq.status_code == 429:
                 espera = 30
                 try:
@@ -679,7 +737,6 @@ def consultar_groq(norma, jurisdiccion, max_reintentos=3):
                 time.sleep(espera)
                 continue
 
-            # CASO 2: OTROS ERRORES HTTP
             if res_groq.status_code != 200:
                 print(f"❌ Groq rechazó la solicitud ({res_groq.status_code}).")
                 print(res_groq.text[:300])
@@ -689,7 +746,6 @@ def consultar_groq(norma, jurisdiccion, max_reintentos=3):
                     continue
                 return None
 
-            # CASO 3: RESPUESTA OK → parsear
             data = res_groq.json()
 
             try:
@@ -713,7 +769,6 @@ def consultar_groq(norma, jurisdiccion, max_reintentos=3):
                     continue
                 return None
 
-            # CASO 4: JSON OK pero con campos vacíos → reintentar
             if not validar_dictamen(dictamen):
                 print(f"⚠️ Dictamen incompleto en intento {intento}/{max_reintentos}.")
                 if intento < max_reintentos:
@@ -741,8 +796,10 @@ def consultar_groq(norma, jurisdiccion, max_reintentos=3):
 
     print(f"❌ Se agotaron los {max_reintentos} intentos para '{titulo}'.")
     return None
+
+
 # =======================================================================
-# 11. ESCAPAR HTML
+# 12. ESCAPAR HTML
 # =======================================================================
 
 def escapar_html(texto):
@@ -764,7 +821,7 @@ def escapar_html(texto):
 
 
 # =======================================================================
-# 12. FORMATEAR PARA TELEGRAM
+# 13. FORMATEAR PARA TELEGRAM
 # =======================================================================
 
 def formatear_para_telegram(dictamen):
@@ -774,7 +831,6 @@ def formatear_para_telegram(dictamen):
     criollo = escapar_html(dictamen.get("criollo", ""))
     letra_chica = escapar_html(dictamen.get("letraChica", ""))
 
-    # Traducir jurisdicción
     nombres_jur = {
         "NACION": "Gobierno Nacional",
         "PBA": "Provincia de Buenos Aires",
@@ -798,7 +854,7 @@ def formatear_para_telegram(dictamen):
 
 
 # =======================================================================
-# 13. ENVIAR A TELEGRAM
+# 14. ENVIAR A TELEGRAM
 # =======================================================================
 
 def enviar_telegram(mensaje):
@@ -828,7 +884,7 @@ def enviar_telegram(mensaje):
 
 
 # =======================================================================
-# 14. GUARDAR EN datos.js
+# 15. GUARDAR EN datos.js
 # =======================================================================
 
 def ya_existe_en_datos(titulo):
@@ -903,11 +959,12 @@ def guardar_en_datos_js(dictamen):
 
 
 # =======================================================================
-# 15. PROCESAR UNA JURISDICCIÓN
+# 16. PROCESAR UNA JURISDICCIÓN
 # =======================================================================
 
-def procesar_jurisdiccion(jurisdiccion):
-    """Procesa CABA, PBA o Nación. Devuelve lista de resultados."""
+def procesar_jurisdiccion(jurisdiccion, procesadas, descartadas):
+    """Procesa CABA, PBA o Nación. Devuelve lista de resultados.
+    Usa la caché de procesadas para no repetir normas."""
 
     print(f"\n{'═' * 70}")
     print(f"🗺️ PROCESANDO {jurisdiccion.upper()}")
@@ -942,23 +999,43 @@ def procesar_jurisdiccion(jurisdiccion):
     resultados = []
 
     for i, norma in enumerate(candidatas, 1):
+        titulo = norma.get("norma", "")
         print(f"\n{'─' * 70}")
-        print(f"📋 [{jurisdiccion.upper()}] NORMA {i}/{len(candidatas)}: {norma.get('norma', '')}")
+        print(f"📋 [{jurisdiccion.upper()}] NORMA {i}/{len(candidatas)}: {titulo}")
         print(f"{'─' * 70}\n")
+
+        # === CHEQUEO DE CACHÉ ===
+        h = hash_norma(jurisdiccion, titulo)
+        if h in procesadas:
+            print(f"⏭️ Salteando (ya procesada en corrida anterior): {titulo}")
+            continue
 
         dictamen = consultar_groq(norma, jurisdiccion)
 
         if not dictamen:
-            print(f"⚠️ No se pudo analizar. Se saltea.")
+            print(f"⚠️ No se pudo analizar. Se saltea (no se marca como procesada).")
             continue
 
+        # Si Groq dijo "no publicar", la guardamos en descartadas
         if not dictamen.get("publicar", False):
             print(f"⏭️ Groq: no amerita publicar.")
+            descartadas.append({
+                "fecha": datetime.now().strftime("%Y-%m-%d"),
+                "jurisdiccion": jurisdiccion,
+                "titulo": dictamen.get("titulo", titulo),
+                "motivo": "Groq consideró que no tiene impacto real sobre el pueblo trabajador"
+            })
+            procesadas.add(h)
             continue
 
+        # Publicar: Telegram + datos.js
         mensaje = formatear_para_telegram(dictamen)
         enviado = enviar_telegram(mensaje)
         guardado = guardar_en_datos_js(dictamen)
+
+        # Marcar como procesada SOLO si se guardó bien
+        if guardado:
+            procesadas.add(h)
 
         resultados.append({
             "titulo": dictamen.get("titulo", ""),
@@ -974,7 +1051,7 @@ def procesar_jurisdiccion(jurisdiccion):
 
 
 # =======================================================================
-# 16. PROCESO PRINCIPAL
+# 17. PROCESO PRINCIPAL
 # =======================================================================
 
 def ejecutar_patrullaje():
@@ -985,30 +1062,46 @@ def ejecutar_patrullaje():
     print("🕵️ Iniciando patrullaje...")
     print("=" * 70)
 
+    # Cargar caché
+    procesadas = cargar_procesadas()
+    descartadas = cargar_descartadas()
+    print(f"\n💾 Caché cargada: {len(procesadas)} normas ya procesadas.")
+    print(f"📋 Descartadas acumuladas: {len(descartadas)}.\n")
+
     todos = {}
 
-    todos["caba"] = procesar_jurisdiccion("caba")
-    todos["pba"] = procesar_jurisdiccion("pba")
-    todos["nacion"] = procesar_jurisdiccion("nacion")
+    todos["caba"] = procesar_jurisdiccion("caba", procesadas, descartadas)
+    todos["pba"] = procesar_jurisdiccion("pba", procesadas, descartadas)
+    todos["nacion"] = procesar_jurisdiccion("nacion", procesadas, descartadas)
+
+    # Guardar caché al final
+    guardar_procesadas(procesadas)
+    guardar_descartadas(descartadas)
 
     print("\n")
     print("=" * 70)
     print("📊 RESUMEN DEL PATRULLAJE")
     print("=" * 70)
 
+    total = 0
     for jur, resultados in todos.items():
         print(f"\n  {jur.upper()}: {len(resultados)} publicadas")
         for r in resultados:
             tg = "✅" if r["telegram"] else "❌"
             js = "✅" if r["datos_js"] else "❌"
             print(f"    - {r['titulo']} | TG: {tg} | JS: {js}")
+            total += 1
+
+    print(f"\n  TOTAL PUBLICADAS: {total}")
+    print(f"  CACHÉ TOTAL: {len(procesadas)} normas procesadas")
+    print(f"  DESCARTADAS: {len(descartadas)}")
 
     print("\n" + "=" * 70)
     print("")
 
 
 # =======================================================================
-# 17. EJECUTAR
+# 18. EJECUTAR
 # =======================================================================
 
 if __name__ == "__main__":
