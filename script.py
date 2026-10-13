@@ -6,10 +6,22 @@ import hashlib
 import requests
 import pdfplumber
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv()
+
+
+# =======================================================================
+# 0. ZONA HORARIA ARGENTINA
+# =======================================================================
+
+ZONA_AR = ZoneInfo("America/Argentina/Buenos_Aires")
+
+def ahora_ar():
+    """Devuelve la fecha/hora actual en zona horaria argentina."""
+    return datetime.now(ZONA_AR)
 
 
 # =======================================================================
@@ -366,7 +378,7 @@ def validar_dictamen(dictamen):
 def bajar_pdf_boletin_caba():
     """Consulta la API de CABA y baja el PDF del boletín del día."""
 
-    fecha_hoy = datetime.now().strftime("%d-%m-%Y")
+    fecha_hoy = ahora_ar().strftime("%d-%m-%Y")
     url = url_caba.format(fecha=fecha_hoy)
 
     print(f"📥 CABA: Consultando API para {fecha_hoy}...")
@@ -455,7 +467,7 @@ def obtener_id_boletin_pba():
     """Scrappea la página de ediciones anteriores y devuelve el ID
     de la sección OFICIAL del boletín de hoy."""
 
-    fecha_hoy = datetime.now().strftime("%d/%m/%Y")
+    fecha_hoy = ahora_ar().strftime("%d/%m/%Y")
     print(f"📥 PBA: Buscando boletín del {fecha_hoy}...")
 
     try:
@@ -697,7 +709,7 @@ def consultar_groq(norma, jurisdiccion, max_reintentos=3):
         "## NORMA A ANALIZAR\n\n"
         f"Jurisdicción: {jurisdiccion.upper()}\n"
         f"Tipo y número: {norma.get('norma', '')}\n"
-        f"Fecha de análisis: {datetime.now().strftime('%d/%m/%Y')}\n"
+        f"Fecha de análisis: {ahora_ar().strftime('%d/%m/%Y')}\n"
         f"Página del boletín: {pagina_norma}\n"
         f"Sumario oficial:\n{norma.get('sumario', '')}\n\n"
         "Analizá esta norma siguiendo el formato JSON del system prompt."
@@ -921,7 +933,7 @@ def construir_entrada_js(dictamen, fecha):
 def guardar_en_datos_js(dictamen):
 
     titulo = dictamen.get("titulo", "").strip()
-    fecha_hoy = datetime.now().strftime("%Y-%m-%d")
+    fecha_hoy = ahora_ar().strftime("%Y-%m-%d")
 
     if ya_existe_en_datos(titulo):
         print(f"⚠️ Ya existe '{titulo}'. No se agrega.")
@@ -1020,7 +1032,7 @@ def procesar_jurisdiccion(jurisdiccion, procesadas, descartadas):
         if not dictamen.get("publicar", False):
             print(f"⏭️ Groq: no amerita publicar.")
             descartadas.append({
-                "fecha": datetime.now().strftime("%Y-%m-%d"),
+                "fecha": ahora_ar().strftime("%Y-%m-%d"),
                 "jurisdiccion": jurisdiccion,
                 "titulo": dictamen.get("titulo", titulo),
                 "motivo": "Groq consideró que no tiene impacto real sobre el pueblo trabajador"
