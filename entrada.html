@@ -148,11 +148,16 @@
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
   }[c]));
 
+  // FIX: parsear fecha sin pasar por Date() para evitar bug de zona horaria
   const fmtFecha = (f) => {
     if (!f) return '';
-    const d = new Date(f);
-    if (isNaN(d)) return f;
-    return d.toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' });
+    // Puede venir como "2026-10-13" o "2026-10-13T00:00:00.000Z"
+    const soloFecha = String(f).split('T')[0];
+    const [yyyy, mm, dd] = soloFecha.split('-');
+    if (!yyyy || !mm || !dd) return f;
+    const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    const mes = parseInt(mm, 10) - 1;
+    return `${parseInt(dd, 10)} de ${meses[mes]} de ${yyyy}`;
   };
 
   // Parsear frontmatter + devolver cuerpo
