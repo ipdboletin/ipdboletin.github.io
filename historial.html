@@ -76,7 +76,7 @@
     </div>
   </details>
 
-  <!-- BOTÓN LIMPIAR FILTROS (aparece si hay alguno activo) -->
+  <!-- BOTÓN LIMPIAR FILTROS -->
   <div id="barraFiltros" style="display:none;margin-bottom:var(--sp-3);text-align:center;">
     <button class="btn btn-ghost btn-chico" id="btnLimpiarTodo">✕ Limpiar todos los filtros</button>
   </div>
@@ -191,12 +191,15 @@
   // Helpers
   const hoy = new Date().toISOString().slice(0, 10);
   const esHoy = (f) => (f || '').slice(0, 10) === hoy;
+
+  // FIX: parsear fecha sin pasar por Date() para evitar bug de zona horaria
   const fmtFecha = (f) => {
     if (!f) return '';
-    const d = new Date(f);
-    if (isNaN(d)) return f;
-    return d.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: '2-digit' });
+    const [yyyy, mm, dd] = String(f).split('-');
+    if (!yyyy || !mm || !dd) return f;
+    return `${dd}/${mm}/${yyyy.slice(2)}`;
   };
+
   const escapeHtml = (s) => (s || '').replace(/[&<>"']/g, c => ({
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
   }[c]));
@@ -234,9 +237,8 @@
         return true;
       })
       .sort((a, b) => {
-        const fa = new Date(a.fecha || 0);
-        const fb = new Date(b.fecha || 0);
-        return fb - fa;
+        // FIX: comparación por string (YYYY-MM-DD ordena bien)
+        return (b.fecha || '').localeCompare(a.fecha || '');
       });
   }
 
