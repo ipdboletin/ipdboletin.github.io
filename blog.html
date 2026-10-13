@@ -1,430 +1,236 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog – IPD | Información para la Defensa</title>
-    <meta name="description" content="Blog de IPD - Información para la Defensa. Análisis profundos sobre el Boletín Oficial de Nación, PBA y CABA bajo la doctrina nacional justicialista.">
-    <meta name="keywords" content="blog, boletín oficial, análisis, peronismo, justicialismo, Argentina">
-    <meta name="author" content="Junta de Desarrolladores Nacional Justicialistas">
-    <meta name="robots" content="index, follow">
-
-    <link rel="canonical" href="https://ipdboletin.github.io/blog.html" />
-    <link rel="icon" href="condor.png" type="image/png">
-    <link rel="apple-touch-icon" href="condor.png">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1D3557">
-
-    <meta property="og:title" content="Blog – IPD | Información para la Defensa">
-    <meta property="og:description" content="Análisis profundos sobre el Boletín Oficial bajo la doctrina nacional justicialista.">
-    <meta property="og:image" content="https://ipdboletin.github.io/condor.png">
-    <meta property="og:url" content="https://ipdboletin.github.io/blog.html">
-    <meta property="og:type" content="website">
-    <meta property="og:locale" content="es_AR">
-    <meta property="og:site_name" content="IPD - Información para la Defensa">
-
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Blog – IPD | Información para la Defensa">
-    <meta name="twitter:description" content="Análisis profundos sobre el Boletín Oficial bajo la doctrina nacional justicialista.">
-    <meta name="twitter:image" content="https://ipdboletin.github.io/condor.png">
-
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Blog",
-      "name": "Blog – IPD",
-      "url": "https://ipdboletin.github.io/blog.html",
-      "description": "Análisis profundos sobre el Boletín Oficial de Nación, PBA y CABA.",
-      "publisher": {
-        "@type": "Organization",
-        "name": "IPD - Información para la Defensa",
-        "logo": "https://ipdboletin.github.io/condor.png",
-        "sameAs": [
-          "https://t.me/+x1jpuKAZKMowNjYx",
-          "https://whatsapp.com/channel/0029VbDIsLn2ZjCuyTNW5E1L",
-          "https://x.com/ipdboletin"
-        ]
-      }
-    }
-    </script>
-
-    <style>
-        :root {
-            --azul-tactico: #1D3557;
-            --azul-medio: #457B9D;
-            --azul-claro: #A8DADC;
-            --rojo: #C1121F;
-            --dorado: #C9A227;
-            --gris-oscuro: #2D3748;
-            --gris-claro: #F7FAFC;
-            --gris-medio: #718096;
-            --blanco: #FFFFFF;
-            --fondo-principal: #F7FAFC;
-            --fondo-secundario: #FFFFFF;
-            --fondo-terciario: #FAFAFA;
-            --texto-principal: #2D3748;
-            --texto-secundario: #718096;
-            --texto-terciario: #4A5568;
-            --borde: #E2E8F0;
-            --card-fondo: #FFFFFF;
-            --header-fondo: #1D3557;
-            --header-texto: #FFFFFF;
-            --footer-fondo: #2D3748;
-            --footer-texto: rgba(255,255,255,0.8);
-        }
-        body.modo-oscuro {
-            --fondo-principal: #0F172A;
-            --fondo-secundario: #1E293B;
-            --fondo-terciario: #1E293B;
-            --texto-principal: #E2E8F0;
-            --texto-secundario: #94A3B8;
-            --texto-terciario: #CBD5E1;
-            --borde: #334155;
-            --card-fondo: #1E293B;
-            --header-fondo: #0F172A;
-            --header-texto: #FFFFFF;
-            --footer-fondo: #020617;
-            --footer-texto: rgba(255,255,255,0.7);
-            --azul-tactico: #457B9D;
-            --azul-medio: #A8DADC;
-        }
-        * { box-sizing: border-box; transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
-        body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--fondo-principal); color: var(--texto-principal); line-height: 1.6; min-height: 100vh; display: flex; flex-direction: column; }
-
-        .header-ipd { background-color: var(--header-fondo); color: var(--header-texto); position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
-        .header-top { display: flex; justify-content: space-between; align-items: center; padding: 12px 30px; max-width: 1400px; margin: 0 auto; width: 100%; }
-        .header-izq { display: flex; align-items: center; gap: 15px; height: 45px; }
-        .header-logo { font-size: 32px; font-weight: 900; letter-spacing: 2px; color: var(--header-texto); line-height: 1; }
-        .header-separador { font-size: 32px; color: rgba(255,255,255,0.3); line-height: 1; }
-        .header-nombre { display: flex; flex-direction: column; justify-content: center; line-height: 1; }
-        .header-nombre .linea1 { font-size: 12px; font-weight: 400; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.65); line-height: 1; }
-        .header-nombre .linea2 { font-size: 12px; font-weight: 400; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.65); line-height: 1; }
-        .header-der { display: flex; align-items: center; gap: 15px; }
-        .bandera-css { width: 40px; height: 26px; border-radius: 2px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.3); display: flex; flex-direction: column; }
-        .bandera-css .franja-celeste { flex: 1; background-color: #74ACDF; }
-        .bandera-css .franja-blanca { flex: 1; background-color: #FFFFFF; }
-        .header-emblema { height: 45px; width: auto; filter: brightness(0) invert(1); }
-        .header-año { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.9); letter-spacing: 1px; line-height: 1; }
-        .btn-modo { background-color: rgba(255,255,255,0.15); border: none; color: var(--header-texto); width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-size: 18px; line-height: 1; display: flex; align-items: center; justify-content: center; transition: 0.3s; flex-shrink: 0; padding: 0; }
-        .btn-modo:hover { background-color: rgba(255,255,255,0.3); transform: scale(1.05); }
-
-        .nav-ipd { background-color: var(--header-fondo); border-top: 1px solid rgba(255,255,255,0.15); }
-        .nav-ipd-inner { max-width: 1400px; margin: 0 auto; padding: 0 30px; display: flex; gap: 5px; }
-        .nav-ipd a { color: var(--header-texto); text-decoration: none; padding: 12px 20px; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; border-bottom: 3px solid transparent; }
-        .nav-ipd a:hover, .nav-ipd a.active { background-color: rgba(255,255,255,0.1); border-bottom-color: var(--dorado); }
-
-        .contenido-blog { flex: 1; max-width: 1000px; margin: 0 auto; padding: 40px 20px; width: 100%; }
-        .blog-titulo-seccion { text-align: center; margin-bottom: 40px; }
-        .blog-titulo-seccion h1 { color: var(--azul-tactico); text-transform: uppercase; font-size: 32px; font-weight: 900; letter-spacing: 2px; margin: 0 0 10px 0; }
-        .blog-titulo-seccion p { color: var(--texto-secundario); font-size: 16px; font-style: italic; margin: 0; }
-        .blog-cargando { text-align: center; padding: 40px; color: var(--texto-secundario); font-size: 15px; }
-        .blog-vacio { text-align: center; padding: 60px 20px; background: var(--fondo-secundario); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .blog-vacio-icono { font-size: 60px; margin-bottom: 15px; }
-        .blog-vacio-titulo { color: var(--azul-tactico); font-size: 22px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; }
-        .blog-vacio-texto { color: var(--texto-principal); font-size: 15px; line-height: 1.6; }
-        .blog-grid { display: grid; grid-template-columns: 1fr; gap: 30px; }
-        .blog-card { background: var(--card-fondo); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.06); transition: transform 0.3s ease, box-shadow 0.3s ease; border: 1px solid var(--borde); }
-        .blog-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
-        .blog-card-imagen { width: 100%; height: 220px; object-fit: cover; display: block; background: var(--fondo-terciario); }
-        .blog-card-contenido { padding: 25px 30px 30px 30px; }
-        .blog-card-fecha { font-size: 12px; color: var(--texto-secundario); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; margin-bottom: 10px; }
-        .blog-card-titulo { color: var(--azul-tactico); font-size: 24px; font-weight: 800; line-height: 1.3; margin: 0 0 12px 0; }
-        .blog-card-copete { color: var(--texto-terciario); font-size: 15px; line-height: 1.6; margin: 0 0 20px 0; }
-        .blog-card-btn { display: inline-block; background-color: var(--azul-tactico); color: #FFFFFF; padding: 10px 22px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
-        .blog-card-btn:hover { background-color: var(--dorado); }
-
-        .footer-ipd { background-color: var(--footer-fondo); color: var(--footer-texto); padding: 25px 20px 25px 20px; text-align: center; margin-top: auto; }
-        .footer-contenido { max-width: 1100px; margin: 0 auto; }
-        .footer-titulo { font-size: 15px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; font-weight: bold; color: #FFFFFF; }
-
-        /* Pirámide invertida en footer: Telegram + WhatsApp arriba, X abajo */
-        .footer-botones {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 28px;
-            margin-bottom: 25px;
-        }
-        .footer-fila-arriba {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        .footer-btn { display: inline-flex; align-items: center; gap: 8px; background-color: var(--azul-tactico); color: #FFFFFF; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-size: 15px; font-weight: 700; transition: 0.3s; }
-        .footer-btn:hover { background-color: var(--dorado); }
-
-        /* Logo X: ícono suelto, sin fondo, centrado abajo */
-        .link-x {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-            opacity: 0.9;
-        }
-        .link-x img {
-            height: 38px;
-            width: auto;
-            display: block;
-        }
-        .link-x:hover {
-            transform: scale(1.12);
-            opacity: 1;
-        }
-
-        /* Emblema J.D.N.J en footer */
-        .footer-emblema-jdnj {
-            display: block;
-            width: 110px;
-            height: auto;
-            margin: 0 auto 14px auto;
-            opacity: 0.95;
-        }
-
-        .footer-firma-nombre { font-size: 15px; font-weight: 700; color: #FFFFFF; margin-bottom: 5px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
-        .footer-firma-desc { font-size: 13px; font-style: italic; color: rgba(255,255,255,0.6); margin-bottom: 20px; }
-        .footer-copy { font-size: 12px; color: rgba(255,255,255,0.5); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
-
-        @media (max-width: 768px) {
-            .header-top { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 8px; padding: 10px 45px 10px 15px; position: relative; min-height: 50px; height: 50px; }
-            .header-izq { display: flex; align-items: center; justify-content: center; gap: 10px; height: auto; width: auto; }
-            .header-logo { font-size: 22px; letter-spacing: 1.5px; }
-            .header-separador { display: none; }
-            .header-nombre { display: block; line-height: 1; }
-            .header-nombre .linea1, .header-nombre .linea2 { display: inline; font-size: 10px; letter-spacing: 1px; color: rgba(255,255,255,0.75); }
-            .header-nombre .linea1::after { content: " "; }
-            .header-der { display: contents; }
-            .bandera-css, .header-emblema, .header-año { display: none; }
-            .btn-modo { position: absolute; right: 10px; top: 12px; width: 26px; height: 26px; font-size: 14px; line-height: 1; background-color: rgba(255,255,255,0.08); padding: 0; transform: none; margin: 0; display: flex; align-items: center; justify-content: center; }
-            .nav-ipd-inner { flex-wrap: wrap; justify-content: center; padding: 0 10px; gap: 0; }
-            .nav-ipd a { padding: 10px 12px; font-size: 11px; letter-spacing: 0.5px; }
-            .contenido-blog { padding: 25px 15px; }
-            .blog-titulo-seccion h1 { font-size: 24px; }
-            .blog-titulo-seccion p { font-size: 14px; }
-            .blog-card-imagen { height: 180px; }
-            .blog-card-contenido { padding: 20px 22px 25px 22px; }
-            .blog-card-titulo { font-size: 20px; }
-            .blog-card-copete { font-size: 14px; }
-
-            /* Footer mobile: apilado */
-            .footer-botones { gap: 22px; }
-            .footer-fila-arriba { flex-direction: column; align-items: stretch; width: 100%; }
-            .footer-btn { width: 100%; max-width: 280px; margin: 0 auto; justify-content: center; }
-            .link-x img { height: 34px; }
-            .footer-emblema-jdnj { width: 95px; margin-bottom: 12px; }
-        }
-        @media (max-width: 380px) {
-            .nav-ipd a { padding: 9px 9px; font-size: 10px; }
-            .blog-titulo-seccion h1 { font-size: 20px; }
-            .blog-card-titulo { font-size: 18px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog — IPD</title>
+<meta name="description" content="Notas de investigación de IPD: análisis profundo de las normas que afectan tu vida.">
+<link rel="icon" href="solocondor.png">
+<link rel="apple-touch-icon" href="solocondor.png">
+<meta name="theme-color" content="#1D3557">
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <header class="header-ipd">
-        <div class="header-top">
-            <div class="header-izq">
-                <span class="header-logo">IPD</span>
-                <span class="header-separador">|</span>
-                <div class="header-nombre">
-                    <span class="linea1">Información para la</span>
-                    <span class="linea2">Defensa</span>
-                </div>
-            </div>
-            <div class="header-der">
-                <button class="btn-modo" id="btn-modo" title="Cambiar modo claro/oscuro">🌙</button>
-                <div class="bandera-css">
-                    <div class="franja-celeste"></div>
-                    <div class="franja-blanca"></div>
-                    <div class="franja-celeste"></div>
-                </div>
-                <img src="emblema.png" alt="Emblema IPD" class="header-emblema">
-                <span class="header-año">2026 - La organización vence al tiempo...</span>
-            </div>
-        </div>
-        <nav class="nav-ipd">
-            <div class="nav-ipd-inner">
-                <a href="index.html">Inicio</a>
-                <a href="historial.html">Historial</a>
-                <a href="blog.html" class="active">Blog</a>
-                <a href="sobre.html">Sobre IPD</a>
-            </div>
-        </nav>
-    </header>
+<!-- ============ HEADER ============ -->
+<header class="header">
+  <div class="header-top">
+    <div class="header-izq">
+      <span class="header-logo">IPD</span>
+      <span class="header-nombre">
+        <span class="linea1">Información</span>
+        <span class="linea2">para la Defensa</span>
+      </span>
+    </div>
+    <div class="header-der">
+      <nav class="header-nav">
+        <a href="index.html">INICIO</a>
+        <a href="historial.html">HISTORIAL</a>
+        <a href="blog.html" class="activo">BLOG</a>
+        <a href="sobre.html">SOBRE IPD</a>
+      </nav>
+      <button class="header-btn-tema" id="btnTema" aria-label="Cambiar tema">🌙</button>
+    </div>
+  </div>
+</header>
 
-    <section class="contenido-blog">
-        <div class="blog-titulo-seccion">
-            <h1>Blog IPD</h1>
-            <p>Análisis profundos sobre el Boletín Oficial</p>
-        </div>
-        <div id="blog-cargando" class="blog-cargando">Cargando notas...</div>
-        <div id="blog-lista" class="blog-grid"></div>
-        <div id="blog-vacio" class="blog-vacio" style="display:none;">
-            <div class="blog-vacio-icono">📝</div>
-            <h2 class="blog-vacio-titulo">Pronto, las primeras notas</h2>
-            <p class="blog-vacio-texto">
-                Estamos preparando los primeros análisis en profundidad.
-                Mientras tanto, podés leer el historial completo de normas.
-            </p>
-            <a href="historial.html" class="blog-card-btn" style="margin-top:20px;">Ir al Historial</a>
-        </div>
-    </section>
+<!-- ============ CONTENIDO ============ -->
+<main class="container">
 
-    <footer class="footer-ipd">
-        <div class="footer-contenido">
-            <p class="footer-titulo">📲 Sumate a nuestra comunidad</p>
-            <!-- Pirámide invertida: Telegram + WhatsApp arriba, X abajo centrado -->
-            <div class="footer-botones">
-                <div class="footer-fila-arriba">
-                    <a href="https://t.me/+x1jpuKAZKMowNjYx" class="footer-btn" target="_blank">📲 Telegram</a>
-                    <a href="https://whatsapp.com/channel/0029VbDIsLn2ZjCuyTNW5E1L" class="footer-btn" target="_blank">💬 WhatsApp</a>
-                </div>
-                <a href="https://x.com/ipdboletin" class="link-x" target="_blank" rel="noopener" aria-label="Seguinos en X" title="Seguinos en X">
-                    <img src="equislogo.png" alt="X - Información para la Defensa">
-                </a>
-            </div>
-            <img src="JDNJ.png" alt="Junta de Desarrolladores Nacional Justicialistas" class="footer-emblema-jdnj">
-            <p class="footer-firma-nombre">Junta de Desarrolladores Nacional Justicialistas</p>
-            <p class="footer-firma-desc">Información para la Defensa</p>
-            <p class="footer-copy">© 2026 IPD - Información para la Defensa · Todos los derechos reservados</p>
-        </div>
-    </footer>
+  <div class="seccion-titulo" style="margin-top:0">
+    <h3>Blog de investigación</h3>
+  </div>
 
-    <script>
-        // ============ MODO OSCURO ============
-        const btnModo = document.getElementById('btn-modo');
-        const body = document.body;
-        function aplicarModo(oscuro) {
-            if (oscuro) {
-                body.classList.add('modo-oscuro');
-                btnModo.textContent = '☀️';
-                btnModo.title = 'Cambiar a modo claro';
-            } else {
-                body.classList.remove('modo-oscuro');
-                btnModo.textContent = '🌙';
-                btnModo.title = 'Cambiar a modo oscuro';
-            }
-        }
-        const modoGuardado = localStorage.getItem('modo-oscuro');
-        if (modoGuardado === 'true') { aplicarModo(true); }
-        else { aplicarModo(false); }
-        btnModo.addEventListener('click', () => {
-            const estaOscuro = body.classList.contains('modo-oscuro');
-            aplicarModo(!estaOscuro);
-            localStorage.setItem('modo-oscuro', (!estaOscuro).toString());
-        });
+  <!-- ESTADO: CARGANDO -->
+  <div id="estadoCargando" class="texto-centro" style="padding:var(--sp-7) var(--sp-4);color:var(--texto-suave);">
+    <div style="font-size:28px;margin-bottom:var(--sp-3);opacity:.5;">⏳</div>
+    <p>Cargando notas...</p>
+  </div>
 
-        // ============ CONFIGURACIÓN ============
-        const REPO = 'ipdboletin/ipdboletin.github.io';
-        const CARPETA = 'blog';
-        const API = `https://api.github.com/repos/${REPO}/contents/${CARPETA}`;
+  <!-- ESTADO: VACÍO -->
+  <div id="estadoVacio" style="display:none;text-align:center;padding:var(--sp-7) var(--sp-4);color:var(--texto-suave);">
+    <div style="font-size:36px;margin-bottom:var(--sp-3);opacity:.5;">📰</div>
+    <p>Todavía no hay notas publicadas.</p>
+    <p style="font-size:var(--fs-sm);margin-top:var(--sp-2);">Volvé pronto.</p>
+  </div>
 
-        // ============ PARSEAR FRONTMATTER ============
-        function parseFrontmatter(texto) {
-            const match = texto.match(/^---\s*\n([\s\S]*?)\n---\s*\n?([\s\S]*)$/);
-            if (!match) return { data: {}, body: texto };
+  <!-- ESTADO: ERROR -->
+  <div id="estadoError" style="display:none;text-align:center;padding:var(--sp-7) var(--sp-4);color:var(--texto-suave);">
+    <div style="font-size:36px;margin-bottom:var(--sp-3);opacity:.5;">⚠️</div>
+    <p>No se pudieron cargar las notas.</p>
+    <p style="font-size:var(--fs-sm);margin-top:var(--sp-2);">Probá recargar la página.</p>
+  </div>
 
-            const yaml = match[1];
-            const body = match[2];
-            const data = {};
+  <!-- LISTA DE NOTAS -->
+  <div id="listaBlog"></div>
 
-            yaml.split('\n').forEach(linea => {
-                const m = linea.match(/^(\w+):\s*(.*)$/);
-                if (!m) return;
-                const clave = m[1].trim();
-                let valor = m[2].trim();
-                valor = valor.replace(/^['"]|['"]$/g, '');
-                data[clave] = valor;
-            });
+</main>
 
-            return { data, body };
-        }
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <img src="JDNJ.png" alt="" class="footer-jdnj" onerror="this.style.display='none'">
+  <p>JUNTA DE DESARROLLADORES<br>NACIONAL JUSTICIALISTAS</p>
+  <div class="footer-links">
+    <a href="index.html">Inicio</a>
+    <a href="historial.html">Historial</a>
+    <a href="blog.html">Blog</a>
+    <a href="sobre.html">Sobre IPD</a>
+  </div>
+</footer>
 
-        // ============ FORMATEAR FECHA ============
-        function formatearFecha(iso) {
-            if (!iso) return '';
-            const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-            const [a, m, d] = iso.split('-');
-            return `${parseInt(d)} de ${meses[parseInt(m)-1]} de ${a}`;
-        }
+<!-- ============ BOTTOM NAV (mobile) ============ -->
+<nav class="bottom-nav">
+  <a href="index.html" class="bottom-nav-item">
+    <span class="ic">🏠</span>Inicio
+  </a>
+  <a href="historial.html" class="bottom-nav-item">
+    <span class="ic">📜</span>Historial
+  </a>
+  <a href="blog.html" class="bottom-nav-item activo">
+    <span class="ic">📰</span>Blog
+  </a>
+  <a href="sobre.html" class="bottom-nav-item">
+    <span class="ic">ℹ️</span>Sobre
+  </a>
+</nav>
 
-        // ============ CARGAR LISTA DE NOTAS ============
-        async function cargarBlog() {
-            const contenedor = document.getElementById('blog-lista');
-            const vacio = document.getElementById('blog-vacio');
-            const cargando = document.getElementById('blog-cargando');
+<!-- ============ LÓGICA ============ -->
+<script>
+/* ---------- Tema claro/oscuro ---------- */
+(function(){
+  const html = document.documentElement;
+  const btn = document.getElementById('btnTema');
+  const guardado = localStorage.getItem('ipd-tema');
+  if (guardado === 'oscuro') {
+    html.setAttribute('data-tema', 'oscuro');
+    btn.textContent = '☀️';
+  }
+  btn.addEventListener('click', function(){
+    const esOscuro = html.getAttribute('data-tema') === 'oscuro';
+    if (esOscuro) {
+      html.removeAttribute('data-tema');
+      localStorage.setItem('ipd-tema', 'claro');
+      btn.textContent = '🌙';
+    } else {
+      html.setAttribute('data-tema', 'oscuro');
+      localStorage.setItem('ipd-tema', 'oscuro');
+      btn.textContent = '☀️';
+    }
+  });
+})();
 
-            try {
-                const res = await fetch(API + '?t=' + Date.now());
-                if (!res.ok) throw new Error('No se pudo listar la carpeta');
-                const archivos = await res.json();
+/* ---------- Blog: leer carpeta /blog vía GitHub API ---------- */
+(function(){
+  const REPO = 'ipdboletin/ipdboletin.github.io';
+  const RAMA = 'main';
+  const CARPETA = 'blog';
 
-                const mds = archivos.filter(a => a.name.endsWith('.md'));
+  const lista = document.getElementById('listaBlog');
+  const cargando = document.getElementById('estadoCargando');
+  const vacio = document.getElementById('estadoVacio');
+  const error = document.getElementById('estadoError');
 
-                if (mds.length === 0) {
-                    cargando.style.display = 'none';
-                    vacio.style.display = 'block';
-                    return;
-                }
+  // Helpers
+  const escapeHtml = (s) => (s || '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
 
-                const notas = await Promise.all(mds.map(async (a) => {
-                    try {
-                        const r = await fetch(a.download_url + '?t=' + Date.now());
-                        const txt = await r.text();
-                        const { data } = parseFrontmatter(txt);
-                        const slug = a.name.replace(/\.md$/, '');
-                        return {
-                            slug: slug,
-                            titulo: data.title || 'Sin título',
-                            fecha: data.date || '',
-                            copete: data.excerpt || '',
-                            imagen: data.image || ''
-                        };
-                    } catch (e) {
-                        return null;
-                    }
-                }));
+  const fmtFecha = (f) => {
+    if (!f) return '';
+    const d = new Date(f);
+    if (isNaN(d)) return f;
+    return d.toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' });
+  };
 
-                const validas = notas.filter(n => n !== null).sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+  // Parsear frontmatter simple (--- clave: valor ---)
+  function parseFrontmatter(texto){
+    const match = texto.match(/^---\s*\n([\s\S]*?)\n---/);
+    if (!match) return {};
+    const yaml = match[1];
+    const data = {};
+    yaml.split('\n').forEach(linea => {
+      const m = linea.match(/^([a-zA-Z_][a-zA-Z0-9_]*)\s*:\s*(.*)$/);
+      if (m){
+        let valor = m[2].trim();
+        // Sacar comillas si las tiene
+        valor = valor.replace(/^['"]|['"]$/g, '');
+        data[m[1]] = valor;
+      }
+    });
+    return data;
+  }
 
-                if (validas.length === 0) {
-                    cargando.style.display = 'none';
-                    vacio.style.display = 'block';
-                    return;
-                }
+  // Cargar notas
+  async function cargarBlog(){
+    try {
+      // 1. Traer lista de archivos de /blog
+      const urlLista = `https://api.github.com/repos/${REPO}/contents/${CARPETA}?ref=${RAMA}&t=${Date.now()}`;
+      const res = await fetch(urlLista, {
+        headers: { 'Accept': 'application/vnd.github.v3+json' }
+      });
+      if (!res.ok) throw new Error('Error al listar');
+      const archivos = await res.json();
 
-                contenedor.innerHTML = validas.map(n => {
-                    const imgHtml = n.imagen
-                        ? `<img src="${n.imagen}" alt="${n.titulo}" class="blog-card-imagen" loading="lazy">`
-                        : '';
-                    const fechaFmt = formatearFecha(n.fecha);
-                    const url = `entrada.html?slug=${encodeURIComponent(n.slug)}`;
-                    return `
-                        <article class="blog-card">
-                            ${imgHtml}
-                            <div class="blog-card-contenido">
-                                <div class="blog-card-fecha">${fechaFmt}</div>
-                                <h2 class="blog-card-titulo">${n.titulo}</h2>
-                                <p class="blog-card-copete">${n.copete}</p>
-                                <a href="${url}" class="blog-card-btn">Leer nota →</a>
-                            </div>
-                        </article>
-                    `;
-                }).join('');
+      // 2. Filtrar solo .md (ignorar carpeta img)
+      const notas = archivos.filter(a => a.type === 'file' && a.name.endsWith('.md'));
 
-                cargando.style.display = 'none';
-            } catch (err) {
-                console.error('Error cargando el blog:', err);
-                cargando.style.display = 'none';
-                vacio.style.display = 'block';
-            }
-        }
+      if (notas.length === 0){
+        cargando.style.display = 'none';
+        vacio.style.display = 'block';
+        return;
+      }
 
-        cargarBlog();
-    </script>
+      // 3. Traer el contenido de cada .md en paralelo
+      const promesas = notas.map(n => fetch(n.download_url + '?t=' + Date.now()).then(r => r.text()));
+      const contenidos = await Promise.all(promesas);
+
+      // 4. Parsear cada nota
+      const datos = notas.map((n, i) => {
+        const fm = parseFrontmatter(contenidos[i]);
+        const slug = n.name.replace(/\.md$/, '');
+        return {
+          slug: slug,
+          title: fm.title || 'Sin título',
+          date: fm.date || '',
+          excerpt: fm.excerpt || '',
+          image: fm.image || ''
+        };
+      });
+
+      // 5. Ordenar por fecha descendente
+      datos.sort((a, b) => {
+        const fa = new Date(a.date || 0);
+        const fb = new Date(b.date || 0);
+        return fb - fa;
+      });
+
+      // 6. Render
+      cargando.style.display = 'none';
+      lista.innerHTML = datos.map(n => `
+        <a href="entrada.html?slug=${encodeURIComponent(n.slug)}" class="blog-card" style="text-decoration:none;color:inherit;display:block;">
+          <div class="blog-card-img">
+            ${n.image
+              ? `<img src="${escapeHtml(n.image)}" alt="" loading="lazy" onerror="this.style.display='none';this.parentElement.innerHTML='📰';">`
+              : '📰'}
+          </div>
+          <div class="blog-card-body">
+            <h4>${escapeHtml(n.title)}</h4>
+            <p>${escapeHtml(n.excerpt)}</p>
+            <span class="card-fecha" style="display:block;margin:0;">${fmtFecha(n.date)}</span>
+          </div>
+        </a>
+      `).join('');
+
+    } catch(e){
+      console.error('Error cargando blog:', e);
+      cargando.style.display = 'none';
+      error.style.display = 'block';
+    }
+  }
+
+  cargarBlog();
+})();
+</script>
 
 </body>
 </html>
