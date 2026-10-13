@@ -1,378 +1,248 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cargando... – IPD | Información para la Defensa</title>
-    <meta name="description" content="Análisis del Boletín Oficial bajo la doctrina nacional justicialista.">
-    <meta name="author" content="Junta de Desarrolladores Nacional Justicialistas">
-    <meta name="robots" content="index, follow">
-
-    <link rel="canonical" id="canonical-link" href="https://ipdboletin.github.io/entrada.html" />
-    <link rel="icon" href="condor.png" type="image/png">
-    <link rel="apple-touch-icon" href="condor.png">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1D3557">
-
-    <meta property="og:title" id="og-title" content="IPD - Información para la Defensa">
-    <meta property="og:description" id="og-desc" content="Análisis del Boletín Oficial.">
-    <meta property="og:image" id="og-image" content="https://ipdboletin.github.io/condor.png">
-    <meta property="og:url" id="og-url" content="https://ipdboletin.github.io/entrada.html">
-    <meta property="og:type" content="article">
-    <meta property="og:locale" content="es_AR">
-    <meta property="og:site_name" content="IPD - Información para la Defensa">
-
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" id="tw-title" content="IPD - Información para la Defensa">
-    <meta name="twitter:description" id="tw-desc" content="Análisis del Boletín Oficial.">
-    <meta name="twitter:image" id="tw-image" content="https://ipdboletin.github.io/condor.png">
-
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-    <style>
-        :root {
-            --azul-tactico: #1D3557;
-            --azul-medio: #457B9D;
-            --azul-claro: #A8DADC;
-            --rojo: #C1121F;
-            --dorado: #C9A227;
-            --gris-oscuro: #2D3748;
-            --fondo-principal: #F7FAFC;
-            --fondo-secundario: #FFFFFF;
-            --texto-principal: #2D3748;
-            --texto-secundario: #718096;
-            --texto-terciario: #4A5568;
-            --borde: #E2E8F0;
-            --card-fondo: #FFFFFF;
-            --header-fondo: #1D3557;
-            --header-texto: #FFFFFF;
-            --footer-fondo: #2D3748;
-            --footer-texto: rgba(255,255,255,0.8);
-        }
-        body.modo-oscuro {
-            --fondo-principal: #0F172A;
-            --fondo-secundario: #1E293B;
-            --texto-principal: #E2E8F0;
-            --texto-secundario: #94A3B8;
-            --texto-terciario: #CBD5E1;
-            --borde: #334155;
-            --card-fondo: #1E293B;
-            --header-fondo: #0F172A;
-            --header-texto: #FFFFFF;
-            --footer-fondo: #020617;
-            --footer-texto: rgba(255,255,255,0.7);
-            --azul-tactico: #457B9D;
-            --azul-medio: #A8DADC;
-        }
-        * { box-sizing: border-box; transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
-        body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--fondo-principal); color: var(--texto-principal); line-height: 1.6; min-height: 100vh; display: flex; flex-direction: column; }
-
-        .header-ipd { background-color: var(--header-fondo); color: var(--header-texto); position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
-        .header-top { display: flex; justify-content: space-between; align-items: center; padding: 12px 30px; max-width: 1400px; margin: 0 auto; width: 100%; }
-        .header-izq { display: flex; align-items: center; gap: 15px; height: 45px; }
-        .header-logo { font-size: 32px; font-weight: 900; letter-spacing: 2px; color: var(--header-texto); line-height: 1; }
-        .header-separador { font-size: 32px; color: rgba(255,255,255,0.3); line-height: 1; }
-        .header-nombre { display: flex; flex-direction: column; justify-content: center; line-height: 1; }
-        .header-nombre .linea1, .header-nombre .linea2 { font-size: 12px; font-weight: 400; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.65); line-height: 1; }
-        .header-der { display: flex; align-items: center; gap: 15px; }
-        .bandera-css { width: 40px; height: 26px; border-radius: 2px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.3); display: flex; flex-direction: column; }
-        .bandera-css .franja-celeste { flex: 1; background-color: #74ACDF; }
-        .bandera-css .franja-blanca { flex: 1; background-color: #FFFFFF; }
-        .header-emblema { height: 45px; width: auto; filter: brightness(0) invert(1); }
-        .header-año { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.9); letter-spacing: 1px; line-height: 1; }
-        .btn-modo { background-color: rgba(255,255,255,0.15); border: none; color: var(--header-texto); width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-size: 18px; line-height: 1; display: flex; align-items: center; justify-content: center; transition: 0.3s; flex-shrink: 0; padding: 0; }
-        .btn-modo:hover { background-color: rgba(255,255,255,0.3); transform: scale(1.05); }
-        .nav-ipd { background-color: var(--header-fondo); border-top: 1px solid rgba(255,255,255,0.15); }
-        .nav-ipd-inner { max-width: 1400px; margin: 0 auto; padding: 0 30px; display: flex; gap: 5px; }
-        .nav-ipd a { color: var(--header-texto); text-decoration: none; padding: 12px 20px; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; border-bottom: 3px solid transparent; }
-        .nav-ipd a:hover, .nav-ipd a.active { background-color: rgba(255,255,255,0.1); border-bottom-color: var(--dorado); }
-
-        .contenido-entrada { flex: 1; max-width: 800px; margin: 0 auto; padding: 40px 20px; width: 100%; }
-        .entrada-cargando { text-align: center; padding: 60px 20px; color: var(--texto-secundario); font-size: 15px; }
-        .entrada-volver { display: inline-block; color: var(--azul-tactico); text-decoration: none; font-size: 14px; font-weight: 600; margin-bottom: 25px; }
-        .entrada-volver:hover { color: var(--dorado); }
-        .entrada-cabecera { margin-bottom: 30px; }
-        .entrada-fecha { font-size: 13px; color: var(--texto-secundario); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; margin-bottom: 12px; }
-        .entrada-titulo { color: var(--azul-tactico); font-size: 38px; font-weight: 900; line-height: 1.2; margin: 0 0 18px 0; }
-        .entrada-copete { color: var(--texto-terciario); font-size: 19px; line-height: 1.5; font-style: italic; margin: 0 0 25px 0; padding-left: 15px; border-left: 4px solid var(--dorado); }
-        .entrada-imagen { width: 100%; height: auto; border-radius: 10px; margin-bottom: 30px; display: block; }
-        .entrada-cuerpo { font-size: 17px; line-height: 1.8; color: var(--texto-principal); }
-        .entrada-cuerpo p { margin: 0 0 20px 0; }
-        .entrada-cuerpo h2 { color: var(--azul-tactico); font-size: 26px; font-weight: 800; margin: 35px 0 15px 0; line-height: 1.3; }
-        .entrada-cuerpo h3 { color: var(--azul-tactico); font-size: 21px; font-weight: 700; margin: 30px 0 12px 0; line-height: 1.3; }
-        .entrada-cuerpo blockquote { border-left: 4px solid var(--dorado); padding-left: 20px; margin: 25px 0; color: var(--texto-terciario); font-style: italic; font-size: 18px; }
-        .entrada-cuerpo ul, .entrada-cuerpo ol { margin: 0 0 20px 0; padding-left: 25px; }
-        .entrada-cuerpo li { margin-bottom: 8px; }
-        .entrada-cuerpo a { color: var(--azul-medio); text-decoration: underline; }
-        .entrada-cuerpo a:hover { color: var(--dorado); }
-        .entrada-cuerpo strong { color: var(--azul-tactico); font-weight: 700; }
-        .entrada-cuerpo img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
-
-        .footer-ipd { background-color: var(--footer-fondo); color: var(--footer-texto); padding: 25px 20px 25px 20px; text-align: center; margin-top: auto; }
-        .footer-contenido { max-width: 1100px; margin: 0 auto; }
-        .footer-titulo { font-size: 15px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; font-weight: bold; color: #FFFFFF; }
-
-        /* Pirámide invertida en footer: Telegram + WhatsApp arriba, X abajo */
-        .footer-botones {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 28px;
-            margin-bottom: 25px;
-        }
-        .footer-fila-arriba {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        .footer-btn { display: inline-flex; align-items: center; gap: 8px; background-color: var(--azul-tactico); color: #FFFFFF; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-size: 15px; font-weight: 700; transition: 0.3s; }
-        .footer-btn:hover { background-color: var(--dorado); }
-
-        /* Logo X: ícono suelto, sin fondo, centrado abajo */
-        .link-x {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-            opacity: 0.9;
-        }
-        .link-x img {
-            height: 38px;
-            width: auto;
-            display: block;
-        }
-        .link-x:hover {
-            transform: scale(1.12);
-            opacity: 1;
-        }
-
-        /* Emblema J.D.N.J en footer */
-        .footer-emblema-jdnj {
-            display: block;
-            width: 110px;
-            height: auto;
-            margin: 0 auto 14px auto;
-            opacity: 0.95;
-        }
-
-        .footer-firma-nombre { font-size: 15px; font-weight: 700; color: #FFFFFF; margin-bottom: 5px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
-        .footer-firma-desc { font-size: 13px; font-style: italic; color: rgba(255,255,255,0.6); margin-bottom: 20px; }
-        .footer-copy { font-size: 12px; color: rgba(255,255,255,0.5); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
-
-        @media (max-width: 768px) {
-            .header-top { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 8px; padding: 10px 45px 10px 15px; position: relative; min-height: 50px; height: 50px; }
-            .header-izq { display: flex; align-items: center; justify-content: center; gap: 10px; height: auto; width: auto; }
-            .header-logo { font-size: 22px; letter-spacing: 1.5px; }
-            .header-separador { display: none; }
-            .header-nombre { display: block; line-height: 1; }
-            .header-nombre .linea1, .header-nombre .linea2 { display: inline; font-size: 10px; letter-spacing: 1px; color: rgba(255,255,255,0.75); }
-            .header-nombre .linea1::after { content: " "; }
-            .header-der { display: contents; }
-            .bandera-css, .header-emblema, .header-año { display: none; }
-            .btn-modo { position: absolute; right: 10px; top: 12px; width: 26px; height: 26px; font-size: 14px; line-height: 1; background-color: rgba(255,255,255,0.08); padding: 0; transform: none; margin: 0; display: flex; align-items: center; justify-content: center; }
-            .nav-ipd-inner { flex-wrap: wrap; justify-content: center; padding: 0 10px; gap: 0; }
-            .nav-ipd a { padding: 10px 12px; font-size: 11px; letter-spacing: 0.5px; }
-            .contenido-entrada { padding: 25px 15px; }
-            .entrada-titulo { font-size: 26px; }
-            .entrada-copete { font-size: 16px; }
-            .entrada-cuerpo { font-size: 16px; }
-            .entrada-cuerpo h2 { font-size: 22px; }
-            .entrada-cuerpo h3 { font-size: 19px; }
-
-            /* Footer mobile: apilado */
-            .footer-botones { gap: 22px; }
-            .footer-fila-arriba { flex-direction: column; align-items: stretch; width: 100%; }
-            .footer-btn { width: 100%; max-width: 280px; margin: 0 auto; justify-content: center; }
-            .link-x img { height: 34px; }
-            .footer-emblema-jdnj { width: 95px; margin-bottom: 12px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cargando... — IPD</title>
+<meta name="description" content="Nota de investigación del blog de IPD.">
+<link rel="icon" href="solocondor.png">
+<link rel="apple-touch-icon" href="solocondor.png">
+<meta name="theme-color" content="#1D3557">
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <header class="header-ipd">
-        <div class="header-top">
-            <div class="header-izq">
-                <span class="header-logo">IPD</span>
-                <span class="header-separador">|</span>
-                <div class="header-nombre">
-                    <span class="linea1">Información para la</span>
-                    <span class="linea2">Defensa</span>
-                </div>
-            </div>
-            <div class="header-der">
-                <button class="btn-modo" id="btn-modo" title="Cambiar modo claro/oscuro">🌙</button>
-                <div class="bandera-css">
-                    <div class="franja-celeste"></div>
-                    <div class="franja-blanca"></div>
-                    <div class="franja-celeste"></div>
-                </div>
-                <img src="emblema.png" alt="Emblema IPD" class="header-emblema">
-                <span class="header-año">2026 - La organización vence al tiempo...</span>
-            </div>
-        </div>
-        <nav class="nav-ipd">
-            <div class="nav-ipd-inner">
-                <a href="index.html">Inicio</a>
-                <a href="historial.html">Historial</a>
-                <a href="blog.html" class="active">Blog</a>
-                <a href="sobre.html">Sobre IPD</a>
-            </div>
-        </nav>
+<!-- ============ HEADER ============ -->
+<header class="header">
+  <div class="header-top">
+    <div class="header-izq">
+      <span class="header-logo">IPD</span>
+      <span class="header-nombre">
+        <span class="linea1">Información</span>
+        <span class="linea2">para la Defensa</span>
+      </span>
+    </div>
+    <div class="header-der">
+      <nav class="header-nav">
+        <a href="index.html">INICIO</a>
+        <a href="historial.html">HISTORIAL</a>
+        <a href="blog.html" class="activo">BLOG</a>
+        <a href="sobre.html">SOBRE IPD</a>
+      </nav>
+      <button class="header-btn-tema" id="btnTema" aria-label="Cambiar tema">🌙</button>
+    </div>
+  </div>
+</header>
+
+<!-- ============ CONTENIDO ============ -->
+<main class="container">
+
+  <div style="margin-bottom:var(--sp-4);">
+    <a href="blog.html" style="font-size:var(--fs-sm);color:var(--azul-medio);font-weight:600;">← Volver al blog</a>
+  </div>
+
+  <!-- ESTADO: CARGANDO -->
+  <div id="estadoCargando" class="texto-centro" style="padding:var(--sp-7) var(--sp-4);color:var(--texto-suave);">
+    <div style="font-size:28px;margin-bottom:var(--sp-3);opacity:.5;">⏳</div>
+    <p>Cargando nota...</p>
+  </div>
+
+  <!-- ESTADO: ERROR -->
+  <div id="estadoError" style="display:none;text-align:center;padding:var(--sp-7) var(--sp-4);color:var(--texto-suave);">
+    <div style="font-size:36px;margin-bottom:var(--sp-3);opacity:.5;">⚠️</div>
+    <p>No se encontró la nota.</p>
+    <p style="font-size:var(--fs-sm);margin-top:var(--sp-2);">
+      <a href="blog.html" style="color:var(--azul-medio);font-weight:600;">Volver al blog</a>
+    </p>
+  </div>
+
+  <!-- ARTÍCULO -->
+  <article id="articulo" style="display:none;">
+    <header style="margin-bottom:var(--sp-5);text-align:center;">
+      <img id="artImagen" src="" alt="" style="display:none;width:100%;max-height:400px;object-fit:cover;border-radius:var(--radio);margin-bottom:var(--sp-4);">
+      <h1 id="artTitulo" style="font-size:var(--fs-2xl);line-height:1.25;margin-bottom:var(--sp-3);"></h1>
+      <p id="artCopete" style="font-size:var(--fs-md);color:var(--texto-suave);line-height:1.55;max-width:640px;margin:0 auto var(--sp-3);"></p>
+      <div style="font-size:var(--fs-sm);color:var(--texto-suave);">
+        <span id="artFecha"></span>
+      </div>
     </header>
 
-    <section class="contenido-entrada">
-        <a href="blog.html" class="entrada-volver">← Volver al Blog</a>
-        <div id="entrada-cargando" class="entrada-cargando">Cargando nota...</div>
-        <article id="entrada-articulo" style="display:none;">
-            <div class="entrada-cabecera">
-                <div class="entrada-fecha" id="entrada-fecha"></div>
-                <h1 class="entrada-titulo" id="entrada-titulo"></h1>
-                <p class="entrada-copete" id="entrada-copete"></p>
-            </div>
-            <img id="entrada-imagen" class="entrada-imagen" style="display:none;" alt="">
-            <div class="entrada-cuerpo" id="entrada-cuerpo"></div>
-        </article>
-    </section>
+    <div id="artCuerpo" class="articulo-cuerpo"></div>
 
-    <footer class="footer-ipd">
-        <div class="footer-contenido">
-            <p class="footer-titulo">📲 Sumate a nuestra comunidad</p>
-            <!-- Pirámide invertida: Telegram + WhatsApp arriba, X abajo centrado -->
-            <div class="footer-botones">
-                <div class="footer-fila-arriba">
-                    <a href="https://t.me/+x1jpuKAZKMowNjYx" class="footer-btn" target="_blank">📲 Telegram</a>
-                    <a href="https://whatsapp.com/channel/0029VbDIsLn2ZjCuyTNW5E1L" class="footer-btn" target="_blank">💬 WhatsApp</a>
-                </div>
-                <a href="https://x.com/ipdboletin" class="link-x" target="_blank" rel="noopener" aria-label="Seguinos en X" title="Seguinos en X">
-                    <img src="equislogo.png" alt="X - Información para la Defensa">
-                </a>
-            </div>
-            <img src="JDNJ.png" alt="Junta de Desarrolladores Nacional Justicialistas" class="footer-emblema-jdnj">
-            <p class="footer-firma-nombre">Junta de Desarrolladores Nacional Justicialistas</p>
-            <p class="footer-firma-desc">Información para la Defensa</p>
-            <p class="footer-copy">© 2026 IPD - Información para la Defensa · Todos los derechos reservados</p>
-        </div>
-    </footer>
+    <div style="margin-top:var(--sp-6);padding-top:var(--sp-5);border-top:1px solid var(--borde);display:flex;gap:var(--sp-3);justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-primario" id="btnCompartir">Compartir nota</button>
+      <a href="blog.html" class="btn btn-ghost">Volver al blog</a>
+    </div>
+  </article>
 
-    <script>
-        // ============ MODO OSCURO ============
-        const btnModo = document.getElementById('btn-modo');
-        const body = document.body;
-        function aplicarModo(oscuro) {
-            if (oscuro) {
-                body.classList.add('modo-oscuro');
-                btnModo.textContent = '☀️';
-                btnModo.title = 'Cambiar a modo claro';
-            } else {
-                body.classList.remove('modo-oscuro');
-                btnModo.textContent = '🌙';
-                btnModo.title = 'Cambiar a modo oscuro';
-            }
-        }
-        const modoGuardado = localStorage.getItem('modo-oscuro');
-        if (modoGuardado === 'true') { aplicarModo(true); }
-        else { aplicarModo(false); }
-        btnModo.addEventListener('click', () => {
-            const estaOscuro = body.classList.contains('modo-oscuro');
-            aplicarModo(!estaOscuro);
-            localStorage.setItem('modo-oscuro', (!estaOscuro).toString());
-        });
+</main>
 
-        // ============ CONFIGURACIÓN ============
-        const REPO = 'ipdboletin/ipdboletin.github.io';
-        const CARPETA = 'blog';
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <img src="JDNJ.png" alt="" class="footer-jdnj" onerror="this.style.display='none'">
+  <p>JUNTA DE DESARROLLADORES<br>NACIONAL JUSTICIALISTAS</p>
+  <div class="footer-links">
+    <a href="index.html">Inicio</a>
+    <a href="historial.html">Historial</a>
+    <a href="blog.html">Blog</a>
+    <a href="sobre.html">Sobre IPD</a>
+  </div>
+</footer>
 
-        // ============ PARSEAR FRONTMATTER ============
-        function parseFrontmatter(texto) {
-            const match = texto.match(/^---\s*\n([\s\S]*?)\n---\s*\n?([\s\S]*)$/);
-            if (!match) return { data: {}, body: texto };
-            const yaml = match[1];
-            const body = match[2];
-            const data = {};
-            yaml.split('\n').forEach(linea => {
-                const m = linea.match(/^(\w+):\s*(.*)$/);
-                if (!m) return;
-                const clave = m[1].trim();
-                let valor = m[2].trim();
-                valor = valor.replace(/^['"]|['"]$/g, '');
-                data[clave] = valor;
-            });
-            return { data, body };
-        }
+<!-- ============ BOTTOM NAV (mobile) ============ -->
+<nav class="bottom-nav">
+  <a href="index.html" class="bottom-nav-item">
+    <span class="ic">🏠</span>Inicio
+  </a>
+  <a href="historial.html" class="bottom-nav-item">
+    <span class="ic">📜</span>Historial
+  </a>
+  <a href="blog.html" class="bottom-nav-item activo">
+    <span class="ic">📰</span>Blog
+  </a>
+  <a href="sobre.html" class="bottom-nav-item">
+    <span class="ic">ℹ️</span>Sobre
+  </a>
+</nav>
 
-        // ============ FORMATEAR FECHA ============
-        function formatearFecha(iso) {
-            if (!iso) return '';
-            const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-            const [a, m, d] = iso.split('-');
-            return `${parseInt(d)} de ${meses[parseInt(m)-1]} de ${a}`;
-        }
+<!-- ============ MARKED.JS (renderizar Markdown) ============ -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-        // ============ CARGAR ENTRADA ============
-        async function cargarEntrada() {
-            const params = new URLSearchParams(window.location.search);
-            const slug = params.get('slug');
+<!-- ============ LÓGICA ============ -->
+<script>
+/* ---------- Tema claro/oscuro ---------- */
+(function(){
+  const html = document.documentElement;
+  const btn = document.getElementById('btnTema');
+  const guardado = localStorage.getItem('ipd-tema');
+  if (guardado === 'oscuro') {
+    html.setAttribute('data-tema', 'oscuro');
+    btn.textContent = '☀️';
+  }
+  btn.addEventListener('click', function(){
+    const esOscuro = html.getAttribute('data-tema') === 'oscuro';
+    if (esOscuro) {
+      html.removeAttribute('data-tema');
+      localStorage.setItem('ipd-tema', 'claro');
+      btn.textContent = '🌙';
+    } else {
+      html.setAttribute('data-tema', 'oscuro');
+      localStorage.setItem('ipd-tema', 'oscuro');
+      btn.textContent = '☀️';
+    }
+  });
+})();
 
-            const cargando = document.getElementById('entrada-cargando');
+/* ---------- Entrada: leer un .md específico ---------- */
+(function(){
+  const REPO = 'ipdboletin/ipdboletin.github.io';
+  const RAMA = 'main';
+  const CARPETA = 'blog';
 
-            if (!slug) {
-                cargando.textContent = 'No se especificó ninguna nota.';
-                return;
-            }
+  const cargando = document.getElementById('estadoCargando');
+  const error = document.getElementById('estadoError');
+  const articulo = document.getElementById('articulo');
 
-            try {
-                const url = `https://raw.githubusercontent.com/${REPO}/main/${CARPETA}/${slug}.md`;
-                const res = await fetch(url + '?t=' + Date.now());
-                if (!res.ok) throw new Error('No se encontró la nota');
-                const texto = await res.text();
-                const { data, body: cuerpoMd } = parseFrontmatter(texto);
+  // Helpers
+  const escapeHtml = (s) => (s || '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
 
-                // Título de la pestaña
-                document.title = (data.title || 'Nota') + ' – IPD';
+  const fmtFecha = (f) => {
+    if (!f) return '';
+    const d = new Date(f);
+    if (isNaN(d)) return f;
+    return d.toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' });
+  };
 
-                // Meta tags para SEO / compartir
-                const titulo = data.title || '';
-                const copete = data.excerpt || '';
-                const imagen = data.image ? new URL(data.image, window.location.origin).href : 'https://ipdboletin.github.io/condor.png';
-                const urlActual = window.location.href;
+  // Parsear frontmatter + devolver cuerpo
+  function parseMd(texto){
+    const match = texto.match(/^---\s*\n([\s\S]*?)\n---\s*\n?([\s\S]*)$/);
+    if (!match) return { frontmatter: {}, cuerpo: texto };
+    const yaml = match[1];
+    const cuerpo = match[2];
+    const fm = {};
+    yaml.split('\n').forEach(linea => {
+      const m = linea.match(/^([a-zA-Z_][a-zA-Z0-9_]*)\s*:\s*(.*)$/);
+      if (m){
+        let valor = m[2].trim().replace(/^['"]|['"]$/g, '');
+        fm[m[1]] = valor;
+      }
+    });
+    return { frontmatter: fm, cuerpo: cuerpo };
+  }
 
-                document.getElementById('og-title').setAttribute('content', titulo);
-                document.getElementById('og-desc').setAttribute('content', copete);
-                document.getElementById('og-image').setAttribute('content', imagen);
-                document.getElementById('og-url').setAttribute('content', urlActual);
-                document.getElementById('tw-title').setAttribute('content', titulo);
-                document.getElementById('tw-desc').setAttribute('content', copete);
-                document.getElementById('tw-image').setAttribute('content', imagen);
-                document.getElementById('canonical-link').setAttribute('href', urlActual);
+  // Obtener slug de la URL
+  const params = new URLSearchParams(location.search);
+  const slug = params.get('slug');
 
-                // Renderizar
-                document.getElementById('entrada-fecha').textContent = formatearFecha(data.date);
-                document.getElementById('entrada-titulo').textContent = titulo;
-                document.getElementById('entrada-copete').textContent = copete;
+  if (!slug){
+    cargando.style.display = 'none';
+    error.style.display = 'block';
+    return;
+  }
 
-                if (data.image) {
-                    const img = document.getElementById('entrada-imagen');
-                    img.src = data.image;
-                    img.alt = titulo;
-                    img.style.display = 'block';
-                }
+  // Cargar el .md
+  async function cargarEntrada(){
+    try {
+      const urlRaw = `https://raw.githubusercontent.com/${REPO}/${RAMA}/${CARPETA}/${slug}.md?t=${Date.now()}`;
+      const res = await fetch(urlRaw);
+      if (!res.ok) throw new Error('No se encontró');
+      const texto = await res.text();
+      const { frontmatter: fm, cuerpo } = parseMd(texto);
 
-                document.getElementById('entrada-cuerpo').innerHTML = marked.parse(cuerpoMd);
+      // Actualizar meta tags
+      document.title = (fm.title || 'Nota') + ' — IPD';
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc && fm.excerpt) metaDesc.setAttribute('content', fm.excerpt);
 
-                cargando.style.display = 'none';
-                document.getElementById('entrada-articulo').style.display = 'block';
-            } catch (err) {
-                console.error('Error cargando la entrada:', err);
-                cargando.innerHTML = 'No se pudo cargar la nota. <a href="blog.html">Volver al Blog</a>.';
-            }
-        }
+      // Llenar el artículo
+      document.getElementById('artTitulo').textContent = fm.title || 'Sin título';
+      document.getElementById('artCopete').textContent = fm.excerpt || '';
+      document.getElementById('artFecha').textContent = fmtFecha(fm.date);
 
-        cargarEntrada();
-    </script>
+      if (fm.image){
+        const img = document.getElementById('artImagen');
+        img.src = fm.image;
+        img.alt = fm.title || '';
+        img.style.display = 'block';
+      }
+
+      // Renderizar Markdown
+      document.getElementById('artCuerpo').innerHTML = marked.parse(cuerpo);
+
+      // Mostrar
+      cargando.style.display = 'none';
+      articulo.style.display = 'block';
+
+    } catch(e){
+      console.error('Error cargando entrada:', e);
+      cargando.style.display = 'none';
+      error.style.display = 'block';
+    }
+  }
+
+  // Compartir
+  document.getElementById('btnCompartir').addEventListener('click', async () => {
+    const url = location.href;
+    const titulo = document.getElementById('artTitulo').textContent;
+    if (navigator.share){
+      try {
+        await navigator.share({ title: titulo, url: url });
+      } catch(e){ /* cancelado */ }
+    } else {
+      try {
+        await navigator.clipboard.writeText(url);
+        alert('Link copiado al portapapeles');
+      } catch(e){
+        alert('No se pudo copiar');
+      }
+    }
+  });
+
+  cargarEntrada();
+})();
+</script>
 
 </body>
 </html>
