@@ -1,520 +1,227 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sobre IPD – Información para la Defensa</title>
-    <meta name="description" content="Sobre IPD - Información para la Defensa. La Junta de Desarrolladores Nacional Justicialistas pone la verdad del Boletín Oficial al servicio del pueblo trabajador.">
-    <meta name="keywords" content="IPD, sobre, peronismo, justicialismo, boletín oficial, Argentina">
-    <meta name="author" content="Junta de Desarrolladores Nacional Justicialistas">
-    <meta name="robots" content="index, follow">
-
-    <!-- ============ CANONICAL ============ -->
-    <link rel="canonical" href="https://ipdboletin.github.io/sobre.html" />
-
-    <!-- ============ FAVICON ============ -->
-    <link rel="icon" href="condor.png" type="image/png">
-    <link rel="apple-touch-icon" href="condor.png">
-
-    <!-- ============ MANIFEST PWA ============ -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1D3557">
-
-    <!-- ============ OPEN GRAPH (Facebook / WhatsApp) ============ -->
-    <meta property="og:title" content="Sobre IPD – Información para la Defensa">
-    <meta property="og:description" content="La Junta de Desarrolladores Nacional Justicialistas pone la verdad del Boletín Oficial al servicio del pueblo trabajador.">
-    <meta property="og:image" content="https://ipdboletin.github.io/condor.png">
-    <meta property="og:url" content="https://ipdboletin.github.io/sobre.html">
-    <meta property="og:type" content="website">
-    <meta property="og:locale" content="es_AR">
-    <meta property="og:site_name" content="IPD - Información para la Defensa">
-
-    <!-- ============ TWITTER / X CARD ============ -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Sobre IPD – Información para la Defensa">
-    <meta name="twitter:description" content="La Junta de Desarrolladores Nacional Justicialistas pone la verdad del Boletín Oficial al servicio del pueblo trabajador.">
-    <meta name="twitter:image" content="https://ipdboletin.github.io/condor.png">
-
-    <!-- ============ JSON-LD (Structured Data) ============ -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "AboutPage",
-      "name": "Sobre IPD – Información para la Defensa",
-      "url": "https://ipdboletin.github.io/sobre.html",
-      "description": "Sobre IPD - Información para la Defensa. Junta de Desarrolladores Nacional Justicialistas.",
-      "isPartOf": {
-        "@type": "WebSite",
-        "name": "IPD - Información para la Defensa",
-        "url": "https://ipdboletin.github.io/"
-      }
-    }
-    </script>
-
-    <style>
-        :root {
-            --azul-tactico: #1D3557;
-            --azul-medio: #457B9D;
-            --azul-claro: #A8DADC;
-            --rojo: #C1121F;
-            --dorado: #C9A227;
-            --gris-oscuro: #2D3748;
-            --gris-claro: #F7FAFC;
-            --gris-medio: #718096;
-            --blanco: #FFFFFF;
-            
-            --fondo-principal: #F7FAFC;
-            --fondo-secundario: #FFFFFF;
-            --fondo-terciario: #FAFAFA;
-            --texto-principal: #2D3748;
-            --texto-secundario: #718096;
-            --texto-terciario: #4A5568;
-            --borde: #E2E8F0;
-            --card-fondo: #FFFFFF;
-            --header-fondo: #1D3557;
-            --header-texto: #FFFFFF;
-            --footer-fondo: #2D3748;
-            --footer-texto: rgba(255,255,255,0.8);
-        }
-        
-        body.modo-oscuro {
-            --fondo-principal: #0F172A;
-            --fondo-secundario: #1E293B;
-            --fondo-terciario: #1E293B;
-            --texto-principal: #E2E8F0;
-            --texto-secundario: #94A3B8;
-            --texto-terciario: #CBD5E1;
-            --borde: #334155;
-            --card-fondo: #1E293B;
-            --header-fondo: #0F172A;
-            --header-texto: #FFFFFF;
-            --footer-fondo: #020617;
-            --footer-texto: rgba(255,255,255,0.7);
-            --azul-tactico: #457B9D;
-            --azul-medio: #A8DADC;
-        }
-        
-        * { box-sizing: border-box; transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
-        body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--fondo-principal); color: var(--texto-principal); line-height: 1.6; }
-        
-        /* ============ HEADER ESTILO ARCA ============ */
-        .header-ipd { background-color: var(--header-fondo); color: var(--header-texto); position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
-        .header-top { display: flex; justify-content: space-between; align-items: center; padding: 12px 30px; max-width: 1400px; margin: 0 auto; }
-        .header-izq { display: flex; align-items: center; gap: 15px; height: 45px; }
-        .header-logo { font-size: 32px; font-weight: 900; letter-spacing: 2px; color: var(--header-texto); line-height: 1; }
-        .header-separador { font-size: 32px; color: rgba(255,255,255,0.3); line-height: 1; }
-        .header-nombre { display: flex; flex-direction: column; justify-content: center; line-height: 1; }
-        .header-nombre .linea1 { font-size: 12px; font-weight: 400; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.65); line-height: 1; }
-        .header-nombre .linea2 { font-size: 12px; font-weight: 400; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.65); line-height: 1; }
-        .header-der { display: flex; align-items: center; gap: 15px; }
-        .bandera-css { width: 40px; height: 26px; border-radius: 2px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.3); display: flex; flex-direction: column; }
-        .bandera-css .franja-celeste { flex: 1; background-color: #74ACDF; }
-        .bandera-css .franja-blanca { flex: 1; background-color: #FFFFFF; }
-        .header-emblema { height: 45px; width: auto; filter: brightness(0) invert(1); }
-        .header-año { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.9); letter-spacing: 1px; line-height: 1; }
-        
-        /* Botón modo oscuro (desktop) */
-        .btn-modo { background-color: rgba(255,255,255,0.15); border: none; color: var(--header-texto); width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-size: 18px; line-height: 1; display: flex; align-items: center; justify-content: center; transition: 0.3s; flex-shrink: 0; padding: 0; }
-        .btn-modo:hover { background-color: rgba(255,255,255,0.3); transform: scale(1.05); }
-        
-        /* ============ NAV ============ */
-        .nav-ipd { background-color: var(--header-fondo); border-top: 1px solid rgba(255,255,255,0.15); }
-        .nav-ipd-inner { max-width: 1400px; margin: 0 auto; padding: 0 30px; display: flex; gap: 5px; }
-        .nav-ipd a { color: var(--header-texto); text-decoration: none; padding: 12px 20px; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; border-bottom: 3px solid transparent; }
-        .nav-ipd a:hover, .nav-ipd a.active { background-color: rgba(255,255,255,0.1); border-bottom-color: var(--dorado); }
-        
-        /* ============ CONTENEDOR ============ */
-        .container { max-width: 900px; margin: 40px auto; padding: 0 25px; }
-        
-        /* ============ SECCIONES ============ */
-        .seccion-card { background: var(--fondo-secundario); padding: 35px 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; border-left: 5px solid var(--azul-tactico); }
-        .seccion-card h2 { color: var(--azul-tactico); text-transform: uppercase; font-size: 20px; font-weight: 900; letter-spacing: 1.5px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; text-align: center; }
-        .seccion-card p { font-size: 16px; line-height: 1.7; color: var(--texto-principal); margin-bottom: 15px; text-align: justify; }
-        .seccion-card p:last-child { margin-bottom: 0; }
-        .seccion-card strong { color: var(--azul-tactico); }
-        
-        /* ============ VALORES EN PIRÁMIDE ============ */
-        .valores-piramide { margin-top: 40px; }
-        .valores-base { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px; }
-        .valor-card { background: var(--fondo-terciario); padding: 20px; border-radius: 8px; text-align: center; border-top: 3px solid var(--dorado); }
-        .valor-comunidad { max-width: 380px; margin: 0 auto; padding: 25px 20px; }
-        .valor-icono { font-size: 32px; margin-bottom: 10px; }
-        .valor-titulo { font-size: 15px; font-weight: 700; color: var(--azul-tactico); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
-        .valor-texto { font-size: 13px; color: var(--texto-secundario); line-height: 1.5; }
-        
-        /* ============ CÓMO FUNCIONA ============ */
-        .pasos-lista { list-style: none; padding: 0; margin: 20px 0 0 0; counter-reset: paso; }
-        .pasos-lista li { counter-increment: paso; padding: 15px 20px 15px 60px; position: relative; margin-bottom: 12px; background: var(--fondo-terciario); border-radius: 8px; font-size: 15px; color: var(--texto-principal); }
-        .pasos-lista li::before { content: counter(paso); position: absolute; left: 15px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; background: var(--azul-tactico); color: #FFFFFF; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 15px; }
-        
-        /* ============ FAQ ============ */
-        .faq-item { background: var(--fondo-terciario); border-radius: 8px; padding: 20px; margin-bottom: 12px; border-left: 4px solid var(--dorado); }
-        .faq-pregunta { font-size: 16px; font-weight: 700; color: var(--azul-tactico); margin-bottom: 8px; }
-        .faq-respuesta { font-size: 15px; color: var(--texto-principal); line-height: 1.6; }
-        
-        /* ============ CITA ============ */
-        .cita-peron { text-align: center; font-size: 18px; font-style: italic; color: var(--azul-tactico); font-weight: bold; padding: 30px 20px; margin: 30px 0; border-top: 2px solid var(--borde); border-bottom: 2px solid var(--borde); }
-        
-        /* ============ FOOTER ============ */
-        .footer-ipd { background-color: var(--footer-fondo); color: var(--footer-texto); padding: 25px 20px 25px 20px; text-align: center; margin-top: 40px; }
-        .footer-contenido { max-width: 1100px; margin: 0 auto; }
-        .footer-titulo { font-size: 15px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; font-weight: bold; color: #FFFFFF; }
-
-        /* Pirámide invertida en footer: Telegram + WhatsApp arriba, X abajo */
-        .footer-botones {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 28px;
-            margin-bottom: 25px;
-        }
-        .footer-fila-arriba {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        .footer-btn { display: inline-flex; align-items: center; gap: 8px; background-color: var(--azul-tactico); color: #FFFFFF; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-size: 15px; font-weight: 700; transition: 0.3s; }
-        .footer-btn:hover { background-color: var(--dorado); }
-
-        /* Logo X: ícono suelto, sin fondo, centrado abajo */
-        .link-x {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-            opacity: 0.9;
-        }
-        .link-x img {
-            height: 38px;
-            width: auto;
-            display: block;
-        }
-        .link-x:hover {
-            transform: scale(1.12);
-            opacity: 1;
-        }
-
-        /* Emblema J.D.N.J en footer */
-        .footer-emblema-jdnj {
-            display: block;
-            width: 110px;
-            height: auto;
-            margin: 0 auto 14px auto;
-            opacity: 0.95;
-        }
-
-        .footer-firma-nombre { font-size: 15px; font-weight: 700; color: #FFFFFF; margin-bottom: 5px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
-        .footer-firma-desc { font-size: 13px; font-style: italic; color: rgba(255,255,255,0.6); margin-bottom: 20px; }
-        .footer-copy { font-size: 12px; color: rgba(255,255,255,0.5); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
-        
-        /* ============ RESPONSIVE ============ */
-        @media (max-width: 768px) {
-            /* --- HEADER MOBILE: UNA FILA CENTRADA --- */
-            .header-top {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                justify-content: center;
-                gap: 8px;
-                padding: 10px 45px 10px 15px;
-                position: relative;
-                min-height: 50px;
-                height: 50px;
-            }
-
-            .header-izq {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 10px;
-                height: auto;
-                width: auto;
-            }
-
-            .header-logo {
-                font-size: 22px;
-                letter-spacing: 1.5px;
-            }
-
-            .header-separador { display: none; }
-
-            .header-nombre {
-                display: block;
-                line-height: 1;
-            }
-
-            .header-nombre .linea1,
-            .header-nombre .linea2 {
-                display: inline;
-                font-size: 10px;
-                letter-spacing: 1px;
-                color: rgba(255,255,255,0.75);
-            }
-
-            .header-nombre .linea1::after { content: " "; }
-
-            /* En mobile ocultamos bandera, cóndor y año. Dejamos solo el botón */
-            .header-der { 
-                display: contents;
-            }
-            .bandera-css,
-            .header-emblema,
-            .header-año { display: none; }
-
-            /* Botón modo: anclado a posición FIJA, sin depender del contenido */
-            .btn-modo {
-                position: absolute;
-                right: 10px;
-                top: 12px;
-                width: 26px;
-                height: 26px;
-                font-size: 14px;
-                line-height: 1;
-                background-color: rgba(255,255,255,0.08);
-                padding: 0;
-                transform: none;
-                margin: 0;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            .btn-modo:active { background-color: rgba(255,255,255,0.25); }
-
-            /* --- NAV --- */
-            .nav-ipd-inner {
-                flex-wrap: wrap;
-                justify-content: center;
-                padding: 0 10px;
-                gap: 0;
-            }
-            .nav-ipd a {
-                padding: 10px 12px;
-                font-size: 11px;
-                letter-spacing: 0.5px;
-            }
-
-            /* --- CONTENEDOR --- */
-            .container { margin: 20px 15px; padding: 0; }
-            .seccion-card { padding: 25px 20px; }
-            .seccion-card h2 { font-size: 17px; }
-            .seccion-card p { font-size: 15px; text-align: left; }
-            .valores-base { grid-template-columns: 1fr; }
-            .valor-comunidad { max-width: 100%; }
-            .cita-peron { font-size: 16px; }
-
-            /* --- FOOTER MOBILE --- */
-            .footer-botones { gap: 22px; }
-            .footer-fila-arriba { flex-direction: column; align-items: stretch; width: 100%; }
-            .footer-btn { width: 100%; max-width: 280px; margin: 0 auto; justify-content: center; }
-            .link-x img { height: 34px; }
-            .footer-emblema-jdnj { width: 95px; margin-bottom: 12px; }
-        }
-
-        /* Ajuste extra para pantallas muy chicas */
-        @media (max-width: 380px) {
-            .nav-ipd a { padding: 9px 9px; font-size: 10px; }
-            .seccion-card h2 { font-size: 15px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sobre IPD — Información para la Defensa</title>
+<meta name="description" content="Qué es IPD, cómo funciona, nuestra mirada y la Junta de Desarrolladores Nacional Justicialistas.">
+<link rel="icon" href="solocondor.png">
+<link rel="apple-touch-icon" href="solocondor.png">
+<meta name="theme-color" content="#1D3557">
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <!-- ============ HEADER ESTILO ARCA ============ -->
-    <header class="header-ipd">
-        <div class="header-top">
-            <div class="header-izq">
-                <span class="header-logo">IPD</span>
-                <span class="header-separador">|</span>
-                <div class="header-nombre">
-                    <span class="linea1">Información para la</span>
-                    <span class="linea2">Defensa</span>
-                </div>
-            </div>
-            <div class="header-der">
-                <button class="btn-modo" id="btn-modo" title="Cambiar modo claro/oscuro">🌙</button>
-                <div class="bandera-css">
-                    <div class="franja-celeste"></div>
-                    <div class="franja-blanca"></div>
-                    <div class="franja-celeste"></div>
-                </div>
-                <img src="emblema.png" alt="Emblema IPD" class="header-emblema">
-                <span class="header-año">2026 - La organización vence al tiempo...</span>
-            </div>
-        </div>
-        <nav class="nav-ipd">
-            <div class="nav-ipd-inner">
-                <a href="index.html">Inicio</a>
-                <a href="historial.html">Historial</a>
-                <a href="blog.html">Blog</a>
-                <a href="sobre.html" class="active">Sobre IPD</a>
-            </div>
-        </nav>
-    </header>
-
-    <!-- ============ CONTENIDO ============ -->
-    <div class="container">
-
-        <!-- BIENVENIDA -->
-        <section class="seccion-card">
-            <h2>🇦🇷 Bienvenidos a IPD</h2>
-            <p>
-                Bienvenidos a <strong>Información para la Defensa</strong>, el portal estratégico creado por la <strong>Junta de Desarrolladores Nacional Justicialistas</strong> para poner la verdad del Boletín Oficial al alcance y al servicio de cada trabajador argentino.
-            </p>
-            <p>
-                Bajo la conducción técnica y doctrinaria de nuestro compañero programador <strong>J6</strong>, hemos diseñado esta herramienta con una premisa clara: en la Nueva Argentina, la información no puede ser el privilegio de una minoría ilustrada ni un laberinto legal para someter al pueblo. Fieles al legado del General Juan Domingo Perón, entendemos que la verdadera justicia social comienza cuando el trabajador conoce sus derechos y comprende las decisiones que afectan su destino.
-            </p>
-            <p>
-                El lenguaje jurídico, complejo y deliberadamente oscuro, suele funcionar como una barrera colonial que aleja a los ciudadanos de la realidad institucional. Nuestra misión es romper ese monopolio del saber. Este sitio web actúa como un <strong>traductor patriótico y popular</strong>: toma los decretos, leyes y resoluciones del Boletín Oficial de la República Argentina y los procesa para devolver un texto claro, directo y accesible. Queremos que cada obrero, cada empleado y cada productor nacional sepa exactamente qué se está firmando y cómo defenderse.
-            </p>
-            <p>
-                Para la Junta de Desarrolladores Nacional Justicialistas, <strong>programar es un acto de soberanía política y de independencia económica</strong>. No desarrollamos para el mercado ni para la especulación financiera; desarrollamos para la organización del pueblo. Como nos enseñó el Conductor, <em>"mejor que decir es hacer, y mejor que buscar es realizar"</em>. Aquí está nuestra realización: tecnología soberana al servicio de la defensa de la Patria y de la felicidad del pueblo trabajador.
-            </p>
-        </section>
-
-        <!-- PRINCIPIOS EN PIRÁMIDE -->
-        <section class="seccion-card">
-            <h2>🎯 Nuestros Principios</h2>
-            <p>
-                IPD se sostiene sobre los pilares del Nacional Justicialismo histórico: la justicia social, la soberanía política y la independencia económica. Cada análisis que publicamos se apoya en estos principios.
-            </p>
-            
-            <div class="valores-piramide">
-                <div class="valor-card valor-comunidad">
-                    <div class="valor-icono">🏘️</div>
-                    <div class="valor-titulo">Comunidad Organizada</div>
-                    <div class="valor-texto">El pueblo organizado como fuerza transformadora.</div>
-                </div>
-                <div class="valores-base">
-                    <div class="valor-card">
-                        <div class="valor-icono">👨‍👩‍👧</div>
-                        <div class="valor-titulo">Justicia Social</div>
-                        <div class="valor-texto">El trabajador como sujeto histórico y rector de la Nación.</div>
-                    </div>
-                    <div class="valor-card">
-                        <div class="valor-icono">🏛️</div>
-                        <div class="valor-titulo">Soberanía Política</div>
-                        <div class="valor-texto">La Patria decide sobre sus recursos estratégicos.</div>
-                    </div>
-                    <div class="valor-card">
-                        <div class="valor-icono">⚙️</div>
-                        <div class="valor-titulo">Independencia Económica</div>
-                        <div class="valor-texto">Industria nacional, trabajo argentino y mercado interno.</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- CÓMO FUNCIONA -->
-        <section class="seccion-card">
-            <h2>⚙️ Cómo funciona IPD</h2>
-            <p>
-                Todos los días hábiles, a las 7:40 AM, IPD ejecuta un patrullaje automático sobre el Boletín Oficial:
-            </p>
-            <ol class="pasos-lista">
-                <li><strong>Lee el Boletín Oficial</strong> de Nación, Provincia de Buenos Aires y Ciudad Autónoma de Buenos Aires.</li>
-                <li><strong>Filtra las normas relevantes</strong> para el pueblo trabajador (tarifas, trabajo, impuestos, industria, agro, pesca, transporte, vivienda, salud, educación, soberanía).</li>
-                <li><strong>Analiza cada norma</strong> con inteligencia artificial entrenada en la doctrina nacional y popular.</li>
-                <li><strong>Publica el análisis</strong> en el sitio web, en Telegram y en WhatsApp.</li>
-            </ol>
-        </section>
-
-        <!-- CITA -->
-        <div class="cita-peron">
-            "La organización vence al tiempo..."
-        </div>
-
-        <!-- PREGUNTAS FRECUENTES -->
-        <section class="seccion-card">
-            <h2>❓ Preguntas Frecuentes</h2>
-            
-            <div class="faq-item">
-                <div class="faq-pregunta">¿Qué es IPD?</div>
-                <div class="faq-respuesta">
-                    IPD (Información para la Defensa) es una herramienta de análisis político que audita diariamente el Boletín Oficial de la Nación, PBA y CABA, y traduce las normas a un lenguaje claro y popular desde la doctrina nacional y justicialista.
-                </div>
-            </div>
-            
-            <div class="faq-item">
-                <div class="faq-pregunta">¿Cómo se financia IPD?</div>
-                <div class="faq-respuesta">
-                    Actualmente, IPD se financia íntegramente del bolsillo de los desarrolladores de la Junta. Próximamente habilitaremos la posibilidad de recibir colaboraciones y donaciones de la comunidad para sostener y ampliar el proyecto.
-                </div>
-            </div>
-            
-            <div class="faq-item">
-                <div class="faq-pregunta">¿Quiénes hacen IPD?</div>
-                <div class="faq-respuesta">
-                    La <strong>Junta de Desarrolladores Nacional Justicialistas</strong>, bajo la conducción técnica y doctrinaria del compañero programador conocido como <strong>J6</strong>.
-                </div>
-            </div>
-            
-            <div class="faq-item">
-                <div class="faq-pregunta">¿Cómo puedo colaborar?</div>
-                <div class="faq-respuesta">
-                    Por ahora, la mejor forma de colaborar es sumándote a nuestras comunidades de Telegram y WhatsApp, compartiendo los análisis con otros laburantes, y difundiendo el proyecto. Cuando habilitemos las donaciones, lo anunciaremos por todos los canales.
-                </div>
-            </div>
-        </section>
-
+<!-- ============ HEADER ============ -->
+<header class="header">
+  <div class="header-top">
+    <div class="header-izq">
+      <span class="header-logo">IPD</span>
+      <span class="header-nombre">
+        <span class="linea1">Información</span>
+        <span class="linea2">para la Defensa</span>
+      </span>
     </div>
+    <div class="header-der">
+      <nav class="header-nav">
+        <a href="index.html">INICIO</a>
+        <a href="historial.html">HISTORIAL</a>
+        <a href="blog.html">BLOG</a>
+        <a href="sobre.html" class="activo">SOBRE IPD</a>
+      </nav>
+      <button class="header-btn-tema" id="btnTema" aria-label="Cambiar tema">🌙</button>
+    </div>
+  </div>
+</header>
 
-    <!-- ============ FOOTER ============ -->
-    <footer class="footer-ipd">
-        <div class="footer-contenido">
-            <p class="footer-titulo">📲 Sumate a nuestra comunidad</p>
-            <!-- Pirámide invertida: Telegram + WhatsApp arriba, X abajo centrado -->
-            <div class="footer-botones">
-                <div class="footer-fila-arriba">
-                    <a href="https://t.me/+x1jpuKAZKMowNjYx" class="footer-btn" target="_blank">📲 Telegram</a>
-                    <a href="https://whatsapp.com/channel/0029VbDIsLn2ZjCuyTNW5E1L" class="footer-btn" target="_blank">💬 WhatsApp</a>
-                </div>
-                <a href="https://x.com/ipdboletin" class="link-x" target="_blank" rel="noopener" aria-label="Seguinos en X" title="Seguinos en X">
-                    <img src="equislogo.png" alt="X - Información para la Defensa">
-                </a>
-            </div>
-            <img src="JDNJ.png" alt="Junta de Desarrolladores Nacional Justicialistas" class="footer-emblema-jdnj">
-            <p class="footer-firma-nombre">Junta de Desarrolladores Nacional Justicialistas</p>
-            <p class="footer-firma-desc">Información para la Defensa</p>
-            <p class="footer-copy">© 2026 IPD - Información para la Defensa · Todos los derechos reservados</p>
+<!-- ============ CONTENIDO ============ -->
+<main class="container">
+
+  <!-- HERO COMPACTO -->
+  <section class="hero" style="padding:var(--sp-6) var(--sp-5);">
+    <div class="hero-contenido">
+      <h2 style="white-space:normal;">¿Qué es IPD?</h2>
+      <p style="white-space:normal;">Traducimos el Boletín Oficial para que sepas cómo te afecta, todos los días.</p>
+    </div>
+  </section>
+
+  <!-- QUÉ ES -->
+  <section class="sobre-seccion">
+    <h3 class="sobre-titulo">Qué hacemos</h3>
+    <p>IPD es un sistema que lee los <strong>Boletines Oficiales de Nación, Provincia de Buenos Aires y CABA</strong>, los analiza con mirada nacional y justicialista, y publica un resumen claro: qué dice la norma en la letra chica, a quién beneficia y a quién perjudica.</p>
+    <p>No somos neutrales. Creemos que el Estado tiene que estar al servicio del pueblo, no de los monopolios. Y creemos que la información pública tiene que llegar a todos, no solo a los que saben leer un decreto.</p>
+  </section>
+
+  <!-- NUESTRA MIRADA -->
+  <section class="sobre-seccion">
+    <h3 class="sobre-titulo">Nuestra mirada</h3>
+    <p>Trabajamos con tres principios:</p>
+    <div class="principios">
+      <div class="principio">
+        <div class="principio-icono">✊</div>
+        <div>
+          <h4>El trabajo como sujeto histórico</h4>
+          <p>Los trabajadores son el motor de la patria. Cada norma se lee preguntando: ¿crea trabajo o lo destruye?</p>
         </div>
-    </footer>
+      </div>
+      <div class="principio">
+        <div class="principio-icono">🇦🇷</div>
+        <div>
+          <h4>Independencia económica y soberanía</h4>
+          <p>Recursos estratégicos, energía, puertos, tierras. Denunciamos toda entrega disfrazada de modernización.</p>
+        </div>
+      </div>
+      <div class="principio">
+        <div class="principio-icono">🏛️</div>
+        <div>
+          <h4>Pueblo organizado</h4>
+          <p>La información no sirve si no se comparte. Por eso publicamos todo gratis y abrimos canales para organizarnos.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <script>
-        // ============ MODO OSCURO ============
-        const btnModo = document.getElementById('btn-modo');
-        const body = document.body;
-        
-        function aplicarModo(oscuro) {
-            if (oscuro) {
-                body.classList.add('modo-oscuro');
-                btnModo.textContent = '☀️';
-                btnModo.title = 'Cambiar a modo claro';
-            } else {
-                body.classList.remove('modo-oscuro');
-                btnModo.textContent = '🌙';
-                btnModo.title = 'Cambiar a modo oscuro';
-            }
-        }
-        
-        const modoGuardado = localStorage.getItem('modo-oscuro');
-        
-        if (modoGuardado === 'true') {
-            aplicarModo(true);
-        } else if (modoGuardado === 'false') {
-            aplicarModo(false);
-        } else {
-            aplicarModo(false);
-        }
-        
-        btnModo.addEventListener('click', () => {
-            const estaOscuro = body.classList.contains('modo-oscuro');
-            aplicarModo(!estaOscuro);
-            localStorage.setItem('modo-oscuro', (!estaOscuro).toString());
-        });
-    </script>
+  <!-- CÓMO FUNCIONA -->
+  <section class="sobre-seccion">
+    <h3 class="sobre-titulo">Cómo funciona</h3>
+    <ol class="pasos">
+      <li>
+        <span class="paso-num">1</span>
+        <div>
+          <strong>Bajamos los boletines</strong>
+          <p>Todos los días a las 7:40 AM bajamos los PDFs de Nación, PBA y CABA.</p>
+        </div>
+      </li>
+      <li>
+        <span class="paso-num">2</span>
+        <div>
+          <strong>Extraemos las normas</strong>
+          <p>Filtramos por palabras clave para quedarnos solo con lo importante.</p>
+        </div>
+      </li>
+      <li>
+        <span class="paso-num">3</span>
+        <div>
+          <strong>Analizamos con IA</strong>
+          <p>Un modelo entrenado con doctrina nacional y justicialista escribe el análisis.</p>
+        </div>
+      </li>
+      <li>
+        <span class="paso-num">4</span>
+        <div>
+          <strong>Publicamos y avisamos</strong>
+          <p>Todo se publica en la web y se manda alerta por Telegram.</p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <!-- LA JUNTA -->
+  <section class="sobre-seccion">
+    <h3 class="sobre-titulo">Quiénes somos</h3>
+    <div class="junta-caja">
+      <img src="JDNJ.png" alt="Junta de Desarrolladores Nacional Justicialistas" onerror="this.style.display='none';">
+      <p><strong>Junta de Desarrolladores Nacional Justicialistas</strong></p>
+      <p class="junta-sub">Conducción técnica: J6</p>
+      <p class="junta-texto">Somos militantes y desarrolladores que decidimos poner la tecnología al servicio de la patria. Este proyecto es independiente, autogestionado y sin fines de lucro.</p>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="sobre-seccion">
+    <h3 class="sobre-titulo">Preguntas frecuentes</h3>
+    <div class="faq">
+      <details>
+        <summary>¿Quién escribe los análisis?</summary>
+        <p>Los análisis los genera un modelo de inteligencia artificial entrenado con doctrina nacional y justicialista, supervisado por la Junta. No son opiniones personales, son interpretaciones basadas en un marco doctrinario claro.</p>
+      </details>
+      <details>
+        <summary>¿Es gratis?</summary>
+        <p>Sí, todo el contenido es gratuito y siempre lo va a ser. No cobramos suscripción ni ponemos contenido detrás de un pago.</p>
+      </details>
+      <details>
+        <summary>¿Cómo se financian?</summary>
+        <p>Con aportes voluntarios de la comunidad y trabajo ad honorem de la Junta. Si querés colaborar, escribinos por Telegram.</p>
+      </details>
+      <details>
+        <summary>¿Puedo compartir los análisis?</summary>
+        <p>Sí, y te pedimos que lo hagas. La información que no se comparte no sirve. Podés compartir por WhatsApp, Telegram, X, o donde quieras.</p>
+      </details>
+      <details>
+        <summary>¿De dónde sacan las normas?</summary>
+        <p>Del Boletín Oficial de la República Argentina, del Boletín Oficial de la Provincia de Buenos Aires y del Boletín Oficial de la Ciudad de Buenos Aires. Fuentes públicas y oficiales.</p>
+      </details>
+      <details>
+        <summary>¿Puedo colaborar?</summary>
+        <p>Sí. Podés sumarte a la comunidad de Telegram, compartir los análisis, o escribirnos si querés aportar con código, diseño, redacción o difusión.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- COMUNIDAD -->
+  <section class="comunidad">
+    <h3>Sumate a la comunidad</h3>
+    <div class="comunidad-botones">
+      <a href="https://t.me/+x1jpuKAZKMowNjYx" target="_blank" rel="noopener" class="btn btn-dorado">📲 Telegram</a>
+      <a href="https://whatsapp.com/channel/0029VbDIsLn2ZjCuyTNW5E1L" target="_blank" rel="noopener" class="btn btn-blanco">💬 WhatsApp</a>
+      <a href="https://x.com/ipdboletin" target="_blank" rel="noopener" class="btn btn-blanco">𝕏 Seguinos en X</a>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <img src="JDNJ.png" alt="" class="footer-jdnj" onerror="this.style.display='none'">
+  <p>JUNTA DE DESARROLLADORES<br>NACIONAL JUSTICIALISTAS</p>
+  <div class="footer-links">
+    <a href="index.html">Inicio</a>
+    <a href="historial.html">Historial</a>
+    <a href="blog.html">Blog</a>
+    <a href="sobre.html">Sobre IPD</a>
+  </div>
+</footer>
+
+<!-- ============ BOTTOM NAV (mobile) ============ -->
+<nav class="bottom-nav">
+  <a href="index.html" class="bottom-nav-item">
+    <span class="ic">🏠</span>Inicio
+  </a>
+  <a href="historial.html" class="bottom-nav-item">
+    <span class="ic">📜</span>Historial
+  </a>
+  <a href="blog.html" class="bottom-nav-item">
+    <span class="ic">📰</span>Blog
+  </a>
+  <a href="sobre.html" class="bottom-nav-item activo">
+    <span class="ic">ℹ️</span>Sobre
+  </a>
+</nav>
+
+<!-- ============ LÓGICA (solo tema) ============ -->
+<script>
+(function(){
+  const html = document.documentElement;
+  const btn = document.getElementById('btnTema');
+  const guardado = localStorage.getItem('ipd-tema');
+  if (guardado === 'oscuro') {
+    html.setAttribute('data-tema', 'oscuro');
+    btn.textContent = '☀️';
+  }
+  btn.addEventListener('click', function(){
+    const esOscuro = html.getAttribute('data-tema') === 'oscuro';
+    if (esOscuro) {
+      html.removeAttribute('data-tema');
+      localStorage.setItem('ipd-tema', 'claro');
+      btn.textContent = '🌙';
+    } else {
+      html.setAttribute('data-tema', 'oscuro');
+      localStorage.setItem('ipd-tema', 'oscuro');
+      btn.textContent = '☀️';
+    }
+  });
+})();
+</script>
 
 </body>
 </html>
