@@ -176,21 +176,21 @@
   const hoy = new Date().toISOString().slice(0, 10);
   const esHoy = (fecha) => (fecha || '').slice(0, 10) === hoy;
 
+  // FIX: parsear fecha sin pasar por Date() para evitar bug de zona horaria
   const fmtFecha = (fecha) => {
     if (!fecha) return '';
-    const d = new Date(fecha);
-    if (isNaN(d)) return fecha;
-    return d.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: '2-digit' });
+    const [yyyy, mm, dd] = String(fecha).split('-');
+    if (!yyyy || !mm || !dd) return fecha;
+    return `${dd}/${mm}/${yyyy.slice(2)}`;
   };
 
   // Total
   statNormas.textContent = baseDatosIPD.length.toLocaleString('es-AR');
 
   // Ordenar + tomar últimas 3
+  // FIX: comparación por string (YYYY-MM-DD ordena bien lexicográficamente)
   const ordenadas = [...baseDatosIPD].sort((a, b) => {
-    const fa = new Date(a.fecha || 0);
-    const fb = new Date(b.fecha || 0);
-    return fb - fa;
+    return (b.fecha || '').localeCompare(a.fecha || '');
   });
   const ultimas = ordenadas.slice(0, 3);
 
