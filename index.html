@@ -1,627 +1,209 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IPD – Información para la Defensa</title>
-    <meta name="description" content="IPD - Información para la Defensa. Análisis diario del Boletín Oficial de Nación, PBA y CABA. Traducimos la letra chica del coloniaje económico para defender el trabajo, la Patria y el bolsillo popular.">
-    <meta name="keywords" content="boletín oficial, análisis, peronismo, justicialismo, trabajo, Argentina, Nación, PBA, CABA">
-    <meta name="author" content="Junta de Desarrolladores Nacional Justicialistas">
-    <meta name="robots" content="index, follow">
-
-    <!-- ============ CANONICAL ============ -->
-    <link rel="canonical" href="https://ipdboletin.github.io/" />
-
-    <!-- ============ FAVICON ============ -->
-    <link rel="icon" href="condor.png" type="image/png">
-    <link rel="apple-touch-icon" href="condor.png">
-
-    <!-- ============ MANIFEST PWA ============ -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1D3557">
-
-    <!-- ============ OPEN GRAPH (Facebook / WhatsApp) ============ -->
-    <meta property="og:title" content="IPD - Información para la Defensa">
-    <meta property="og:description" content="Análisis diario del Boletín Oficial. Traducimos la letra chica para defender el trabajo, la Patria y el bolsillo popular.">
-    <meta property="og:image" content="https://ipdboletin.github.io/condor.png">
-    <meta property="og:url" content="https://ipdboletin.github.io/">
-    <meta property="og:type" content="website">
-    <meta property="og:locale" content="es_AR">
-    <meta property="og:site_name" content="IPD - Información para la Defensa">
-
-    <!-- ============ TWITTER / X CARD ============ -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="IPD - Información para la Defensa">
-    <meta name="twitter:description" content="Análisis diario del Boletín Oficial. Traducimos la letra chica para defender el trabajo, la Patria y el bolsillo popular.">
-    <meta name="twitter:image" content="https://ipdboletin.github.io/condor.png">
-
-    <!-- ============ JSON-LD (Structured Data) ============ -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "IPD - Información para la Defensa",
-      "alternateName": "IPD",
-      "url": "https://ipdboletin.github.io/",
-      "logo": "https://ipdboletin.github.io/condor.png",
-      "description": "Análisis diario del Boletín Oficial de Nación, PBA y CABA bajo la doctrina nacional justicialista.",
-      "sameAs": [
-        "https://t.me/+x1jpuKAZKMowNjYx",
-        "https://whatsapp.com/channel/0029VbDIsLn2ZjCuyTNW5E1L",
-        "https://x.com/ipdboletin"
-      ]
-    }
-    </script>
-
-    <style>
-        /* ============ VARIABLES MODO CLARO ============ */
-        :root {
-            --azul-tactico: #1D3557;
-            --azul-medio: #457B9D;
-            --azul-claro: #A8DADC;
-            --rojo: #C1121F;
-            --dorado: #C9A227;
-            --gris-oscuro: #2D3748;
-            --gris-claro: #F7FAFC;
-            --gris-medio: #718096;
-            --blanco: #FFFFFF;
-            
-            --fondo-principal: #F7FAFC;
-            --fondo-secundario: #FFFFFF;
-            --fondo-terciario: #FAFAFA;
-            --texto-principal: #2D3748;
-            --texto-secundario: #718096;
-            --texto-terciario: #4A5568;
-            --borde: #E2E8F0;
-            --card-fondo: #FFFFFF;
-            --header-fondo: #1D3557;
-            --header-texto: #FFFFFF;
-            --footer-fondo: #2D3748;
-            --footer-texto: rgba(255,255,255,0.8);
-        }
-        
-        /* ============ VARIABLES MODO OSCURO ============ */
-        body.modo-oscuro {
-            --fondo-principal: #0F172A;
-            --fondo-secundario: #1E293B;
-            --fondo-terciario: #1E293B;
-            --texto-principal: #E2E8F0;
-            --texto-secundario: #94A3B8;
-            --texto-terciario: #CBD5E1;
-            --borde: #334155;
-            --card-fondo: #1E293B;
-            --header-fondo: #0F172A;
-            --header-texto: #FFFFFF;
-            --footer-fondo: #020617;
-            --footer-texto: rgba(255,255,255,0.7);
-            --azul-tactico: #457B9D;
-            --azul-medio: #A8DADC;
-        }
-        
-        * { box-sizing: border-box; transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
-        body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--fondo-principal); color: var(--texto-principal); line-height: 1.6; }
-        
-        /* ============ HEADER ESTILO ARCA ============ */
-        .header-ipd { background-color: var(--header-fondo); color: var(--header-texto); position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
-        .header-top { display: flex; justify-content: space-between; align-items: center; padding: 12px 30px; max-width: 1400px; margin: 0 auto; }
-        .header-izq { display: flex; align-items: center; gap: 15px; height: 45px; }
-        .header-logo { font-size: 32px; font-weight: 900; letter-spacing: 2px; color: var(--header-texto); line-height: 1; }
-        .header-separador { font-size: 32px; color: rgba(255,255,255,0.3); line-height: 1; }
-        .header-nombre { display: flex; flex-direction: column; justify-content: center; line-height: 1; }
-        .header-nombre .linea1 { font-size: 12px; font-weight: 400; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.65); line-height: 1; }
-        .header-nombre .linea2 { font-size: 12px; font-weight: 400; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.65); line-height: 1; }
-        .header-der { display: flex; align-items: center; gap: 15px; }
-        .bandera-css { width: 40px; height: 26px; border-radius: 2px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.3); display: flex; flex-direction: column; }
-        .bandera-css .franja-celeste { flex: 1; background-color: #74ACDF; }
-        .bandera-css .franja-blanca { flex: 1; background-color: #FFFFFF; }
-        .header-emblema { height: 45px; width: auto; filter: brightness(0) invert(1); }
-        .header-año { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.9); letter-spacing: 1px; line-height: 1; }
-        
-        /* Botón modo oscuro (desktop) */
-        .btn-modo { background-color: rgba(255,255,255,0.15); border: none; color: var(--header-texto); width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-size: 18px; line-height: 1; display: flex; align-items: center; justify-content: center; transition: 0.3s; flex-shrink: 0; padding: 0; }
-        .btn-modo:hover { background-color: rgba(255,255,255,0.3); transform: scale(1.05); }
-        
-        /* ============ NAV ============ */
-        .nav-ipd { background-color: var(--header-fondo); border-top: 1px solid rgba(255,255,255,0.15); }
-        .nav-ipd-inner { max-width: 1400px; margin: 0 auto; padding: 0 30px; display: flex; gap: 5px; }
-        .nav-ipd a { color: var(--header-texto); text-decoration: none; padding: 12px 20px; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; border-bottom: 3px solid transparent; }
-        .nav-ipd a:hover, .nav-ipd a.active { background-color: rgba(255,255,255,0.1); border-bottom-color: var(--dorado); }
-        
-        /* ============ HERO ============ */
-        .hero { text-align: center; padding: 50px 20px 40px 20px; background-color: var(--fondo-secundario); }
-        .hero-condor { max-width: 400px; width: 100%; height: auto; margin: 0 auto 30px auto; display: block; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.1)); }
-        .hero-subtitulo { font-size: 18px; color: var(--texto-secundario); font-style: italic; margin-bottom: 25px; }
-        .hero-proclama { max-width: 700px; margin: 0 auto 35px auto; font-size: 17px; line-height: 1.7; color: var(--texto-principal); font-weight: 500; }
-        .hero-botones { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
-        .btn-primario { display: inline-block; background-color: var(--azul-tactico); color: #FFFFFF; padding: 15px 30px; border-radius: 8px; text-decoration: none; font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; box-shadow: 0 4px 6px rgba(29,53,87,0.2); }
-        .btn-primario:hover { background-color: var(--dorado); }
-        .btn-secundario { display: inline-block; background-color: transparent; color: var(--azul-tactico); padding: 15px 30px; border-radius: 8px; text-decoration: none; font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border: 2px solid var(--azul-tactico); transition: 0.3s; }
-        .btn-secundario:hover { background-color: var(--azul-tactico); color: #FFFFFF; }
-        
-        /* ============ STATS ============ */
-        .stats { background-color: var(--azul-tactico); color: #FFFFFF; padding: 30px 20px; display: flex; justify-content: center; gap: 60px; flex-wrap: wrap; }
-        .stat-item { text-align: center; }
-        .stat-numero { font-size: 32px; font-weight: 900; color: var(--dorado); display: block; }
-        .stat-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.8); margin-top: 5px; }
-        
-        /* ============ CONTENEDOR GENERAL ============ */
-        .container-seccion { max-width: 1100px; margin: 0 auto; padding: 50px 20px; }
-        .seccion-titulo { font-size: 24px; font-weight: 900; color: var(--azul-tactico); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; text-align: center; }
-        .seccion-subtitulo { font-size: 14px; color: var(--texto-secundario); text-align: center; margin-bottom: 35px; font-style: italic; }
-        
-        /* ============ CARDS ÚLTIMAS NORMAS ============ */
-        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .card-norma { background-color: var(--card-fondo); border: 1px solid var(--borde); border-radius: 10px; padding: 20px; transition: 0.3s; border-left: 4px solid var(--azul-tactico); }
-        .card-norma:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); border-left-color: var(--dorado); }
-        .card-jurisdiccion { display: inline-block; font-size: 10px; background-color: var(--azul-tactico); color: #FFFFFF; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; font-weight: 700; }
-        .card-titulo { font-size: 17px; font-weight: 700; color: var(--azul-tactico); margin-bottom: 10px; line-height: 1.3; }
-        .card-criollo { font-size: 14px; color: var(--texto-principal); line-height: 1.5; }
-        .card-fecha { font-size: 12px; color: var(--texto-secundario); margin-top: 10px; font-style: italic; }
-        .ver-todo { text-align: center; margin-top: 30px; }
-        
-        /* ============ FORM SUSCRIPCIÓN ============ */
-        .seccion-suscripcion { background-color: var(--fondo-secundario); padding: 50px 20px; text-align: center; border-top: 1px solid var(--borde); border-bottom: 1px solid var(--borde); }
-        .form-suscripcion { display: inline-flex; gap: 10px; max-width: 500px; width: 100%; flex-wrap: wrap; justify-content: center; }
-        .form-suscripcion input[type="email"] { flex: 1; min-width: 250px; padding: 15px 20px; border: 2px solid var(--azul-tactico); border-radius: 8px; font-size: 15px; color: var(--texto-principal); background-color: var(--fondo-principal); }
-        .form-suscripcion input[type="email"]:focus { outline: none; border-color: var(--dorado); }
-        .form-suscripcion button { background-color: var(--azul-tactico); color: #FFFFFF; padding: 15px 30px; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 6px rgba(29,53,87,0.2); }
-        .form-suscripcion button:hover { background-color: var(--dorado); }
-        .aviso-confirmacion { font-size: 12px; color: var(--texto-secundario); margin-top: 15px; }
-        
-        /* ============ SOBRE IPD ============ */
-        .sobre-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .sobre-card { background-color: var(--card-fondo); padding: 30px 25px; border-radius: 10px; text-align: center; transition: 0.3s; border: 1px solid var(--borde); border-top: 4px solid var(--azul-tactico); }
-        .sobre-card:hover { border-top-color: var(--dorado); transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
-        .sobre-icono { font-size: 40px; margin-bottom: 15px; }
-        .sobre-titulo { font-size: 17px; font-weight: 700; color: var(--azul-tactico); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
-        .sobre-texto { font-size: 14px; color: var(--texto-principal); line-height: 1.6; }
-        
-        /* ============ COMUNIDAD ============ */
-        .seccion-comunidad { background-color: var(--azul-tactico); color: #FFFFFF; padding: 50px 20px 30px 20px; text-align: center; }
-        .comunidad-titulo { font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
-        .comunidad-subtitulo { font-size: 14px; color: rgba(255,255,255,0.8); margin-bottom: 30px; font-style: italic; }
-
-        /* Pirámide invertida: fila de arriba (Telegram + WhatsApp) y X abajo centrado */
-        .comunidad-botones {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 28px;
-        }
-        .comunidad-fila-arriba {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        .btn-comunidad { display: inline-flex; align-items: center; gap: 8px; background-color: #FFFFFF; color: var(--azul-tactico); padding: 14px 28px; border-radius: 8px; text-decoration: none; font-size: 15px; font-weight: 700; transition: 0.3s; }
-        .btn-comunidad:hover { background-color: var(--dorado); color: #FFFFFF; }
-
-        /* Logo X: ícono suelto, sin fondo, centrado abajo */
-        .link-x {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-            opacity: 0.9;
-        }
-        .link-x img {
-            height: 38px;
-            width: auto;
-            display: block;
-        }
-        .link-x:hover {
-            transform: scale(1.12);
-            opacity: 1;
-        }
-        
-        /* ============ FOOTER ============ */
-        .footer-ipd { background-color: var(--footer-fondo); color: var(--footer-texto); padding: 25px 20px 25px 20px; text-align: center; }
-        .footer-contenido { max-width: 1100px; margin: 0 auto; }
-
-        /* Emblema J.D.N.J en footer */
-        .footer-emblema-jdnj {
-            display: block;
-            width: 110px;
-            height: auto;
-            margin: 0 auto 14px auto;
-            opacity: 0.95;
-        }
-
-        .footer-firma-nombre { font-size: 15px; font-weight: 700; color: #FFFFFF; margin-bottom: 5px; }
-        .footer-firma-desc { font-size: 13px; font-style: italic; color: rgba(255,255,255,0.6); margin-bottom: 20px; }
-        .footer-copy { font-size: 12px; color: rgba(255,255,255,0.5); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
-        
-        /* ============ RESPONSIVE ============ */
-        @media (max-width: 768px) {
-            /* --- HEADER MOBILE: UNA FILA CENTRADA --- */
-            .header-top {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                justify-content: center;
-                gap: 8px;
-                padding: 10px 45px 10px 15px;
-                position: relative;
-                min-height: 50px;
-                height: 50px;
-            }
-
-            .header-izq {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 10px;
-                height: auto;
-                width: auto;
-            }
-
-            .header-logo {
-                font-size: 22px;
-                letter-spacing: 1.5px;
-            }
-
-            .header-separador { display: none; }
-
-            .header-nombre {
-                display: block;
-                line-height: 1;
-            }
-
-            .header-nombre .linea1,
-            .header-nombre .linea2 {
-                display: inline;
-                font-size: 10px;
-                letter-spacing: 1px;
-                color: rgba(255,255,255,0.75);
-            }
-
-            .header-nombre .linea1::after { content: " "; }
-
-            /* En mobile ocultamos bandera, cóndor y año. Dejamos solo el botón */
-            .header-der { 
-                display: contents;
-            }
-            .bandera-css,
-            .header-emblema,
-            .header-año { display: none; }
-
-            /* Botón modo: anclado a posición FIJA, sin depender del contenido */
-            .btn-modo {
-                position: absolute;
-                right: 10px;
-                top: 12px;
-                width: 26px;
-                height: 26px;
-                font-size: 14px;
-                line-height: 1;
-                background-color: rgba(255,255,255,0.08);
-                padding: 0;
-                transform: none;
-                margin: 0;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            .btn-modo:active { background-color: rgba(255,255,255,0.25); }
-
-            /* --- NAV --- */
-            .nav-ipd-inner {
-                flex-wrap: wrap;
-                justify-content: center;
-                padding: 0 10px;
-                gap: 0;
-            }
-            .nav-ipd a {
-                padding: 10px 12px;
-                font-size: 11px;
-                letter-spacing: 0.5px;
-            }
-
-            /* --- HERO --- */
-            .hero { padding: 35px 18px 30px 18px; }
-            .hero-condor { max-width: 240px; margin-bottom: 22px; }
-            .hero-subtitulo { font-size: 15px; margin-bottom: 18px; }
-            .hero-proclama { font-size: 15px; line-height: 1.6; margin-bottom: 28px; }
-
-            .hero-botones {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 10px;
-                max-width: 320px;
-                margin: 0 auto;
-            }
-            .btn-primario,
-            .btn-secundario {
-                width: 100%;
-                text-align: center;
-                padding: 14px 20px;
-                font-size: 14px;
-            }
-
-            /* --- STATS --- */
-            .stats {
-                gap: 20px;
-                padding: 22px 15px;
-                justify-content: space-around;
-            }
-            .stat-item { flex: 1 1 30%; min-width: 90px; }
-            .stat-numero { font-size: 22px; }
-            .stat-label { font-size: 10px; letter-spacing: 1px; }
-
-            /* --- SECCIONES --- */
-            .container-seccion { padding: 35px 18px; }
-            .seccion-titulo { font-size: 20px; }
-            .seccion-subtitulo { font-size: 13px; margin-bottom: 25px; }
-
-            /* --- CARDS --- */
-            .cards-grid { grid-template-columns: 1fr; gap: 15px; }
-
-            /* --- FORM SUSCRIPCIÓN --- */
-            .seccion-suscripcion { padding: 35px 18px; }
-            .form-suscripcion {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .form-suscripcion input[type="email"] {
-                min-width: 0;
-                width: 100%;
-            }
-            .form-suscripcion button { width: 100%; }
-
-            /* --- SOBRE --- */
-            .sobre-grid { grid-template-columns: 1fr; }
-
-            /* --- COMUNIDAD MOBILE: apilado vertical --- */
-            .seccion-comunidad { padding: 35px 18px 25px 18px; }
-            .comunidad-titulo { font-size: 20px; }
-            .comunidad-botones {
-                max-width: 320px;
-                margin: 0 auto;
-                gap: 22px;
-            }
-            .comunidad-fila-arriba {
-                flex-direction: column;
-                align-items: stretch;
-                width: 100%;
-            }
-            .btn-comunidad { justify-content: center; }
-            .link-x img {
-                height: 34px;
-            }
-
-            /* --- FOOTER: emblema más chico en mobile --- */
-            .footer-emblema-jdnj {
-                width: 95px;
-                margin-bottom: 12px;
-            }
-        }
-
-        /* Ajuste extra para pantallas muy chicas */
-        @media (max-width: 380px) {
-            .nav-ipd a { padding: 9px 9px; font-size: 10px; }
-            .stat-numero { font-size: 20px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IPD — Información para la Defensa</title>
+<meta name="description" content="Traducimos el Boletín Oficial para que sepas cómo te afecta. Análisis diario de Nación, PBA y CABA con mirada nacional y justicialista.">
+<link rel="icon" href="solocondor.png">
+<link rel="apple-touch-icon" href="solocondor.png">
+<meta name="theme-color" content="#1D3557">
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <!-- ============ HEADER ESTILO ARCA ============ -->
-    <header class="header-ipd">
-        <div class="header-top">
-            <div class="header-izq">
-                <span class="header-logo">IPD</span>
-                <span class="header-separador">|</span>
-                <div class="header-nombre">
-                    <span class="linea1">Información para la</span>
-                    <span class="linea2">Defensa</span>
-                </div>
-            </div>
-            <div class="header-der">
-                <button class="btn-modo" id="btn-modo" title="Cambiar modo claro/oscuro">🌙</button>
-                <div class="bandera-css">
-                    <div class="franja-celeste"></div>
-                    <div class="franja-blanca"></div>
-                    <div class="franja-celeste"></div>
-                </div>
-                <img src="emblema.png" alt="Emblema IPD" class="header-emblema">
-                <span class="header-año">2026 - La organización vence al tiempo...</span>
-            </div>
-        </div>
-        <nav class="nav-ipd">
-            <div class="nav-ipd-inner">
-                <a href="index.html" class="active">Inicio</a>
-                <a href="historial.html">Historial</a>
-                <a href="blog.html">Blog</a>
-                <a href="sobre.html">Sobre IPD</a>
-            </div>
-        </nav>
-    </header>
+<!-- ============ HEADER ============ -->
+<header class="header">
+  <div class="header-top">
+    <div class="header-izq">
+      <span class="header-logo">IPD</span>
+      <span class="header-nombre">
+        <span class="linea1">Información</span>
+        <span class="linea2">para la Defensa</span>
+      </span>
+    </div>
+    <div class="header-der">
+      <nav class="header-nav">
+        <a href="index.html" class="activo">INICIO</a>
+        <a href="historial.html">HISTORIAL</a>
+        <a href="blog.html">BLOG</a>
+        <a href="sobre.html">SOBRE IPD</a>
+      </nav>
+      <button class="header-btn-tema" id="btnTema" aria-label="Cambiar tema">🌙</button>
+    </div>
+  </div>
+</header>
 
-    <!-- ============ HERO ============ -->
-    <section class="hero">
-        <img src="condor.png" alt="Cóndor IPD" class="hero-condor">
-        <p class="hero-subtitulo">Traducimos el Boletín Oficial para que sepas cómo te afecta</p>
-        <p class="hero-proclama">
-            Monitoreo diario del Boletín Oficial bajo la Doctrina Justicialista. 
-            Traducimos la letra chica del coloniaje económico para defender el trabajo, la Patria y el bolsillo popular.
-        </p>
-        <div class="hero-botones">
-            <a href="historial.html" class="btn-primario">📂 Ver Historial</a>
-            <a href="#suscribirse" class="btn-secundario">✉️ Suscribirme</a>
-        </div>
-    </section>
+<!-- ============ CONTENIDO ============ -->
+<main class="container">
 
-    <!-- ============ STATS ============ -->
-    <section class="stats">
-        <div class="stat-item">
-            <span class="stat-numero" id="stat-normas">0</span>
-            <span class="stat-label">Normas analizadas</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-numero" id="stat-fecha">—</span>
-            <span class="stat-label">Última actualización</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-numero">3</span>
-            <span class="stat-label">Jurisdicciones</span>
-        </div>
-    </section>
+  <!-- HERO -->
+  <section class="hero">
+    <img src="solocondor.png" alt="" class="hero-condor-top" onerror="this.style.display='none'">
+    <div class="hero-contenido">
+      <h2>Traducimos el Boletín Oficial para que sepas cómo te afecta</h2>
+      <p>Análisis diario de Nación, PBA y CABA con mirada nacional y justicialista.</p>
+      <div class="hero-botones">
+        <a href="historial.html" class="btn btn-dorado">Ver últimas normas</a>
+        <a href="#suscribirme" class="btn btn-blanco">Suscribirme gratis</a>
+      </div>
+    </div>
+  </section>
 
-    <!-- ============ ÚLTIMAS NORMAS ============ -->
-    <section class="container-seccion">
-        <h2 class="seccion-titulo">📌 Últimas normas publicadas</h2>
-        <p class="seccion-subtitulo">Las normas más relevantes del Boletín Oficial</p>
-        <div class="cards-grid" id="ultimas-normas">
-            <p style="text-align: center; color: var(--texto-secundario); grid-column: 1 / -1;">Cargando normas...</p>
-        </div>
-        <div class="ver-todo">
-            <a href="historial.html" class="btn-primario">👉 Ver todo el historial</a>
-        </div>
-    </section>
+  <!-- STATS -->
+  <section class="stats">
+    <div class="stat"><b id="statNormas">—</b><span>Normas</span></div>
+    <div class="stat"><b>3</b><span>Jurisd.</span></div>
+    <div class="stat"><b>7:40</b><span>Diario</span></div>
+  </section>
 
-    <!-- ============ SUSCRIPCIÓN ============ -->
-    <section class="seccion-suscripcion" id="suscribirse">
-        <h2 class="seccion-titulo">📬 Suscribite al Boletín</h2>
-        <p class="seccion-subtitulo">Recibí el análisis diario en tu mail, de lunes a viernes a las 7:40 AM</p>
-        <form action="https://formspree.io/f/moejdvey" method="POST" class="form-suscripcion">
-            <input type="email" name="email" placeholder="Tu correo electrónico..." required>
-            <button type="submit">✓ Suscribirse</button>
-        </form>
-        <p class="aviso-confirmacion">Te va a llegar un mail de confirmación. Hacé click para activar tu suscripción.</p>
-    </section>
+  <!-- ÚLTIMAS NORMAS -->
+  <section>
+    <div class="seccion-titulo">
+      <h3>Últimas normas</h3>
+      <a href="historial.html">Ver todas →</a>
+    </div>
+    <div id="ultimasNormas">
+      <!-- Se llena con JS desde datos.js -->
+    </div>
+  </section>
 
-    <!-- ============ SOBRE IPD ============ -->
-    <section class="container-seccion">
-        <h2 class="seccion-titulo">🌐 Sobre IPD</h2>
-        <p class="seccion-subtitulo">Una herramienta de defensa del bolsillo popular</p>
-        <div class="sobre-grid">
-            <div class="sobre-card">
-                <div class="sobre-icono">🎯</div>
-                <h3 class="sobre-titulo">Misión</h3>
-                <p class="sobre-texto">Traducir el Boletín Oficial a un lenguaje claro para que el laburante sepa qué están haciendo con su trabajo, su bolsillo y su Patria.</p>
-            </div>
-            <div class="sobre-card">
-                <div class="sobre-icono">👥</div>
-                <h3 class="sobre-titulo">Quiénes somos</h3>
-                <p class="sobre-texto">Una junta de desarrolladores nacional justicialistas que pone la tecnología al servicio de la causa popular.</p>
-            </div>
-            <div class="sobre-card">
-                <div class="sobre-icono">⚙️</div>
-                <h3 class="sobre-titulo">Cómo funciona</h3>
-                <p class="sobre-texto">Todos los días leemos el Boletín Oficial de Nación, PBA y CABA, filtramos lo relevante y lo analizamos desde la doctrina nacional y popular.</p>
-            </div>
+  <!-- COMUNIDAD -->
+  <section class="comunidad">
+    <h3>Sumate a la comunidad</h3>
+    <div class="comunidad-botones">
+      <a href="https://t.me/+x1jpuKAZKMowNjYx" target="_blank" rel="noopener" class="btn btn-dorado">📲 Telegram</a>
+      <a href="https://whatsapp.com/channel/0029VbDIsLn2ZjCuyTNW5E1L" target="_blank" rel="noopener" class="btn btn-blanco">💬 WhatsApp</a>
+      <a href="https://x.com/ipdboletin" target="_blank" rel="noopener" class="btn btn-blanco">𝕏 Seguinos en X</a>
+    </div>
+  </section>
+
+  <!-- SUSCRIPCIÓN -->
+  <section class="cta-sus" id="suscribirme">
+    <h3>Recibí el análisis en tu mail</h3>
+    <p>Sin spam. Solo lo importante del Boletín, todos los días.</p>
+    <form action="https://formspree.io/f/TU_FORM_ID" method="POST">
+      <input type="email" name="email" placeholder="tu@mail.com" required>
+      <button type="submit" class="btn btn-dorado">Suscribirme</button>
+    </form>
+  </section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <img src="JDNJ.png" alt="" class="footer-jdnj" onerror="this.style.display='none'">
+  <p>JUNTA DE DESARROLLADORES<br>NACIONAL JUSTICIALISTAS</p>
+  <div class="footer-links">
+    <a href="index.html">Inicio</a>
+    <a href="historial.html">Historial</a>
+    <a href="blog.html">Blog</a>
+    <a href="sobre.html">Sobre IPD</a>
+  </div>
+</footer>
+
+<!-- ============ BOTTOM NAV (mobile) ============ -->
+<nav class="bottom-nav">
+  <a href="index.html" class="bottom-nav-item activo">
+    <span class="ic">🏠</span>Inicio
+  </a>
+  <a href="historial.html" class="bottom-nav-item">
+    <span class="ic">📜</span>Historial
+  </a>
+  <a href="blog.html" class="bottom-nav-item">
+    <span class="ic">📰</span>Blog
+  </a>
+  <a href="sobre.html" class="bottom-nav-item">
+    <span class="ic">ℹ️</span>Sobre
+  </a>
+</nav>
+
+<!-- ============ DATOS ============ -->
+<script src="datos.js"></script>
+
+<!-- ============ LÓGICA ============ -->
+<script>
+/* ---------- Tema claro/oscuro ---------- */
+(function(){
+  const html = document.documentElement;
+  const btn = document.getElementById('btnTema');
+  const guardado = localStorage.getItem('ipd-tema');
+  if (guardado === 'oscuro') {
+    html.setAttribute('data-tema', 'oscuro');
+    btn.textContent = '☀️';
+  }
+  btn.addEventListener('click', function(){
+    const esOscuro = html.getAttribute('data-tema') === 'oscuro';
+    if (esOscuro) {
+      html.removeAttribute('data-tema');
+      localStorage.setItem('ipd-tema', 'claro');
+      btn.textContent = '🌙';
+    } else {
+      html.setAttribute('data-tema', 'oscuro');
+      localStorage.setItem('ipd-tema', 'oscuro');
+      btn.textContent = '☀️';
+    }
+  });
+})();
+
+/* ---------- Render últimas 3 normas ---------- */
+(function(){
+  if (typeof baseDatosIPD === 'undefined') return;
+
+  const cont = document.getElementById('ultimasNormas');
+  const statNormas = document.getElementById('statNormas');
+
+  // Total de normas
+  statNormas.textContent = baseDatosIPD.length.toLocaleString('es-AR');
+
+  // Ordenar por fecha descendente y tomar las últimas 3
+  const ordenadas = [...baseDatosIPD].sort((a, b) => {
+    const fa = new Date(a.fecha || 0);
+    const fb = new Date(b.fecha || 0);
+    return fb - fa;
+  });
+  const ultimas = ordenadas.slice(0, 3);
+
+  if (ultimas.length === 0) {
+    cont.innerHTML = '<p class="texto-centro" style="color:var(--texto-suave)">Todavía no hay normas analizadas.</p>';
+    return;
+  }
+
+  // Detectar si es HOY
+  const hoy = new Date().toISOString().slice(0, 10);
+  const esHoy = (fecha) => (fecha || '').slice(0, 10) === hoy;
+
+  // Formatear fecha corta
+  const fmtFecha = (fecha) => {
+    if (!fecha) return '';
+    const d = new Date(fecha);
+    if (isNaN(d)) return fecha;
+    return d.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: '2-digit' });
+  };
+
+  // Render
+  cont.innerHTML = ultimas.map(n => {
+    const jur = (n.jurisdiccion || '').toLowerCase();
+    const chipClase = jur === 'nacion' ? 'chip-nacion' : jur === 'pba' ? 'chip-pba' : jur === 'caba' ? 'chip-caba' : '';
+    const chipTexto = jur === 'nacion' ? 'Nación' : jur === 'pba' ? 'PBA' : jur === 'caba' ? 'CABA' : jur;
+    const badge = esHoy(n.fecha) ? '<span class="badge-hoy">HOY</span>' : '';
+    return `
+      <article class="card">
+        <div class="card-top">
+          <span class="chip ${chipClase}">${chipTexto}</span>
+          ${badge}
+          <span class="card-fecha">${fmtFecha(n.fecha)}</span>
         </div>
-    </section>
-
-    <!-- ============ COMUNIDAD ============ -->
-    <section class="seccion-comunidad">
-        <h2 class="comunidad-titulo">📲 Sumate a la comunidad</h2>
-        <p class="comunidad-subtitulo">Recibí las alertas al instante en tu canal preferido</p>
-        <!-- Pirámide invertida: Telegram + WhatsApp arriba, X abajo centrado -->
-        <div class="comunidad-botones">
-            <div class="comunidad-fila-arriba">
-                <a href="https://t.me/+x1jpuKAZKMowNjYx" class="btn-comunidad" target="_blank">📲 Telegram</a>
-                <a href="https://whatsapp.com/channel/0029VbDIsLn2ZjCuyTNW5E1L" class="btn-comunidad" target="_blank">💬 WhatsApp</a>
-            </div>
-            <a href="https://x.com/ipdboletin" class="link-x" target="_blank" rel="noopener" aria-label="Seguinos en X" title="Seguinos en X">
-                <img src="equislogo.png" alt="X - Información para la Defensa">
-            </a>
+        <h4>${n.titulo || 'Sin título'}</h4>
+        <p>${n.criollo || ''}</p>
+        <div class="card-acciones">
+          <a href="historial.html" class="btn btn-primario">Leer análisis</a>
         </div>
-    </section>
-
-    <!-- ============ FOOTER ============ -->
-    <footer class="footer-ipd">
-        <div class="footer-contenido">
-            <img src="JDNJ.png" alt="Junta de Desarrolladores Nacional Justicialistas" class="footer-emblema-jdnj">
-            <p class="footer-firma-nombre">Junta de Desarrolladores Nacional Justicialistas</p>
-            <p class="footer-firma-desc">Información para la Defensa</p>
-            <p class="footer-copy">© 2026 IPD - Información para la Defensa · Todos los derechos reservados</p>
-        </div>
-    </footer>
-
-    <script src="datos.js"></script>
-    <script>
-        // ============ MODO OSCURO ============
-        const btnModo = document.getElementById('btn-modo');
-        const body = document.body;
-        
-        function aplicarModo(oscuro) {
-            if (oscuro) {
-                body.classList.add('modo-oscuro');
-                btnModo.textContent = '☀️';
-                btnModo.title = 'Cambiar a modo claro';
-            } else {
-                body.classList.remove('modo-oscuro');
-                btnModo.textContent = '🌙';
-                btnModo.title = 'Cambiar a modo oscuro';
-            }
-        }
-        
-        const modoGuardado = localStorage.getItem('modo-oscuro');
-        
-        if (modoGuardado === 'true') {
-            aplicarModo(true);
-        } else if (modoGuardado === 'false') {
-            aplicarModo(false);
-        } else {
-            aplicarModo(false);
-        }
-        
-        btnModo.addEventListener('click', () => {
-            const estaOscuro = body.classList.contains('modo-oscuro');
-            aplicarModo(!estaOscuro);
-            localStorage.setItem('modo-oscuro', (!estaOscuro).toString());
-        });
-        
-        // ============ STATS Y ÚLTIMAS NORMAS ============
-        function cargarStats() {
-            if (typeof baseDatosIPD === 'undefined') return;
-            
-            document.getElementById('stat-normas').textContent = baseDatosIPD.length;
-            
-            if (baseDatosIPD.length > 0) {
-                const ultimaFecha = baseDatosIPD[0].fecha;
-                const [anio, mes, dia] = ultimaFecha.split('-');
-                document.getElementById('stat-fecha').textContent = `${dia}/${mes}`;
-            }
-        }
-        
-        function cargarUltimasNormas() {
-            if (typeof baseDatosIPD === 'undefined') return;
-            
-            const contenedor = document.getElementById('ultimas-normas');
-            contenedor.innerHTML = '';
-            
-            const ultimas = baseDatosIPD.slice(0, 3);
-            
-            if (ultimas.length === 0) {
-                contenedor.innerHTML = '<p style="text-align: center; color: var(--texto-secundario); grid-column: 1 / -1;">No hay normas publicadas todavía.</p>';
-                return;
-            }
-            
-            ultimas.forEach(norma => {
-                const [anio, mes, dia] = norma.fecha.split('-');
-                const fechaFormateada = `${dia}/${mes}/${anio}`;
-                const jurisdiccion = norma.jurisdiccion.toUpperCase();
-                
-                const card = document.createElement('div');
-                card.className = 'card-norma';
-                card.innerHTML = `
-                    <span class="card-jurisdiccion">${jurisdiccion}</span>
-                    <h3 class="card-titulo">${norma.titulo}</h3>
-                    <p class="card-criollo">${norma.criollo}</p>
-                    <p class="card-fecha">📅 ${fechaFormateada}</p>
-                `;
-                contenedor.appendChild(card);
-            });
-        }
-        
-        cargarStats();
-        cargarUltimasNormas();
-    </script>
+      </article>
+    `;
+  }).join('');
+})();
+</script>
 
 </body>
 </html>
