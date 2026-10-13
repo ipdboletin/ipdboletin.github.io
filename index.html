@@ -118,6 +118,16 @@
   </a>
 </nav>
 
+<!-- ============ MODAL DETALLE ============ -->
+<div id="modalDetalle" class="modal-overlay" style="display:none;">
+  <div class="modal-caja">
+    <button class="modal-cerrar" id="modalCerrar" aria-label="Cerrar">✕</button>
+    <div id="modalContenido">
+      <!-- Se llena con JS -->
+    </div>
+  </div>
+</div>
+
 <!-- ============ DATOS ============ -->
 <script src="datos.js"></script>
 
@@ -146,17 +156,37 @@
   });
 })();
 
-/* ---------- Render últimas 3 normas ---------- */
+/* ---------- Render últimas 3 normas + modal ---------- */
 (function(){
   if (typeof baseDatosIPD === 'undefined') return;
 
   const cont = document.getElementById('ultimasNormas');
   const statNormas = document.getElementById('statNormas');
 
-  // Total de normas
+  // Modal
+  const modal = document.getElementById('modalDetalle');
+  const modalContenido = document.getElementById('modalContenido');
+  const modalCerrar = document.getElementById('modalCerrar');
+
+  // Helpers
+  const escapeHtml = (s) => (s || '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+
+  const hoy = new Date().toISOString().slice(0, 10);
+  const esHoy = (fecha) => (fecha || '').slice(0, 10) === hoy;
+
+  const fmtFecha = (fecha) => {
+    if (!fecha) return '';
+    const d = new Date(fecha);
+    if (isNaN(d)) return fecha;
+    return d.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: '2-digit' });
+  };
+
+  // Total
   statNormas.textContent = baseDatosIPD.length.toLocaleString('es-AR');
 
-  // Ordenar por fecha descendente y tomar las últimas 3
+  // Ordenar + tomar últimas 3
   const ordenadas = [...baseDatosIPD].sort((a, b) => {
     const fa = new Date(a.fecha || 0);
     const fb = new Date(b.fecha || 0);
@@ -169,20 +199,8 @@
     return;
   }
 
-  // Detectar si es HOY
-  const hoy = new Date().toISOString().slice(0, 10);
-  const esHoy = (fecha) => (fecha || '').slice(0, 10) === hoy;
-
-  // Formatear fecha corta
-  const fmtFecha = (fecha) => {
-    if (!fecha) return '';
-    const d = new Date(fecha);
-    if (isNaN(d)) return fecha;
-    return d.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: '2-digit' });
-  };
-
   // Render
-  cont.innerHTML = ultimas.map(n => {
+  cont.innerHTML = ultimas.map((n, i) => {
     const jur = (n.jurisdiccion || '').toLowerCase();
     const chipClase = jur === 'nacion' ? 'chip-nacion' : jur === 'pba' ? 'chip-pba' : jur === 'caba' ? 'chip-caba' : '';
     const chipTexto = jur === 'nacion' ? 'Nación' : jur === 'pba' ? 'PBA' : jur === 'caba' ? 'CABA' : jur;
@@ -194,14 +212,70 @@
           ${badge}
           <span class="card-fecha">${fmtFecha(n.fecha)}</span>
         </div>
-        <h4>${n.titulo || 'Sin título'}</h4>
-        <p>${n.criollo || ''}</p>
+        <h4>${escapeHtml(n.titulo || 'Sin título')}</h4>
+        <p>${escapeHtml(n.criollo || '')}</p>
         <div class="card-acciones">
-          <a href="historial.html" class="btn btn-primario">Leer análisis</a>
+          <button class="btn btn-primario" data-accion="leer" data-idx="${i}">Leer análisis</button>
         </div>
       </article>
     `;
   }).join('');
+
+  // Guardar las últimas normas para los handlers
+  cont.dataset.normas = JSON.stringify(ultimas.map(n => ({
+    titulo: n.titulo || '',
+    criollo: n.criollo || '',
+    letraChica: n.letraChica || '',
+    articulo: n.articulo || '',
+    jurisdiccion: n.jurisdiccion || '',
+    fecha: n.fecha || '',
+    url: n.url || ''
+  })));
+
+  // Abrir modal
+  function abrirModal(n){
+    const jur = (n.jurisdiccion || '').toLowerCase();
+    const chipClase = jur === 'nacion' ? 'chip-nacion' : jur === 'pba' ? 'chip-pba' : jur === 'caba' ? 'chip-caba' : '';
+    const chipTexto = jur === 'nacion' ? 'Nación' : jur === 'pba' ? 'PBA' : jur === 'caba' ? 'CABA' : jur;
+
+    modalContenido.innerHTML = `
+      <div class="modal-header">
+        <span class="chip ${chipClase}">${chipTexto}</span>
+        <span class="modal-fecha">${fmtFecha(n.fecha)}</span>
+      </div>
+      <h2 class="modal-titulo">${escapeHtml(n.titulo)}</h2>
+      ${n.criollo ? `<p class="modal-criollo">${escapeHtml(n.criollo)}</p>` : ''}
+      ${n.letraChica ? `<div class="modal-letra"><strong>La trampa:</strong> ${escapeHtml(n.letraChica)}</div>` : ''}
+      ${n.articulo ? `<div class="modal-articulo">${escapeHtml(n.articulo).replace(/\n/g, '<br>')}</div>` : ''}
+      ${n.url ? `<div style="margin-top:var(--sp-4);"><a href="${escapeHtml(n.url)}" target="_blank" rel="noopener" class="btn btn-ghost btn-chico">Ver norma original →</a></div>` : ''}
+    `;
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function cerrarModal(){
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  // Click en "Leer análisis"
+  cont.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-accion="leer"]');
+    if (!btn) return;
+    const idx = parseInt(btn.dataset.idx, 10);
+    const datos = JSON.parse(cont.dataset.normas || '[]');
+    const n = datos[idx];
+    if (n) abrirModal(n);
+  });
+
+  // Cerrar modal
+  modalCerrar.addEventListener('click', cerrarModal);
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) cerrarModal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.style.display === 'flex') cerrarModal();
+  });
 })();
 </script>
 
