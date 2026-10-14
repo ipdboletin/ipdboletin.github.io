@@ -372,49 +372,112 @@ def validar_dictamen(dictamen):
 
 
 # =======================================================================
-# 7. FUNCIONES PARA CABA
+# 7. FUNCIONES PARA CABA (con retry, timeout generoso y redirects)
 # =======================================================================
 
 def bajar_pdf_boletin_caba():
-    """Consulta la API de CABA y baja el PDF del boletín del día."""
+    """Consulta la API de CABA y baja el PDF del boletín del día.
+    Con retry, timeouts generosos, User-Agent de navegador
+    y seguimiento natural de redirects (la API redirige a otro host)."""
 
     fecha_hoy = ahora_ar().strftime("%d-%m-%Y")
     url = url_caba.format(fecha=fecha_hoy)
 
     print(f"📥 CABA: Consultando API para {fecha_hoy}...")
 
-    try:
-        res = requests.get(url, timeout=30)
-        print(f"📡 CABA: Código {res.status_code}")
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36",
+        "Accept": "application/json, */*",
+    }
 
-        if res.status_code != 200:
-            print("❌ CABA: La API rechazó la solicitud.")
+    # === CONSULTA A LA API (con retry) ===
+    data = None
+    for intento in range(1, 4):
+        try:
+            print(f"📡 CABA: Intento {intento}/3...")
+            res = requests.get(url, headers=headers, timeout=60, allow_redirects=True)
+            print(f"📡 CABA: Código {res.status_code} (intento {intento}/3)")
+
+            if res.status_code == 200:
+                data = res.json()
+                break
+            elif res.status_code == 404:
+                print("❌ CABA: No hay boletín para esa fecha.")
+                return None
+            else:
+                print(f"⚠️ CABA: Código inesperado ({res.status_code}).")
+                if intento < 3:
+                    time.sleep(10)
+                    continue
+                return None
+
+        except requests.exceptions.Timeout:
+            print(f"⏱️ CABA: Timeout en intento {intento}/3.")
+            if intento < 3:
+                time.sleep(10)
+                continue
+            print("💥 CABA: Se agotaron los intentos por timeout.")
             return None
 
-        data = res.json()
-        url_pdf = data.get("boletin", {}).get("url_boletin")
-
-        if not url_pdf:
-            print("❌ CABA: No se encontró 'url_boletin'.")
+        except Exception as e:
+            print(f"💥 CABA: Error en intento {intento}/3: {e}")
+            if intento < 3:
+                time.sleep(10)
+                continue
             return None
 
-        print(f"📄 CABA: Bajando PDF...")
-        res_pdf = requests.get(url_pdf, timeout=120)
-
-        if res_pdf.status_code != 200:
-            print(f"❌ CABA: Error al bajar PDF ({res_pdf.status_code})")
-            return None
-
-        with open(RUTA_PDF_CABA, "wb") as f:
-            f.write(res_pdf.content)
-
-        tamano_mb = len(res_pdf.content) / 1024 / 1024
-        print(f"✅ CABA: PDF bajado ({tamano_mb:.2f} MB)")
-        return RUTA_PDF_CABA
-
-    except Exception as e:
-        print(f"💥 CABA: Error bajando PDF: {e}")
+    if not data:
+        print("❌ CABA: No se pudo obtener la respuesta de la API.")
         return None
+
+    url_pdf = data.get("boletin", {}).get("url_boletin")
+
+    if not url_pdf:
+        print("❌ CABA: No se encontró 'url_boletin' en la respuesta.")
+        print(f"📄 Respuesta: {json.dumps(data, ensure_ascii=False)[:500]}")
+        return None
+
+    print(f"📄 CABA: Bajando PDF desde {url_pdf[:80]}...")
+
+    # === DESCARGA DEL PDF (con retry y allow_redirects) ===
+    for intento in range(1, 4):
+        try:
+            res_pdf = requests.get(
+                url_pdf,
+                headers=headers,
+                timeout=180,
+                allow_redirects=True
+            )
+
+            if res_pdf.status_code != 200:
+                print(f"❌ CABA: Error al bajar PDF ({res_pdf.status_code}) intento {intento}/3.")
+                if intento < 3:
+                    time.sleep(10)
+                    continue
+                return None
+
+            with open(RUTA_PDF_CABA, "wb") as f:
+                f.write(res_pdf.content)
+
+            tamano_mb = len(res_pdf.content) / 1024 / 1024
+            print(f"✅ CABA: PDF bajado ({tamano_mb:.2f} MB)")
+            return RUTA_PDF_CABA
+
+        except requests.exceptions.Timeout:
+            print(f"⏱️ CABA: Timeout bajando PDF en intento {intento}/3.")
+            if intento < 3:
+                time.sleep(10)
+                continue
+            return None
+
+        except Exception as e:
+            print(f"💥 CABA: Error bajando PDF en intento {intento}/3: {e}")
+            if intento < 3:
+                time.sleep(10)
+                continue
+            return None
+
+    return None
 
 
 def extraer_normas_caba(ruta_pdf):
