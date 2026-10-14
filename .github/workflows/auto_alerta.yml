@@ -13,9 +13,18 @@ jobs:
   procesar_boletin:
     runs-on: ubuntu-latest
     steps:
-      - name: Clonar espacio de trabajo limpio
+      - name: Clonar repo público (frontend + datos.js)
         uses: actions/checkout@v4
         with:
+          fetch-depth: 1
+          path: repo_publico
+
+      - name: Clonar repo privado (script)
+        uses: actions/checkout@v4
+        with:
+          repository: ipdboletin/ipd-script
+          token: ${{ secrets.PAT_SCRIPT }}
+          path: ipd-script
           fetch-depth: 1
 
       - name: Inicializar Entorno de Ejecución
@@ -24,18 +33,21 @@ jobs:
           python-version: '3.11'
 
       - name: Desplegar Dependencias de Red
-        run: pip install requests python-dotenv pdfplumber
+        run: pip install requests python-dotenv pdfplumber tzdata
 
-      - name: Ejecución del Despacho Autónomo desde la Raíz
+      - name: Ejecución del Despacho Autónomo
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           RESEND_AUDIENCE_ID: ${{ secrets.RESEND_AUDIENCE_ID }}
+          RUTA_DATOS_JS_ENV: ${{ github.workspace }}/repo_publico/datos.js
+        working-directory: ./ipd-script
         run: python script.py
 
       - name: Commitear cambios en datos.js
+        working-directory: ./repo_publico
         run: |
           git config --local user.name "IPD Bot"
           git config --local user.email "bot@ipd.local"
