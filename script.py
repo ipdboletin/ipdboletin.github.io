@@ -58,6 +58,18 @@ MAX_NORMAS_POR_JURISDICCION = 3
 PAUSA_ENTRE_ANALISIS = 60
 PAGINAS_INDICE_NACION = 10
 
+# Timeouts (centralizados para fácil ajuste)
+TIMEOUT_API_CABA = 60
+TIMEOUT_PDF_CABA = 90
+TIMEOUT_PBA_BUSQUEDA = 60
+TIMEOUT_PDF_PBA = 240
+TIMEOUT_PDF_NACION = 240
+TIMEOUT_GROQ = 120
+
+# Groq
+GROQ_MAX_TOKENS = 2500
+GROQ_MAX_REINTENTOS = 3
+
 RUTA_SCRIPT = Path(__file__).resolve().parent
 RUTA_DATOS_JS = RUTA_SCRIPT / "datos.js"
 RUTA_PROCESADAS = RUTA_SCRIPT / "procesadas.json"
@@ -65,6 +77,8 @@ RUTA_DESCARTADAS = RUTA_SCRIPT / "descartadas.json"
 RUTA_PDF_PBA = RUTA_SCRIPT / "boletin_pba_temp.pdf"
 RUTA_PDF_NACION = RUTA_SCRIPT / "boletin_nacion_temp.pdf"
 RUTA_PDF_NORMA_CABA = RUTA_SCRIPT / "norma_caba_temp.pdf"
+
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36"
 
 
 # =======================================================================
@@ -229,6 +243,7 @@ REGLAS DE CONTENIDO:
     * El cuerpo del artículo con la estructura "dice/pero/trampa".
     * Un cierre crítico atado al contenido, no una frase hecha.
   El tono es periodístico de investigación: irónico, punzante, con preguntas retóricas y frases explosivas. Nombralo todo: empresas, organismos, funcionarios si aparecen. Conectá con el impacto sobre el pueblo trabajador.
+  ⚠️ LÍMITE ESTRICTO: NUNCA superes los 1800 caracteres. Si te estás por pasar, cortá el cuerpo antes de llegar al cierre. Es preferible un artículo de 1500 caracteres bien cerrado que uno de 2000 que se corta a la mitad.
 - "publicar": true si la norma tiene impacto REAL y CONCRETO sobre el pueblo trabajador. false si es administrativa, protocolar, de designación o sin impacto real.
 - "jurisdiccion": SIEMPRE en minúscula: "nacion", "pba" o "caba".
 - "titulo": SOLO el tipo y número. Ejemplo: "Decreto 512/2026".
@@ -384,7 +399,7 @@ def obtener_normas_caba_json():
     print(f"📥 CABA: Consultando API para {fecha_hoy}...")
 
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36",
+        "User-Agent": USER_AGENT,
         "Accept": "application/json, */*",
     }
 
@@ -392,7 +407,7 @@ def obtener_normas_caba_json():
     for intento in range(1, 4):
         try:
             print(f"📡 CABA: Intento {intento}/3...")
-            res = requests.get(url, headers=headers, timeout=60, allow_redirects=True)
+            res = requests.get(url, headers=headers, timeout=TIMEOUT_API_CABA, allow_redirects=True)
             print(f"📡 CABA: Código {res.status_code} (intento {intento}/3)")
 
             if res.status_code == 200:
@@ -468,13 +483,14 @@ def aplanar_normas_caba(data):
 
 
 def bajar_pdf_norma_caba(url_norma):
-    """Baja el PDF individual de una norma de CABA (url_norma del JSON)."""
+    """Baja el PDF individual de una norma de CABA (url_norma del JSON).
+    Timeout generoso (90s) porque la API de CABA es lenta."""
 
     if not url_norma:
         return None
 
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36",
+        "User-Agent": USER_AGENT,
     }
 
     for intento in range(1, 4):
@@ -482,7 +498,7 @@ def bajar_pdf_norma_caba(url_norma):
             res = requests.get(
                 url_norma,
                 headers=headers,
-                timeout=60,
+                timeout=TIMEOUT_PDF_CABA,
                 allow_redirects=True
             )
 
@@ -572,44 +588,65 @@ def preparar_norma_caba(norma):
 
 def obtener_id_boletin_pba():
     """Scrappea la página de ediciones anteriores y devuelve el ID
-    de la sección OFICIAL del boletín de hoy."""
+    de la sección OFICIAL del boletín de hoy.
+    Con retry + headers de navegador."""
 
     fecha_hoy = ahora_ar().strftime("%d/%m/%Y")
     print(f"📥 PBA: Buscando boletín del {fecha_hoy}...")
 
-    try:
-        res = requests.get(url_pba_anteriores, timeout=60)
-        print(f"📡 PBA: Código {res.status_code}")
+    headers = {
+        "User-Agent": USER_AGENT,
+    }
 
-        if res.status_code != 200:
-            print("❌ PBA: La página rechazó la solicitud.")
+    for intento in range(1, 4):
+        try:
+            res = requests.get(url_pba_anteriores, headers=headers, timeout=TIMEOUT_PBA_BUSQUEDA)
+            print(f"📡 PBA: Código {res.status_code} (intento {intento}/3)")
+
+            if res.status_code != 200:
+                print("❌ PBA: La página rechazó la solicitud.")
+                if intento < 3:
+                    time.sleep(10)
+                    continue
+                return None
+
+            html = res.text
+            indice_fecha = html.find(f"- {fecha_hoy}")
+
+            if indice_fecha == -1:
+                print(f"❌ PBA: No se encontró el boletín del {fecha_hoy}.")
+                return None
+
+            bloque = html[indice_fecha:indice_fecha + 5000]
+            match = re.search(r'/secciones/(\d+)/ver', bloque)
+
+            if not match:
+                print("❌ PBA: No se encontró el ID de la sección OFICIAL.")
+                return None
+
+            id_boletin = match.group(1)
+            print(f"✅ PBA: ID del boletín OFICIAL = {id_boletin}")
+            return id_boletin
+
+        except requests.exceptions.Timeout:
+            print(f"⏱️ PBA: Timeout buscando ID (intento {intento}/3)")
+            if intento < 3:
+                time.sleep(10)
+                continue
             return None
 
-        html = res.text
-        indice_fecha = html.find(f"- {fecha_hoy}")
-
-        if indice_fecha == -1:
-            print(f"❌ PBA: No se encontró el boletín del {fecha_hoy}.")
+        except Exception as e:
+            print(f"💥 PBA: Error buscando ID (intento {intento}/3): {e}")
+            if intento < 3:
+                time.sleep(10)
+                continue
             return None
 
-        bloque = html[indice_fecha:indice_fecha + 5000]
-        match = re.search(r'/secciones/(\d+)/ver', bloque)
-
-        if not match:
-            print("❌ PBA: No se encontró el ID de la sección OFICIAL.")
-            return None
-
-        id_boletin = match.group(1)
-        print(f"✅ PBA: ID del boletín OFICIAL = {id_boletin}")
-        return id_boletin
-
-    except Exception as e:
-        print(f"💥 PBA: Error buscando ID: {e}")
-        return None
+    return None
 
 
 def bajar_pdf_boletin_pba(id_boletin):
-    """Baja el PDF del boletín de PBA."""
+    """Baja el PDF del boletín de PBA. Con retry y timeout generoso."""
 
     if not id_boletin:
         return None
@@ -617,23 +654,43 @@ def bajar_pdf_boletin_pba(id_boletin):
     url = url_pba_pdf.format(id=id_boletin)
     print(f"📄 PBA: Bajando PDF desde {url}...")
 
-    try:
-        res = requests.get(url, timeout=180)
+    headers = {
+        "User-Agent": USER_AGENT,
+    }
 
-        if res.status_code != 200:
-            print(f"❌ PBA: Error al bajar PDF ({res.status_code})")
+    for intento in range(1, 4):
+        try:
+            res = requests.get(url, headers=headers, timeout=TIMEOUT_PDF_PBA)
+
+            if res.status_code != 200:
+                print(f"❌ PBA: Error al bajar PDF ({res.status_code}) intento {intento}/3")
+                if intento < 3:
+                    time.sleep(10)
+                    continue
+                return None
+
+            with open(RUTA_PDF_PBA, "wb") as f:
+                f.write(res.content)
+
+            tamano_mb = len(res.content) / 1024 / 1024
+            print(f"✅ PBA: PDF bajado ({tamano_mb:.2f} MB)")
+            return RUTA_PDF_PBA
+
+        except requests.exceptions.Timeout:
+            print(f"⏱️ PBA: Timeout bajando PDF (intento {intento}/3)")
+            if intento < 3:
+                time.sleep(10)
+                continue
             return None
 
-        with open(RUTA_PDF_PBA, "wb") as f:
-            f.write(res.content)
+        except Exception as e:
+            print(f"💥 PBA: Error bajando PDF (intento {intento}/3): {e}")
+            if intento < 3:
+                time.sleep(10)
+                continue
+            return None
 
-        tamano_mb = len(res.content) / 1024 / 1024
-        print(f"✅ PBA: PDF bajado ({tamano_mb:.2f} MB)")
-        return RUTA_PDF_PBA
-
-    except Exception as e:
-        print(f"💥 PBA: Error bajando PDF: {e}")
-        return None
+    return None
 
 
 def extraer_normas_pba(ruta_pdf):
@@ -689,30 +746,48 @@ def extraer_normas_pba(ruta_pdf):
 # =======================================================================
 
 def bajar_pdf_boletin_nacion():
-    """Baja el PDF de la primera sección del Boletín Oficial de Nación."""
+    """Baja el PDF de la primera sección del Boletín Oficial de Nación.
+    Con retry y headers de navegador."""
 
     print(f"📄 NACIÓN: Bajando PDF desde {url_nacion_pdf}...")
 
-    try:
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-        }
-        res = requests.get(url_nacion_pdf, headers=headers, timeout=180)
+    headers = {
+        "User-Agent": USER_AGENT,
+    }
 
-        if res.status_code != 200:
-            print(f"❌ NACIÓN: Error al bajar PDF ({res.status_code})")
+    for intento in range(1, 4):
+        try:
+            res = requests.get(url_nacion_pdf, headers=headers, timeout=TIMEOUT_PDF_NACION)
+
+            if res.status_code != 200:
+                print(f"❌ NACIÓN: Error al bajar PDF ({res.status_code}) intento {intento}/3")
+                if intento < 3:
+                    time.sleep(10)
+                    continue
+                return None
+
+            with open(RUTA_PDF_NACION, "wb") as f:
+                f.write(res.content)
+
+            tamano_mb = len(res.content) / 1024 / 1024
+            print(f"✅ NACIÓN: PDF bajado ({tamano_mb:.2f} MB)")
+            return RUTA_PDF_NACION
+
+        except requests.exceptions.Timeout:
+            print(f"⏱️ NACIÓN: Timeout bajando PDF (intento {intento}/3)")
+            if intento < 3:
+                time.sleep(10)
+                continue
             return None
 
-        with open(RUTA_PDF_NACION, "wb") as f:
-            f.write(res.content)
+        except Exception as e:
+            print(f"💥 NACIÓN: Error bajando PDF (intento {intento}/3): {e}")
+            if intento < 3:
+                time.sleep(10)
+                continue
+            return None
 
-        tamano_mb = len(res.content) / 1024 / 1024
-        print(f"✅ NACIÓN: PDF bajado ({tamano_mb:.2f} MB)")
-        return RUTA_PDF_NACION
-
-    except Exception as e:
-        print(f"💥 NACIÓN: Error bajando PDF: {e}")
-        return None
+    return None
 
 
 def extraer_normas_nacion(ruta_pdf):
@@ -798,7 +873,7 @@ def filtrar_normas_relevantes(normas):
 # 11. CONSULTAR GROQ (con retry inteligente)
 # =======================================================================
 
-def consultar_groq(norma, jurisdiccion, max_reintentos=3):
+def consultar_groq(norma, jurisdiccion, max_reintentos=GROQ_MAX_REINTENTOS):
     """Analiza una norma con Groq. Maneja rate limit (429) y JSON inválido
     con reintentos automáticos."""
 
@@ -829,7 +904,7 @@ def consultar_groq(norma, jurisdiccion, max_reintentos=3):
             {"role": "user", "content": norma_texto}
         ],
         "temperature": 0.4,
-        "max_tokens": 2000,
+        "max_tokens": GROQ_MAX_TOKENS,
         "frequency_penalty": 0.3,
         "response_format": {"type": "json_object"}
     }
@@ -837,7 +912,7 @@ def consultar_groq(norma, jurisdiccion, max_reintentos=3):
     for intento in range(1, max_reintentos + 1):
         try:
             res_groq = requests.post(
-                url_groq, headers=headers, json=payload_groq, timeout=120
+                url_groq, headers=headers, json=payload_groq, timeout=TIMEOUT_GROQ
             )
             print(f"📡 Groq: Código {res_groq.status_code} (intento {intento}/{max_reintentos})")
 
@@ -1173,7 +1248,27 @@ def procesar_jurisdiccion(jurisdiccion, procesadas, descartadas):
 
 
 # =======================================================================
-# 17. PROCESO PRINCIPAL
+# 17. LIMPIAR PDFs TEMPORALES
+# =======================================================================
+
+def limpiar_temporales():
+    """Borra los PDFs temporales al final del patrullaje."""
+    temporales = [
+        RUTA_PDF_PBA,
+        RUTA_PDF_NACION,
+        RUTA_PDF_NORMA_CABA,
+    ]
+    for ruta in temporales:
+        try:
+            if ruta.exists():
+                ruta.unlink()
+                print(f"🧹 Borrado: {ruta.name}")
+        except Exception as e:
+            print(f"⚠️ No se pudo borrar {ruta.name}: {e}")
+
+
+# =======================================================================
+# 18. PROCESO PRINCIPAL
 # =======================================================================
 
 def ejecutar_patrullaje():
@@ -1221,9 +1316,14 @@ def ejecutar_patrullaje():
     print("\n" + "=" * 70)
     print("")
 
+    # Limpiar PDFs temporales
+    print("🧹 Limpiando archivos temporales...")
+    limpiar_temporales()
+    print("")
+
 
 # =======================================================================
-# 18. EJECUTAR
+# 19. EJECUTAR
 # =======================================================================
 
 if __name__ == "__main__":
