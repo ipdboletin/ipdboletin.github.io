@@ -56,16 +56,15 @@ CAMPOS_REQUERIDOS = ["jurisdiccion", "titulo", "criollo", "letraChica", "articul
 
 MAX_NORMAS_POR_JURISDICCION = 3
 PAUSA_ENTRE_ANALISIS = 60
-PAGINAS_INDICE_CABA = 30
 PAGINAS_INDICE_NACION = 10
 
 RUTA_SCRIPT = Path(__file__).resolve().parent
 RUTA_DATOS_JS = RUTA_SCRIPT / "datos.js"
 RUTA_PROCESADAS = RUTA_SCRIPT / "procesadas.json"
 RUTA_DESCARTADAS = RUTA_SCRIPT / "descartadas.json"
-RUTA_PDF_CABA = RUTA_SCRIPT / "boletin_caba_temp.pdf"
 RUTA_PDF_PBA = RUTA_SCRIPT / "boletin_pba_temp.pdf"
 RUTA_PDF_NACION = RUTA_SCRIPT / "boletin_nacion_temp.pdf"
+RUTA_PDF_NORMA_CABA = RUTA_SCRIPT / "norma_caba_temp.pdf"
 
 
 # =======================================================================
@@ -372,13 +371,12 @@ def validar_dictamen(dictamen):
 
 
 # =======================================================================
-# 7. FUNCIONES PARA CABA (con retry, timeout generoso y redirects)
+# 7. FUNCIONES PARA CABA (JSON + PDF individual con fallback)
 # =======================================================================
 
-def bajar_pdf_boletin_caba():
-    """Consulta la API de CABA y baja el PDF del boletín del día.
-    Con retry, timeouts generosos, User-Agent de navegador
-    y seguimiento natural de redirects (la API redirige a otro host)."""
+def obtener_normas_caba_json():
+    """Consulta la API de CABA y devuelve la lista plana de normas del día.
+    Maneja retry, timeout generoso y headers de navegador."""
 
     fecha_hoy = ahora_ar().strftime("%d-%m-%Y")
     url = url_caba.format(fecha=fecha_hoy)
@@ -390,7 +388,6 @@ def bajar_pdf_boletin_caba():
         "Accept": "application/json, */*",
     }
 
-    # === CONSULTA A LA API (con retry) ===
     data = None
     for intento in range(1, 4):
         try:
@@ -403,123 +400,170 @@ def bajar_pdf_boletin_caba():
                 break
             elif res.status_code == 404:
                 print("❌ CABA: No hay boletín para esa fecha.")
-                return None
+                return []
             else:
                 print(f"⚠️ CABA: Código inesperado ({res.status_code}).")
                 if intento < 3:
                     time.sleep(10)
                     continue
-                return None
+                return []
 
         except requests.exceptions.Timeout:
             print(f"⏱️ CABA: Timeout en intento {intento}/3.")
             if intento < 3:
                 time.sleep(10)
                 continue
-            print("💥 CABA: Se agotaron los intentos por timeout.")
-            return None
+            return []
 
         except Exception as e:
             print(f"💥 CABA: Error en intento {intento}/3: {e}")
             if intento < 3:
                 time.sleep(10)
                 continue
-            return None
+            return []
 
     if not data:
         print("❌ CABA: No se pudo obtener la respuesta de la API.")
+        return []
+
+    normas = aplanar_normas_caba(data)
+    print(f"✅ CABA: {len(normas)} normas obtenidas del JSON.")
+    return normas
+
+
+def aplanar_normas_caba(data):
+    """Convierte el JSON anidado de CABA en lista plana de normas.
+    Estructura: normas.normas.{poder}.{tipo}.{organismo}[]"""
+
+    normas = []
+    normas_root = data.get("normas", {}).get("normas", {})
+
+    for poder, tipos in normas_root.items():
+        if not isinstance(tipos, dict):
+            continue
+        for tipo, organismos in tipos.items():
+            if not isinstance(organismos, dict):
+                continue
+            for organismo, lista in organismos.items():
+                if not isinstance(lista, list):
+                    continue
+                for n in lista:
+                    if not isinstance(n, dict):
+                        continue
+                    nombre = n.get("nombre", "").strip()
+                    sumario = n.get("sumario", "").strip()
+                    if not nombre:
+                        continue
+
+                    normas.append({
+                        "norma": nombre,
+                        "sumario": sumario,
+                        "url_norma": n.get("url_norma", ""),
+                        "anexos": n.get("anexos", []),
+                        "organismo": organismo,
+                        "pagina": "",
+                    })
+
+    return normas
+
+
+def bajar_pdf_norma_caba(url_norma):
+    """Baja el PDF individual de una norma de CABA (url_norma del JSON)."""
+
+    if not url_norma:
         return None
 
-    url_pdf = data.get("boletin", {}).get("url_boletin")
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36",
+    }
 
-    if not url_pdf:
-        print("❌ CABA: No se encontró 'url_boletin' en la respuesta.")
-        print(f"📄 Respuesta: {json.dumps(data, ensure_ascii=False)[:500]}")
-        return None
-
-    print(f"📄 CABA: Bajando PDF desde {url_pdf[:80]}...")
-
-    # === DESCARGA DEL PDF (con retry y allow_redirects) ===
     for intento in range(1, 4):
         try:
-            res_pdf = requests.get(
-                url_pdf,
+            res = requests.get(
+                url_norma,
                 headers=headers,
-                timeout=180,
+                timeout=60,
                 allow_redirects=True
             )
 
-            if res_pdf.status_code != 200:
-                print(f"❌ CABA: Error al bajar PDF ({res_pdf.status_code}) intento {intento}/3.")
+            if res.status_code != 200:
+                print(f"⚠️ CABA: PDF individual código {res.status_code} (intento {intento}/3)")
                 if intento < 3:
-                    time.sleep(10)
+                    time.sleep(5)
                     continue
                 return None
 
-            with open(RUTA_PDF_CABA, "wb") as f:
-                f.write(res_pdf.content)
+            with open(RUTA_PDF_NORMA_CABA, "wb") as f:
+                f.write(res.content)
 
-            tamano_mb = len(res_pdf.content) / 1024 / 1024
-            print(f"✅ CABA: PDF bajado ({tamano_mb:.2f} MB)")
-            return RUTA_PDF_CABA
+            tamano_kb = len(res.content) / 1024
+            print(f"✅ CABA: PDF individual bajado ({tamano_kb:.1f} KB)")
+            return RUTA_PDF_NORMA_CABA
 
         except requests.exceptions.Timeout:
-            print(f"⏱️ CABA: Timeout bajando PDF en intento {intento}/3.")
+            print(f"⏱️ CABA: Timeout bajando PDF individual (intento {intento}/3)")
             if intento < 3:
-                time.sleep(10)
+                time.sleep(5)
                 continue
             return None
 
         except Exception as e:
-            print(f"💥 CABA: Error bajando PDF en intento {intento}/3: {e}")
+            print(f"💥 CABA: Error bajando PDF individual (intento {intento}/3): {e}")
             if intento < 3:
-                time.sleep(10)
+                time.sleep(5)
                 continue
             return None
 
     return None
 
 
-def extraer_normas_caba(ruta_pdf):
-    """Extrae normas del índice del PDF de CABA."""
-
-    print(f"📖 CABA: Extrayendo índice (primeras {PAGINAS_INDICE_CABA} páginas)...")
+def extraer_texto_pdf_caba(ruta_pdf):
+    """Extrae el texto completo de un PDF individual de CABA."""
 
     try:
         texto = []
         with pdfplumber.open(ruta_pdf) as pdf:
-            limite = min(PAGINAS_INDICE_CABA, len(pdf.pages))
-            for i in range(limite):
-                pagina = pdf.pages[i].extract_text()
-                if pagina:
-                    texto.append(pagina)
+            for pagina in pdf.pages:
+                contenido = pagina.extract_text()
+                if contenido:
+                    texto.append(contenido)
 
         texto_completo = "\n".join(texto)
-        print(f"✅ CABA: Texto extraído ({len(texto_completo)} caracteres).")
-
-        patron = r'((?:Resolución|Decreto|Ley|Disposición)\s+N°\s+[\w\-/]+)\s*\n(.*?)\.{3,}\s*Pág\.\s*(\d+)'
-
-        normas = []
-        for match in re.finditer(patron, texto_completo, re.DOTALL):
-            norma = match.group(1).strip()
-            sumario = " ".join(match.group(2).strip().split())
-            pagina = match.group(3).strip()
-
-            if "de Directorio" in norma:
-                continue
-
-            normas.append({
-                "norma": norma,
-                "sumario": sumario,
-                "pagina": pagina
-            })
-
-        print(f"✅ CABA: {len(normas)} normas encontradas.")
-        return normas
+        return texto_completo
 
     except Exception as e:
-        print(f"💥 CABA: Error extrayendo normas: {e}")
-        return []
+        print(f"💥 CABA: Error extrayendo texto del PDF: {e}")
+        return ""
+
+
+def preparar_norma_caba(norma):
+    """Dada una norma de CABA (con url_norma), intenta bajar el PDF individual
+    y extraer el texto completo. Si falla, deja el sumario como texto.
+    Modifica norma['sumario'] in-place con el texto más completo disponible."""
+
+    titulo = norma.get("norma", "")
+    url_norma = norma.get("url_norma", "")
+
+    if not url_norma:
+        print(f"⚠️ CABA: Sin URL de PDF, usando sumario. ({titulo})")
+        return
+
+    print(f"📄 CABA: Bajando PDF individual de '{titulo}'...")
+    ruta_pdf = bajar_pdf_norma_caba(url_norma)
+
+    if not ruta_pdf:
+        print(f"⚠️ CABA: No se pudo bajar PDF, usando sumario como fallback.")
+        return
+
+    texto_completo = extraer_texto_pdf_caba(ruta_pdf)
+
+    if texto_completo and len(texto_completo.strip()) > 200:
+        # Reemplazar sumario por texto completo (limitado a 3000 chars)
+        texto_limpio = " ".join(texto_completo.split())[:3000]
+        norma["sumario"] = texto_limpio
+        print(f"✅ CABA: Texto completo extraído ({len(texto_limpio)} chars).")
+    else:
+        print(f"⚠️ CABA: PDF sin texto útil, usando sumario como fallback.")
 
 
 # =======================================================================
@@ -534,7 +578,7 @@ def obtener_id_boletin_pba():
     print(f"📥 PBA: Buscando boletín del {fecha_hoy}...")
 
     try:
-        res = requests.get(url_pba_anteriores, timeout=30)
+        res = requests.get(url_pba_anteriores, timeout=60)
         print(f"📡 PBA: Código {res.status_code}")
 
         if res.status_code != 200:
@@ -1046,8 +1090,7 @@ def procesar_jurisdiccion(jurisdiccion, procesadas, descartadas):
     print(f"{'═' * 70}\n")
 
     if jurisdiccion == "caba":
-        ruta_pdf = bajar_pdf_boletin_caba()
-        normas = extraer_normas_caba(ruta_pdf) if ruta_pdf else []
+        normas = obtener_normas_caba_json()
     elif jurisdiccion == "pba":
         id_boletin = obtener_id_boletin_pba()
         ruta_pdf = bajar_pdf_boletin_pba(id_boletin) if id_boletin else None
@@ -1084,6 +1127,10 @@ def procesar_jurisdiccion(jurisdiccion, procesadas, descartadas):
         if h in procesadas:
             print(f"⏭️ Salteando (ya procesada en corrida anterior): {titulo}")
             continue
+
+        # === CABA: intentar enriquecer con el PDF individual ===
+        if jurisdiccion == "caba":
+            preparar_norma_caba(norma)
 
         dictamen = consultar_groq(norma, jurisdiccion)
 
