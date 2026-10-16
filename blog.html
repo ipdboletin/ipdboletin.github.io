@@ -192,6 +192,7 @@
       // 4. Parsear cada nota
       const datos = notas.map((n, i) => {
         const fm = parseFrontmatter(contenidos[i]);
+        console.log('nota:', n.name, 'date:', fm.date);
         const slug = n.name.replace(/\.md$/, '');
         return {
           slug: slug,
