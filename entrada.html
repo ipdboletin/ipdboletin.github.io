@@ -151,7 +151,6 @@
   // FIX: parsear fecha sin pasar por Date() para evitar bug de zona horaria
   const fmtFecha = (f) => {
     if (!f) return '';
-    // Puede venir como "2026-10-13" o "2026-10-13T00:00:00.000Z"
     const soloFecha = String(f).split('T')[0];
     const [yyyy, mm, dd] = soloFecha.split('-');
     if (!yyyy || !mm || !dd) return f;
@@ -190,7 +189,8 @@
   // Cargar el .md
   async function cargarEntrada(){
     try {
-      const urlRaw = `https://raw.githubusercontent.com/${REPO}/${RAMA}/${CARPETA}/${slug}.md?t=${Date.now()}`;
+      // FIX: agregamos encodeURIComponent por si el slug tiene tildes o caracteres raros
+      const urlRaw = `https://raw.githubusercontent.com/${REPO}/${RAMA}/${CARPETA}/${encodeURIComponent(slug)}.md?t=${Date.now()}`;
       const res = await fetch(urlRaw);
       if (!res.ok) throw new Error('No se encontró');
       const texto = await res.text();
@@ -211,6 +211,10 @@
         img.src = fm.image;
         img.alt = fm.title || '';
         img.style.display = 'block';
+        // FIX: si la imagen no carga, la ocultamos para no dejar un ícono roto
+        img.onerror = function(){
+          this.style.display = 'none';
+        };
       }
 
       // Renderizar Markdown
