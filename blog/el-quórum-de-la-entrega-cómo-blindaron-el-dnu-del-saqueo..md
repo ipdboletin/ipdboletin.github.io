@@ -1,5 +1,5 @@
 ---
-title: 'El quórum de la entrega: cómo blindaron el DNU del saqueo'
+title: 'El quórum de la entrega: cómo blindaron el DNU del saqueo.'
 date: 2026-10-15
 excerpt: La oposición fracasó en Diputados y dejó firme el decreto de desregulación general. En la calle, el pueblo organizado pagó la cuenta con palos y gases...
 image: /blog/img/image_6cf7ba67.jpeg
