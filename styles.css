@@ -386,10 +386,15 @@ body{padding-bottom:calc(var(--alto-bottom-nav) + env(safe-area-inset-bottom))}
 .card-fecha{
   font-size:10.5px;
   color:var(--texto-suave);
+  display:block;
+  margin-top:var(--sp-1);
+}
+.card .card-top .card-fecha{
   position:absolute;
   right:0;
   top:50%;
   transform:translateY(-50%);
+  margin-top:0;
 }
 .card h3,
 .card h4{
