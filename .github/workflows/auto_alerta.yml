@@ -46,16 +46,42 @@ jobs:
         working-directory: ./ipd-script
         run: python script.py
 
-      - name: Commitear cambios en datos.js
+      - name: Limpiar archivos temporales
+        working-directory: ./repo_publico
+        run: |
+          rm -f *.temp.pdf *.temp.html
+          rm -f nacion_indice_temp.html nacion_aviso_temp.html
+          rm -f boletin_pba_temp.pdf norma_caba_temp.pdf
+
+      - name: Commitear cambios en repo público
         working-directory: ./repo_publico
         run: |
           git config --local user.name "IPD Bot"
           git config --local user.email "bot@ipd.local"
+
           git add datos.js
+          git add index.html historial.html entrada.html blog.html 2>/dev/null || true
+
           if git diff --cached --quiet; then
-            echo "ℹ️ No hay cambios en datos.js. No se commitea."
+            echo "ℹ️ No hay cambios en repo público."
           else
-            git commit -m "🤖 Nuevo artículo IPD - $(date +'%Y-%m-%d')"
+            git commit -m "🤖 Update IPD - $(date +'%Y-%m-%d %H:%M')"
             git push
-            echo "✅ datos.js actualizado y pusheado."
+            echo "✅ Repo público actualizado."
+          fi
+
+      - name: Commitear caché en repo privado
+        working-directory: ./ipd-script
+        run: |
+          git config --local user.name "IPD Bot"
+          git config --local user.email "bot@ipd.local"
+
+          git add procesadas.json descartadas.json 2>/dev/null || true
+
+          if git diff --cached --quiet; then
+            echo "ℹ️ Sin cambios en caché."
+          else
+            git commit -m "🤖 Cache IPD - $(date +'%Y-%m-%d')"
+            git push
+            echo "✅ Caché actualizada."
           fi
