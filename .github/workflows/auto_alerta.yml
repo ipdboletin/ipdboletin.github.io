@@ -18,6 +18,7 @@ jobs:
         with:
           fetch-depth: 1
           path: repo_publico
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Clonar repo privado (script)
         uses: actions/checkout@v4
@@ -26,6 +27,7 @@ jobs:
           token: ${{ secrets.PAT_SCRIPT }}
           path: ipd-script
           fetch-depth: 1
+          persist-credentials: true # Permiso para hacer push en el privado (por las dudas)
 
       - name: Inicializar Entorno de Ejecución
         uses: actions/setup-python@v5
@@ -53,35 +55,20 @@ jobs:
           rm -f nacion_indice_temp.html nacion_aviso_temp.html
           rm -f boletin_pba_temp.pdf norma_caba_temp.pdf
 
-      - name: Commitear cambios en repo público
+      - name: Commitear datos y caché en repo público
         working-directory: ./repo_publico
         run: |
           git config --local user.name "IPD Bot"
           git config --local user.email "bot@ipd.local"
-
-          git add datos.js
+          
+          # Agregamos el datos.js y los JSON de caché (que ahora se guardan acá)
+          git add datos.js procesadas.json descartadas.json
           git add index.html historial.html entrada.html blog.html 2>/dev/null || true
-
+          
           if git diff --cached --quiet; then
-            echo "ℹ️ No hay cambios en repo público."
+            echo "ℹ️ No hay cambios para commitear."
           else
             git commit -m "🤖 Update IPD - $(date +'%Y-%m-%d %H:%M')"
             git push
-            echo "✅ Repo público actualizado."
-          fi
-
-      - name: Commitear caché en repo privado
-        working-directory: ./ipd-script
-        run: |
-          git config --local user.name "IPD Bot"
-          git config --local user.email "bot@ipd.local"
-
-          git add procesadas.json descartadas.json 2>/dev/null || true
-
-          if git diff --cached --quiet; then
-            echo "ℹ️ Sin cambios en caché."
-          else
-            git commit -m "🤖 Cache IPD - $(date +'%Y-%m-%d')"
-            git push
-            echo "✅ Caché actualizada."
+            echo "✅ Repo público actualizado con datos y caché."
           fi
