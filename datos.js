@@ -1,10 +1,7 @@
-const baseDatosIPD = [
-  {
-    fecha: "2026-10-20",
-    jurisdiccion: "nacion",
-    titulo: "Decreto 1228/2026",
-    criollo: "El decreto 1228/2026 dice que los Fondos de Asistencia Laboral se van a mover a fondos comunes de inversión y fideicomisos bajo la CNV. Pero la carga recae sobre los trabajadores, que tendrán que financiar esos instrumentos del mercado de capitales y asumir la volatilidad. Lo que no dicen es que el esquema favorece a las entidades financieras que administran los fondos.",
-    letraChica: "La parte más crítica está en la Resolución del MINISTERIO DE ECONOMÍA N° 1276/26, que fija los activos elegibles y los lineamientos de inversión, dejando la plata de los despidos a merced del mercado.",
-    articulo: "El Gobierno Nacional metió la mano en el bolsillo de los trabajadores y la puso en la mesa de la bolsa. Mediante el Decreto 1228/2026, el Ejecutivo reglamentó el funcionamiento de los Fondos de Asistencia Laboral y decidió que esa plata no quede quieta, sino que se invierta en el mercado de capitales.\n\nA través de la Resolución 1276/26 del Ministerio de Economía, y con la venia de la Comisión Nacional de Valores (CNV), los fondos que las empresas aportan para cubrir futuras indemnizaciones ahora serán administrados por Fondos Comunes de Inversión y Fideicomisos Financieros.\n\nEn criollo: la plata que debería estar resguardada para que un laburante cobre su indemnización el día que lo rajen, va a terminar financiando la bicicleta financiera de los bancos.\n\nEl decreto argumenta que se hace para canalizar los recursos. Lo que no dice la letra chica es que la volatilidad del mercado no es un riesgo que vayan a asumir los bancos. Ese riesgo lo asume el trabajador.\n\nSi al mercado le va bien, las entidades financieras cobrarán sus comisiones. Si al mercado le va mal, la plata de los despidos se licúa y el que pierde es el que puso el lomo.\n\n¿A quién le sirve esta jugada? A los grandes administradores de fondos y a las consultoras que manejan los fideicomisos. Los que quedan atados a la volatilidad de la bolsa son los mismos de siempre: los laburantes."
-  }
-];
+{
+  "publicar": true,
+  "jurisdiccion": "nacion",
+  "titulo": "Decreto 1228/2026",
+  "criollo": "El Gobierno reglamentó los Fondos de Asistencia Laboral para que las indemnizaciones se inviertan en la bolsa. La resolución que regula las inversiones es ultra conservadora (solo plazos fijos y bonos AAA). Pero la peor trampa es la letra chica: si te despiden en el primer año, el fondo no te paga nada.",
+  "letraChica": "El decreto estira la carencia a 12 meses (si te rajan en el primer año, no cobrás) y posterga la entrada en vigencia hasta diciembre para que las cámaras de bancos (CAFCI, CADAB) se preparen."
+}
