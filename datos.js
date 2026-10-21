@@ -1,6 +1,6 @@
 const baseDatosIPD = [
   {
-    fecha: "2026-10-20",
+    fecha: "2026-10-21",
     jurisdiccion: "nacion",
     titulo: "Decreto 1228/2026",
     criollo: "El Gobierno reglamentó los Fondos de Asistencia Laboral para que las indemnizaciones se inviertan en la bolsa. La resolución que regula las inversiones es ultra conservadora (solo plazos fijos y bonos AAA). Pero la peor trampa es la letra chica: si te despiden en el primer año, el fondo no te paga nada.",
