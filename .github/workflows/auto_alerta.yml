@@ -19,7 +19,7 @@ jobs:
           oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
           tags: tag:ci
-          args: --exit-node=desktop-mullemj --exit-node-allow-lan-access --accept-dns=true
+          args: --exit-node=100.95.27.46 --exit-node-allow-lan-access --accept-dns=true
 
       - name: Clonar repo público (frontend + datos.js)
         uses: actions/checkout@v4
