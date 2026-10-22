@@ -12,7 +12,6 @@ permissions:
 jobs:
   procesar_boletin:
     runs-on: ubuntu-latest
-
     steps:
       - name: Clonar repo público (frontend + datos.js)
         uses: actions/checkout@v4
@@ -36,48 +35,7 @@ jobs:
           python-version: '3.11'
 
       - name: Desplegar Dependencias de Red
-        run: pip install requests "requests[socks]" python-dotenv pdfplumber tzdata
-
-      # Diagnóstico: comprobar DNS y conectividad con Nación.
-      # Este paso no modifica archivos ni cambia el comportamiento del robot.
-      - name: Diagnosticar conexión con Boletín Nacional
-        run: |
-          python - <<'PY'
-          import requests
-          import socket
-
-          urls = [
-              "https://www.boletinoficial.gob.ar/",
-              "https://www.boletinoficial.gob.ar/seccion/primera/20261022",
-              "https://www.boletinoficial.gov.ar/",
-              "https://www.boletinoficial.gov.ar/seccion/primera/20261022",
-          ]
-
-          for url in urls:
-              print(f"\n--- Probando {url} ---")
-
-              try:
-                  host = url.split("/")[2]
-                  addresses = socket.getaddrinfo(
-                      host, 443, type=socket.SOCK_STREAM
-                  )
-                  ips = sorted({item[4][0] for item in addresses})
-                  print("DNS OK:", ", ".join(ips))
-
-                  response = requests.get(
-                      url,
-                      timeout=(15, 20),
-                      headers={"User-Agent": "Mozilla/5.0"}
-                  )
-
-                  print("Estado HTTP:", response.status_code)
-                  print("URL final:", response.url)
-                  print("Bytes recibidos:", len(response.content))
-
-              except Exception as e:
-                  print("ERROR:", type(e).__name__, str(e))
-
-          PY
+        run: pip install requests requests[socks] python-dotenv pdfplumber tzdata
 
       - name: Ejecución del Despacho Autónomo
         env:
@@ -102,10 +60,10 @@ jobs:
         run: |
           git config --local user.name "IPD Bot"
           git config --local user.email "bot@ipd.local"
-
+          
           git add datos.js procesadas.json descartadas.json
           git add index.html historial.html entrada.html blog.html 2>/dev/null || true
-
+          
           if git diff --cached --quiet; then
             echo "ℹ️ No hay cambios para commitear."
           else
@@ -113,4 +71,3 @@ jobs:
             git push
             echo "✅ Repo público actualizado con datos y caché."
           fi
-```
