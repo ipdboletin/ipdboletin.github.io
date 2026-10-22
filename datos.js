@@ -1,5 +1,13 @@
 const baseDatosIPD = [
   {
+    fecha: "2026-10-22",
+    jurisdiccion: "caba",
+    titulo: "Resolución N° 6913/MCGC/26",
+    criollo: "Dice que el Estado va a repartir subsidios a cualquier persona o entidad de la ciudad que quiera montar un proyecto cultural, pero la letra chica obliga a rendir cuentas de cada peso gastado y solo cubre ciertas líneas como creación o mantenimiento de espacios. Lo que no dicen es que el control de la cuenta recae totalmente en el beneficiario, que ahora tiene que asumir el riesgo de que el dinero sea revisado y pueda ser devuelto.",
+    letraChica: "El artículo 32 del Reglamento General del Programa obliga a presentar la rendición de cuentas documentada de los gastos del subsidio.",
+    articulo: "Subsidios culturales con cuenta clara: ¿quién paga la factura?\n\nLa Resolución 6913/MCGC/26 reabre la puerta a los subsidios del Programa de Fomento Metropolitano de la Cultura, las Artes y las Ciencias. Según el texto, cualquier persona física o jurídica con domicilio real o legal en la Ciudad Autónoma de Buenos Aires puede postularse para recibir fondos destinados a proyectos de creación, funcionamiento de espacios culturales, obra y mantenimiento, o adquisición y reparación de mobiliario e insumos. La medida se apoya en el Decreto 1020/04 y en las resoluciones previas que estructuraron las líneas de subsidio.\n\nSin embargo, el detalle que no se anuncia en los titulares está en el artículo 32 del Reglamento General del Programa. Ese artículo fija la obligatoriedad de presentar una rendición de cuentas documentada de los gastos realizados con el subsidio. En la práctica, el beneficiario pasa a ser el responsable de justificar cada gasto y de responder ante la autoridad si la documentación no cumple con los requisitos. La carga de ese control recae sobre el propio solicitante, que asume el riesgo de que el dinero sea devuelto o se le impongan sanciones.\n\nPara los gestores culturales, la condición implica una doble exigencia: primero conseguir el financiamiento y después armar una contabilidad que satisfaga los lineamientos del programa. El Estado, por su parte, mantiene la puerta abierta a la cultura, pero sin renunciar al control financiero. En resumen, la norma abre la posibilidad de recibir fondos, pero la cuenta clara que exige el artículo 32 convierte al beneficiario en el guardián de la propia inversión, trasladando el riesgo de la gestión del dinero del Estado al sector cultural."
+  },
+  {
     fecha: "2026-10-21",
     jurisdiccion: "nacion",
     titulo: "Decreto 1228/2026",
