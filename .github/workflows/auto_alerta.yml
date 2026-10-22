@@ -35,7 +35,8 @@ jobs:
           python-version: '3.11'
 
       - name: Desplegar Dependencias de Red
-        run: pip install requests python-dotenv pdfplumber tzdata
+        # === v18-beta: Agregamos curl_cffi para saltar el bloqueo del Boletín ===
+        run: pip install requests python-dotenv pdfplumber tzdata curl_cffi
 
       - name: Ejecución del Despacho Autónomo
         env:
