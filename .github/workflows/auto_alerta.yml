@@ -18,7 +18,13 @@ jobs:
           curl -fsSL https://tailscale.com/install.sh | sh
           sudo tailscaled > /dev/null 2>&1 &
           sleep 5
-          sudo tailscale up --authkey=${{ secrets.TS_AUTH_KEY }} --exit-node=100.95.27.46 --exit-node-allow-lan-access --accept-dns=true --accept-routes --netfilter-mode=off --timeout=30s
+          
+          echo "Lanzando Tailscale en segundo plano..."
+          sudo tailscale up --authkey=${{ secrets.TS_AUTH_KEY }} --exit-node=100.95.27.46 --exit-node-allow-lan-access --accept-dns=true --accept-routes --netfilter-mode=off &
+          
+          echo "Esperando 15 segundos para que establezca la conexión..."
+          sleep 15
+          echo "✅ Siguiendo con el patrullaje. (Si Tailscale falló, Nación va a dar timeout, pero CABA y PBA van a funcionar)."
 
       - name: Clonar repo público (frontend + datos.js)
         uses: actions/checkout@v4
