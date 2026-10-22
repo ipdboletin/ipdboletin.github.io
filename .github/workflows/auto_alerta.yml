@@ -13,13 +13,12 @@ jobs:
   procesar_boletin:
     runs-on: ubuntu-latest
     steps:
-      - name: Conectar a Tailscale (para esquivar el bloqueo del Boletín)
-        uses: tailscale/github-action@v3
-        with:
-          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
-          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
-          tags: tag:ci
-          args: --exit-node=100.95.27.46 --exit-node-allow-lan-access --accept-dns=true
+      - name: Instalar y Conectar Tailscale (Manual)
+        run: |
+          curl -fsSL https://tailscale.com/install.sh | sh
+          sudo tailscaled > /dev/null 2>&1 &
+          sleep 5
+          sudo tailscale up --authkey=${{ secrets.TS_AUTH_KEY }} --exit-node=100.95.27.46 --exit-node-allow-lan-access --accept-dns=true
 
       - name: Clonar repo público (frontend + datos.js)
         uses: actions/checkout@v4
