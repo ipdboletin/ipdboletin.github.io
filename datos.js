@@ -1,13 +1,5 @@
 const baseDatosIPD = [
   {
-    fecha: "2026-10-26",
-    jurisdiccion: "pba",
-    titulo: "Decreto N° 208/24",
-    criollo: "El decreto dice que la provincia otorga un subsidio de $49.492.585,66 a la cooperativa Villa Montoro Mejor, pero ese dinero sale del erario público y no hay claridad sobre cómo se eligió la entidad, lo que puede ser una trampa para los contribuyentes.",
-    letraChica: "Artículo 1° otorga el subsidio sin detallar criterios de selección, lo que permite asignar recursos públicos sin transparencia.",
-    articulo: "Decreto N° 208/24: subsidio de casi cincuenta millones a cooperativa de La Plata\n\nEl presidente del Instituto Provincial de Asociativismo y Cooperativismo aprobó la entrega de $49.492.585,66 a la Cooperativa de Trabajo por una Villa Montoro Mejor Ltda. El dinero está destinado a la compra de materia prima, bienes de capital y capacitaciones dentro del programa Cooperativas en Marcha y el subprograma Impulso Cooperativo.\n\n¿Qué dice el decreto?\n\nEl artículo 1° establece que la provincia otorga el subsidio en virtud del convenio firmado entre las partes. No se especifican los requisitos de elegibilidad ni los criterios de evaluación de la propuesta, ni se menciona si hubo competencia pública.\n\nImpacto en los trabajadores\n\nPara los empleados de la cooperativa el recurso puede significar nuevas contrataciones, mejora de equipos y capacitación, lo que potencialmente genera puestos de trabajo y eleva la productividad. Sin embargo, el beneficio no llega directamente a los trabajadores del sector privado ni a los que no forman parte de la entidad beneficiada.\n\n¿Dónde está la clave?\n\nEl gasto proviene del erario provincial, por lo que los contribuyentes asumen el costo. La ausencia de transparencia en la selección de la cooperativa abre la posibilidad de que el subsidio se haya otorgado sin una justificación objetiva, lo que constituye una trampa para la ciudadanía.\n\nConclusión doctrinaria\n\nDesde la perspectiva del modelo argentino, la política de subsidios debe acompañarse de mecanismos de control y rendición de cuentas. Sin ellos, la medida corre el riesgo de convertirse en un recurso discrecional que favorece a un grupo puntual en detrimento del conjunto de la sociedad trabajadora."
-  },
-  {
     fecha: "2026-10-20",
     jurisdiccion: "nacion",
     titulo: "Decreto 1228/2026",
